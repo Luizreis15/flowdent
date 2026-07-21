@@ -32,10 +32,28 @@ const AdminAuth = () => {
 
   useEffect(() => {
     checkExistingSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Camada extra: se o Supabase processar um token de recovery da URL a qualquer
+  // momento (mesmo sem ?reset=true), força o formulário de nova senha.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsResetPassword(true);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const checkExistingSession = async () => {
     try {
+      // Não pular direto pro dashboard em fluxo de reset de senha: uma sessão de
+      // recovery (criada automaticamente pelo Supabase ao processar o token da URL)
+      // é uma sessão válida, mas o usuário ainda precisa definir a nova senha antes
+      // de ganhar acesso — senão o link de recuperação vira um login mágico.
+      if (searchParams.get('reset') === 'true') return;
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const isSuperAdmin = await verifySuperAdmin(session.user.id);
