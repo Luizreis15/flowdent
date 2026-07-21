@@ -107,7 +107,7 @@ function AppRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route path="/" element={<Navigate to={`/auth${window.location.hash}`} replace />} />
         
         <Route path="/old-dashboard" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
