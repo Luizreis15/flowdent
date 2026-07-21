@@ -41,23 +41,21 @@ serve(async (req) => {
     
     let event: Stripe.Event;
 
-    // Verify webhook signature if secret is configured
-    if (webhookSecret) {
-      const signature = req.headers.get("stripe-signature");
-      if (!signature) {
-        logStep("ERROR: No stripe-signature header");
-        return new Response(JSON.stringify({ error: "No signature" }), { status: 400 });
-      }
-      try {
-        event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
-      } catch (err) {
-        logStep("ERROR: Signature verification failed", { error: err.message });
-        return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 400 });
-      }
-    } else {
-      // Fallback: parse without verification (dev mode)
-      event = JSON.parse(body);
-      logStep("WARNING: No STRIPE_WEBHOOK_SECRET set, skipping signature verification");
+    // Signature verification is mandatory — never trust an unsigned payload
+    if (!webhookSecret) {
+      logStep("ERROR: STRIPE_WEBHOOK_SECRET not set, rejecting (fail closed)");
+      return new Response(JSON.stringify({ error: "Server configuration error" }), { status: 500 });
+    }
+    const signature = req.headers.get("stripe-signature");
+    if (!signature) {
+      logStep("ERROR: No stripe-signature header");
+      return new Response(JSON.stringify({ error: "No signature" }), { status: 400 });
+    }
+    try {
+      event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    } catch (err) {
+      logStep("ERROR: Signature verification failed", { error: err.message });
+      return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 400 });
     }
 
     logStep("Event received", { type: event.type, id: event.id });

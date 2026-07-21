@@ -45,14 +45,23 @@ serve(async (req) => {
     if (claimsError || !claimsData?.claims?.sub) {
       return jsonError("Unauthorized", 401);
     }
+    const callerId: string = claimsData.claims.sub;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const body: ApproveRequest = await req.json();
-    const { budget_id, approved_by, financial_responsible_id, allocations } = body;
+    // Resolve caller's own clinic; never trust a clinic/ownership claim from the request body
+    const { data: callerClinic } = await supabase
+      .rpc("get_user_clinic_id", { _user_id: callerId });
+    if (!callerClinic) {
+      return jsonError("Usuário sem clínica associada", 403);
+    }
 
-    if (!budget_id || !approved_by) {
-      return jsonError("budget_id and approved_by are required", 400);
+    const body: ApproveRequest = await req.json();
+    const { budget_id, financial_responsible_id, allocations } = body;
+    const approved_by = callerId; // ignora valor enviado pelo cliente
+
+    if (!budget_id) {
+      return jsonError("budget_id is required", 400);
     }
 
     // 1. Fetch budget with items
@@ -64,6 +73,10 @@ serve(async (req) => {
 
     if (budgetError || !budget) {
       return jsonError("Budget not found", 404);
+    }
+
+    if (budget.clinic_id !== callerClinic) {
+      return jsonError("Forbidden", 403);
     }
 
     if (budget.status === "approved" || budget.status === "converted") {

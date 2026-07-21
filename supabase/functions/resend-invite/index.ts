@@ -167,8 +167,21 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const authClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userError } = await authClient.auth.getUser();
+    if (userError || !userData?.user) {
+      return new Response(
+        JSON.stringify({ error: "Não autorizado" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const callerId = userData.user.id;
+
     const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
+      supabaseUrl,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
@@ -178,6 +191,20 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ error: "clinicaId é obrigatório" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Só admin da própria clínica pode reenviar convites dessa clínica
+    const { data: callerUsuario } = await supabaseAdmin
+      .from("usuarios")
+      .select("clinica_id, perfil")
+      .eq("id", callerId)
+      .maybeSingle();
+
+    if (!callerUsuario || callerUsuario.perfil !== "admin" || callerUsuario.clinica_id !== clinicaId) {
+      return new Response(
+        JSON.stringify({ error: "Sem permissão para reenviar convites desta clínica" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

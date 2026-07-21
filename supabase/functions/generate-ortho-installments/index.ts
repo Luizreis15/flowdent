@@ -27,6 +27,7 @@ Deno.serve(async (req) => {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const callerId: string = claimsData.claims.sub;
 
     const { ortho_case_id } = await req.json();
     if (!ortho_case_id) {
@@ -41,6 +42,13 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const { data: callerClinic } = await supabase.rpc("get_user_clinic_id", { _user_id: callerId });
+    if (!callerClinic) {
+      return new Response(JSON.stringify({ error: "Usuário sem clínica associada" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Fetch ortho case
     const { data: caso, error: casoError } = await supabase
       .from("ortho_cases")
@@ -52,6 +60,12 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Caso não encontrado" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (caso.clinic_id !== callerClinic) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 

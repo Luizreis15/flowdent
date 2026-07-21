@@ -27,9 +27,10 @@ Deno.serve(async (req) => {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const callerId: string = claimsData.claims.sub;
 
     const body = await req.json();
-    const { mode, ortho_case_id, clinic_id, percentual_reajuste, valor_fixo_novo } = body;
+    const { mode, ortho_case_id, percentual_reajuste, valor_fixo_novo } = body;
 
     if (!mode || (mode !== "individual" && mode !== "bulk")) {
       return new Response(JSON.stringify({ error: "mode must be 'individual' or 'bulk'" }), {
@@ -42,6 +43,14 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    const { data: callerClinic } = await supabase.rpc("get_user_clinic_id", { _user_id: callerId });
+    if (!callerClinic) {
+      return new Response(JSON.stringify({ error: "Usuário sem clínica associada" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const clinic_id = callerClinic; // ignora valor enviado pelo cliente (usado no modo bulk)
 
     const today = new Date().toISOString().split("T")[0];
     let casesUpdated = 0;
@@ -65,6 +74,12 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "Caso não encontrado" }), {
           status: 404,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (caso.clinic_id !== callerClinic) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -104,7 +119,7 @@ Deno.serve(async (req) => {
 
       // Audit log
       await supabase.from("audit_logs").insert({
-        user_id: "00000000-0000-0000-0000-000000000000",
+        user_id: callerId,
         acao: "ortho_reajuste_individual",
         modulo: "ortodontia",
         detalhes: {
@@ -117,13 +132,7 @@ Deno.serve(async (req) => {
       });
 
     } else {
-      // Bulk mode
-      if (!clinic_id) {
-        return new Response(JSON.stringify({ error: "clinic_id required for bulk mode" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      // Bulk mode (sempre restrito à clínica do usuário autenticado)
       if (!percentual_reajuste) {
         return new Response(JSON.stringify({ error: "percentual_reajuste required for bulk mode" }), {
           status: 400,
@@ -167,7 +176,7 @@ Deno.serve(async (req) => {
 
       // Audit log
       await supabase.from("audit_logs").insert({
-        user_id: "00000000-0000-0000-0000-000000000000",
+        user_id: callerId,
         acao: "ortho_reajuste_massa",
         modulo: "ortodontia",
         detalhes: {

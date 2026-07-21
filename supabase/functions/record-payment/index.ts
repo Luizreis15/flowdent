@@ -61,8 +61,14 @@ serve(async (req) => {
     if (claimsError || !claimsData?.claims?.sub) {
       return jsonResp({ error: "Unauthorized" }, 401);
     }
+    const callerId: string = claimsData.claims.sub;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const { data: callerClinic } = await supabase.rpc("get_user_clinic_id", { _user_id: callerId });
+    if (!callerClinic) {
+      return jsonResp({ error: "Usuário sem clínica associada" }, 403);
+    }
 
     const body: PaymentRequest = await req.json();
     const {
@@ -71,7 +77,6 @@ serve(async (req) => {
       method,
       cash_account_id,
       notes,
-      created_by,
       taxa_adquirente,
       valor_liquido,
       data_repasse,
@@ -80,9 +85,10 @@ serve(async (req) => {
       proof_file_url,
       transaction_reference,
     } = body;
+    const created_by = callerId; // ignora valor enviado pelo cliente
 
-    if (!amount || !method || !created_by) {
-      return jsonResp({ error: "amount, method, and created_by are required" }, 400);
+    if (!amount || !method) {
+      return jsonResp({ error: "amount and method are required" }, 400);
     }
 
     // Build list of titles to pay
@@ -111,6 +117,11 @@ serve(async (req) => {
 
       if (titleError || !title) {
         results.push({ title_id: tp.title_id, error: "Title not found" });
+        continue;
+      }
+
+      if (title.clinic_id !== callerClinic) {
+        results.push({ title_id: tp.title_id, error: "Forbidden" });
         continue;
       }
 

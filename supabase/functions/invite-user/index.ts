@@ -18,6 +18,8 @@ interface InviteUserRequest {
   clinicName: string;
 }
 
+const ALLOWED_ROLES = ["admin", "dentista", "recepcao", "assistente"];
+
 // Template HTML premium para convite
 const generateInviteEmailHtml = (
   name: string,
@@ -156,9 +158,31 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     console.log("=== Invite User Function Started ===");
-    
+
+    // Autenticar o chamador: exige um JWT real de usuário logado, não apenas a anon key
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Não autenticado" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const authClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userError } = await authClient.auth.getUser();
+    if (userError || !userData?.user) {
+      return new Response(
+        JSON.stringify({ error: "Não autenticado" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    const callerId = userData.user.id;
+
     const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
+      supabaseUrl,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       {
         auth: {
@@ -168,8 +192,30 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { name, email, role, clinicaId, clinicName }: InviteUserRequest = await req.json();
-    console.log("Request data:", { name, email, role, clinicaId, clinicName });
+    // Só admins podem convidar, e só para a própria clínica — nunca confiar no clinicaId do body
+    const { data: callerUsuario, error: callerError } = await supabaseAdmin
+      .from("usuarios")
+      .select("clinica_id, perfil")
+      .eq("id", callerId)
+      .maybeSingle();
+
+    if (callerError || !callerUsuario || callerUsuario.perfil !== "admin") {
+      return new Response(
+        JSON.stringify({ error: "Apenas administradores da clínica podem convidar usuários" }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const { name, email, role, clinicName }: InviteUserRequest = await req.json();
+    const clinicaId = callerUsuario.clinica_id; // ignora o valor enviado pelo cliente
+    console.log("Request data:", { name, email, role, clinicaId, clinicName, callerId });
+
+    if (!ALLOWED_ROLES.includes(role)) {
+      return new Response(
+        JSON.stringify({ error: "Perfil inválido" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     // Verificar se o email já existe no auth E na tabela usuarios
     console.log("Checking if email exists in auth...");

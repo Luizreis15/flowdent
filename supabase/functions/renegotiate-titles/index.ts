@@ -46,19 +46,27 @@ serve(async (req) => {
     if (claimsError || !claimsData?.claims?.sub) {
       return jsonResp({ error: "Unauthorized" }, 401);
     }
+    const callerId: string = claimsData.claims.sub;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    const { data: callerClinic } = await supabase.rpc("get_user_clinic_id", { _user_id: callerId });
+    if (!callerClinic) {
+      return jsonResp({ error: "Usuário sem clínica associada" }, 403);
+    }
+
     const body: RenegotiateRequest = await req.json();
     const {
-      clinic_id, patient_id, created_by, title_ids, reason,
+      patient_id, title_ids, reason,
       discount_amount, entry_amount, entry_method, entry_due_date,
       installments, installment_method, first_due_date,
     } = body;
+    const clinic_id = callerClinic; // ignora valor enviado pelo cliente
+    const created_by = callerId; // ignora valor enviado pelo cliente
 
-    if (!clinic_id || !patient_id || !created_by || !title_ids?.length || !first_due_date) {
+    if (!patient_id || !title_ids?.length || !first_due_date) {
       return jsonResp({ error: "Missing required fields" }, 400);
     }
 

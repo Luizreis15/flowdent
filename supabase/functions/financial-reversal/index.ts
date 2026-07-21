@@ -44,14 +44,21 @@ serve(async (req) => {
     if (claimsError || !claimsData?.claims?.sub) {
       return jsonResp({ error: "Unauthorized" }, 401);
     }
+    const callerId: string = claimsData.claims.sub;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const body: ReversalRequest = await req.json();
-    const { action, reason, performed_by } = body;
+    const { data: callerClinic } = await supabase.rpc("get_user_clinic_id", { _user_id: callerId });
+    if (!callerClinic) {
+      return jsonResp({ error: "Usuário sem clínica associada" }, 403);
+    }
 
-    if (!action || !reason || !performed_by) {
-      return jsonResp({ error: "action, reason, and performed_by are required" }, 400);
+    const body: ReversalRequest = await req.json();
+    const { action, reason } = body;
+    const performed_by = callerId; // ignora valor enviado pelo cliente
+
+    if (!action || !reason) {
+      return jsonResp({ error: "action and reason are required" }, 400);
     }
 
     // ====== REVERSE PAYMENT ======
@@ -77,6 +84,7 @@ serve(async (req) => {
         .single();
 
       if (tErr || !title) return jsonResp({ error: "Associated title not found" }, 404);
+      if (title.clinic_id !== callerClinic) return jsonResp({ error: "Forbidden" }, 403);
 
       const beforeTitle = {
         balance: title.balance,
@@ -201,6 +209,7 @@ serve(async (req) => {
         .single();
 
       if (tErr || !title) return jsonResp({ error: "Title not found" }, 404);
+      if (title.clinic_id !== callerClinic) return jsonResp({ error: "Forbidden" }, 403);
       if (title.status === "cancelled") return jsonResp({ error: "Title already cancelled" }, 400);
       if (title.status === "paid") return jsonResp({ error: "Cannot cancel a fully paid title. Reverse payments first." }, 400);
 

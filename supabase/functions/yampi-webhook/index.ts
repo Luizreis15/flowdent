@@ -36,6 +36,25 @@ serve(async (req) => {
   try {
     logStep("Webhook received");
 
+    // Shared-secret check: configure the same value as YAMPI_WEBHOOK_SECRET here
+    // and as a custom header ("x-webhook-secret") on the webhook URL in the Yampi dashboard.
+    const expectedSecret = Deno.env.get("YAMPI_WEBHOOK_SECRET");
+    if (!expectedSecret) {
+      logStep("YAMPI_WEBHOOK_SECRET not configured, rejecting (fail closed)");
+      return new Response(JSON.stringify({ error: "Webhook not configured" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+    const receivedSecret = req.headers.get("x-webhook-secret");
+    if (receivedSecret !== expectedSecret) {
+      logStep("Invalid or missing webhook secret");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
+
     const body = await req.json();
     logStep("Payload", body);
 
