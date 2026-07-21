@@ -250,6 +250,7 @@ export const HistoricoDocumentosModal = ({
 
       const isAtestado = doc.title.toLowerCase().includes("atestado");
       const isContrato = documentType === "contrato" || doc.title.toLowerCase().includes("contrato");
+      const isSolicitacaoExame = documentType === "solicitacao_exame" || doc.title.toLowerCase().includes("solicitação de exame");
       const address = clinic?.address as any;
       const addressStr = address?.rua
         ? `${address.rua}, ${address.numero || "S/N"} - ${address.cidade || ""} / ${address.estado || ""}`
@@ -257,7 +258,7 @@ export const HistoricoDocumentosModal = ({
       const clinicCity = address?.cidade || "";
 
       const pdfData: DocumentoPDFData = {
-        tipo: isContrato ? "contrato" : isAtestado ? "atestado" : "receituario",
+        tipo: isContrato ? "contrato" : isAtestado ? "atestado" : isSolicitacaoExame ? "solicitacao_exame" : "receituario",
         title: doc.title,
         content: doc.content,
         clinicName: clinic?.nome || "Clínica",

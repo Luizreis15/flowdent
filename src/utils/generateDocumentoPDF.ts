@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 
 export interface DocumentoPDFData {
-  tipo: "atestado" | "receituario" | "contrato";
+  tipo: "atestado" | "receituario" | "contrato" | "solicitacao_exame";
   title: string;
   content: string;
   // Clinic
@@ -557,7 +557,7 @@ function drawFooter(doc: jsPDF, data: DocumentoPDFData) {
 
   // Document ID
   if (data.documentId) {
-    const prefix = data.tipo === "atestado" ? "AT" : data.tipo === "contrato" ? "CT" : "RC";
+    const prefix = data.tipo === "atestado" ? "AT" : data.tipo === "contrato" ? "CT" : data.tipo === "solicitacao_exame" ? "SE" : "RC";
     const docIdStr = `ID: FLD-${prefix}-${new Date().getFullYear()}-${data.documentId.substring(0, 8).toUpperCase()}`;
     doc.setFontSize(6.5);
     doc.text(docIdStr, MARGIN_X, y);
@@ -582,10 +582,12 @@ export async function generateDocumentoPDF(data: DocumentoPDFData): Promise<void
   let y = drawHeader(doc, data, logoBase64, primaryColor);
 
   // For contracts, use a clean fixed title to avoid encoding issues
-  const titleText = data.tipo === "atestado" 
-    ? "ATESTADO ODONTOLOGICO" 
-    : data.tipo === "contrato" 
+  const titleText = data.tipo === "atestado"
+    ? "ATESTADO ODONTOLOGICO"
+    : data.tipo === "contrato"
     ? "CONTRATO DE PRESTACAO DE SERVICOS"
+    : data.tipo === "solicitacao_exame"
+    ? "SOLICITACAO DE EXAME RADIOGRAFICO"
     : "RECEITUARIO";
   y = drawDocumentTitle(doc, titleText, y, primaryColor);
 

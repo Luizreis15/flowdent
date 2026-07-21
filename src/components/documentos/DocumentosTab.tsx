@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Plus, ScanLine } from "lucide-react";
 import { NovoDocumentoModal } from "./NovoDocumentoModal";
 import { NovoContratoModal } from "./NovoContratoModal";
 import { HistoricoDocumentosModal } from "./HistoricoDocumentosModal";
@@ -9,6 +9,7 @@ import { TipoReceituarioModal } from "./TipoReceituarioModal";
 import { NovoReceituarioModal } from "./NovoReceituarioModal";
 import { TipoAtestadoModal } from "./TipoAtestadoModal";
 import { NovoAtestadoModal } from "./NovoAtestadoModal";
+import { NovoSolicitacaoExameModal } from "./NovoSolicitacaoExameModal";
 
 interface DocumentosTabProps {
   patientId: string;
@@ -39,6 +40,12 @@ const documentTypes = [
     color: "bg-green-500",
     icon: FileText,
   },
+  {
+    type: "solicitacao_exame",
+    title: "Solicitação de Exame",
+    color: "bg-cyan-600",
+    icon: ScanLine,
+  },
 ];
 
 export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
@@ -49,6 +56,7 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
   const [novoReceituarioOpen, setNovoReceituarioOpen] = useState(false);
   const [tipoAtestadoOpen, setTipoAtestadoOpen] = useState(false);
   const [novoAtestadoOpen, setNovoAtestadoOpen] = useState(false);
+  const [novoSolicitacaoExameOpen, setNovoSolicitacaoExameOpen] = useState(false);
   const [selectedDocType, setSelectedDocType] = useState<string | null>(null);
   const [tipoReceituario, setTipoReceituario] = useState<"impresso" | "digital" | null>(null);
   const [tipoAtestado, setTipoAtestado] = useState<"impresso" | "digital" | null>(null);
@@ -61,6 +69,8 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
       setTipoReceituarioOpen(true);
     } else if (type === "atestado") {
       setTipoAtestadoOpen(true);
+    } else if (type === "solicitacao_exame") {
+      setNovoSolicitacaoExameOpen(true);
     } else {
       setNovoDocumentoOpen(true);
     }
@@ -192,6 +202,12 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
         }}
         patientId={patientId}
         tipo={tipoAtestado}
+      />
+
+      <NovoSolicitacaoExameModal
+        open={novoSolicitacaoExameOpen}
+        onOpenChange={setNovoSolicitacaoExameOpen}
+        patientId={patientId}
       />
 
       <HistoricoDocumentosModal
