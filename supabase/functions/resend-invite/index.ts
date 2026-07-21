@@ -365,7 +365,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Gerar link de recuperação de senha
-    const origin = Deno.env.get("APP_URL") || "https://flowdent.com.br";
+    const origin = Deno.env.get("APP_URL") || "https://app.flowdent.com.br";
     
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: "recovery",

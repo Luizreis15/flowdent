@@ -302,7 +302,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Gerar link de redefinição de senha
     console.log("Generating password reset link...");
     
-    const redirectUrl = Deno.env.get("APP_URL") || "https://flowdent.com.br";
+    const redirectUrl = Deno.env.get("APP_URL") || "https://app.flowdent.com.br";
     
     const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',

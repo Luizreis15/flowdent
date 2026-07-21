@@ -213,9 +213,13 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Determinar URL de redirect baseado no tipo de usuário
-    const redirectUrl = Deno.env.get("APP_URL") || "https://flowdent.com.br";
-    const redirectPath = (isAdmin || isSuperAdmin) ? "/admin?reset=true" : "/auth?reset=true";
-    
+    // /admin vive no domínio do site institucional; /auth vive no domínio do app
+    const isAdminFlow = isAdmin || isSuperAdmin;
+    const redirectUrl = isAdminFlow
+      ? (Deno.env.get("SITE_URL") || "https://flowdent.com.br")
+      : (Deno.env.get("APP_URL") || "https://app.flowdent.com.br");
+    const redirectPath = isAdminFlow ? "/admin?reset=true" : "/auth?reset=true";
+
     console.log("Generating password reset link with redirect:", `${redirectUrl}${redirectPath}`);
 
     const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
