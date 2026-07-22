@@ -12,6 +12,8 @@ import { Plus, ImageIcon, Trash2, ZoomIn, X } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import { getSignedFileUrl, removePatientFiles, uploadPatientFile } from "@/lib/storage";
+import { SignedFileImage } from "@/components/storage/SignedFileImage";
 
 interface OrthoImagesTabProps {
   casoId: string;
@@ -66,11 +68,6 @@ export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
     },
   });
 
-  const getPublicUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("patient-files").getPublicUrl(filePath);
-    return data.publicUrl;
-  };
-
   const handleUpload = async () => {
     if (!file) {
       toast.error("Selecione um arquivo");
@@ -83,11 +80,7 @@ export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
       const fileName = `${Date.now()}_${tipoImagem}.${ext}`;
       const storagePath = `${patientId}/ortodontia/${casoId}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("patient-files")
-        .upload(storagePath, file);
-
-      if (uploadError) throw uploadError;
+      await uploadPatientFile(storagePath, file);
 
       const { data: userData } = await supabase.auth.getUser();
 
@@ -115,9 +108,19 @@ export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
     }
   };
 
+  const openLightbox = async (filePath: string) => {
+    try {
+      const url = await getSignedFileUrl(filePath);
+      setViewImage(url);
+    } catch {
+      toast.error("Erro ao abrir imagem");
+    }
+  };
+
   const handleDelete = async (imageId: string, filePath: string) => {
-    const { error: storageError } = await supabase.storage.from("patient-files").remove([filePath]);
-    if (storageError) {
+    try {
+      await removePatientFiles([filePath]);
+    } catch {
       toast.error("Erro ao remover arquivo");
       return;
     }
@@ -183,14 +186,15 @@ export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {imgs.map((img: any) => (
                   <div key={img.id} className="group relative rounded-lg overflow-hidden border bg-muted aspect-square">
-                    <img
-                      src={getPublicUrl(img.file_path)}
+                    <SignedFileImage
+                      path={img.file_path}
                       alt={TIPO_IMAGEM_MAP[img.tipo_imagem] || img.tipo_imagem}
                       className="w-full h-full object-cover"
+                      fallback={<ImageIcon className="h-8 w-8 text-muted-foreground m-auto" />}
                     />
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                      <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => setViewImage(getPublicUrl(img.file_path))}>
+                      <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => openLightbox(img.file_path)}>
                         <ZoomIn className="w-4 h-4" />
                       </Button>
                       <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => handleDelete(img.id, img.file_path)}>

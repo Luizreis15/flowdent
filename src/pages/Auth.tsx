@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Calendar, DollarSign, ClipboardList, Shield, Clock } from "lucide-react";
 import { z } from "zod";
 import logoFlowdent from '@/assets/logo-flowdent.png';
+import { PASSWORD_HINT, passwordSchema } from "@/lib/password";
 
 const signinSchema = z.object({
   email: z.string().email("Invalid email format").max(255, "Email must be less than 255 characters"),
@@ -173,11 +174,7 @@ const Auth = () => {
       return;
     }
 
-    const passwordValidation = z.string()
-      .min(8, "A senha deve ter pelo menos 8 caracteres")
-      .max(128, "A senha deve ter no máximo 128 caracteres")
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "A senha deve conter letra maiúscula, minúscula e número")
-      .safeParse(newPassword);
+    const passwordValidation = passwordSchema.safeParse(newPassword);
     
     if (!passwordValidation.success) {
       toast({
@@ -245,7 +242,7 @@ const Auth = () => {
                 className="h-12 rounded-xl border-gray-200 focus:border-[hsl(var(--flowdent-blue))] focus:ring-[hsl(var(--flowdent-blue))]/20"
               />
               <p className="text-xs text-[hsl(var(--slate-gray))]">
-                Mínimo 8 caracteres, com letra maiúscula, minúscula e número
+                {PASSWORD_HINT}
               </p>
             </div>
             <div className="space-y-1.5">

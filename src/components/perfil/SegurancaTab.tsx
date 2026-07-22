@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Shield, Key, Smartphone } from "lucide-react";
+import { PASSWORD_HINT, passwordSchema } from "@/lib/password";
 
 interface SegurancaTabProps {
   userId: string;
@@ -25,8 +26,9 @@ const SegurancaTab = ({ userId }: SegurancaTabProps) => {
       return;
     }
 
-    if (passwordData.newPassword.length < 8) {
-      toast.error("A senha deve ter pelo menos 8 caracteres");
+    const validation = passwordSchema.safeParse(passwordData.newPassword);
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
       return;
     }
 
@@ -89,7 +91,7 @@ const SegurancaTab = ({ userId }: SegurancaTabProps) => {
               }
             />
             <p className="text-xs text-muted-foreground">
-              Mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial
+              {PASSWORD_HINT}
             </p>
           </div>
 

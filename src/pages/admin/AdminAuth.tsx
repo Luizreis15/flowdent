@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Shield, Loader2, ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import { passwordSchema, PASSWORD_HINT } from "@/lib/password";
 
 const AdminAuth = () => {
   const navigate = useNavigate();
@@ -122,11 +123,7 @@ const AdminAuth = () => {
       return;
     }
 
-    const passwordValidation = z.string()
-      .min(8, "A senha deve ter pelo menos 8 caracteres")
-      .max(128, "A senha deve ter no máximo 128 caracteres")
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "A senha deve conter letra maiúscula, minúscula e número")
-      .safeParse(newPassword);
+    const passwordValidation = passwordSchema.safeParse(newPassword);
     
     if (!passwordValidation.success) {
       toast.error(passwordValidation.error.errors[0].message);
@@ -235,7 +232,7 @@ const AdminAuth = () => {
                     className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                   />
                   <p className="text-xs text-slate-400">
-                    Mínimo 8 caracteres, com letra maiúscula, minúscula e número
+                    {PASSWORD_HINT}
                   </p>
                 </div>
                 <div className="space-y-2">

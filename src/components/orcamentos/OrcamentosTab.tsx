@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import { AprovarOrcamentoModal } from "./AprovarOrcamentoModal";
 import { supabase } from "@/integrations/supabase/client";
 import { generateRecibo, type ReciboData } from "@/utils/generateRecibo";
+import { resolveClinicLogoUrl } from "@/lib/storage";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -133,7 +134,7 @@ export const OrcamentosTab = ({ budgets, onRefresh, onNewBudget }: OrcamentosTab
         clinicCnpj: clinic?.cnpj || undefined,
         clinicPhone: clinic?.telefone || undefined,
         clinicAddress,
-        clinicLogoUrl: config?.logotipo_url || undefined,
+        clinicLogoUrl: await resolveClinicLogoUrl(config?.logotipo_url),
         description,
       };
 

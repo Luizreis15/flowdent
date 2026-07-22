@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { FileText, Trash2, Eye, Loader2, Printer, FileSignature, Pencil, Save, FileDown } from "lucide-react";
 import { generateDocumentoPDF, type DocumentoPDFData } from "@/utils/generateDocumentoPDF";
+import { resolveClinicLogoUrl } from "@/lib/storage";
 
 interface HistoricoDocumentosModalProps {
   open: boolean;
@@ -187,35 +188,92 @@ export const HistoricoDocumentosModal = ({
   };
 
   const handlePrintDoc = (doc: Document) => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>${doc.title}</title>
-            <style>
-              @media print { @page { margin: 2cm; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-              body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #000; max-width: 800px; margin: 0 auto; }
-              h1 { font-size: 24px; margin-bottom: 20px; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
-              .content { white-space: pre-wrap; line-height: 1.8; font-size: 12pt; }
-              .meta { color: #666; margin-bottom: 20px; font-size: 14px; }
-              .signature-area { margin-top: 80px; text-align: center; }
-              .signature-line { border-top: 1px solid #000; width: 300px; margin: 60px auto 10px; }
-              @media print { button { display: none; } }
-            </style>
-          </head>
-          <body>
-            <h1>${doc.title}</h1>
-            <div class="meta">${format(new Date(doc.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</div>
-            <div class="content">${doc.content.replace(/\n/g, '<br>')}</div>
-            <div class="signature-area"><div class="signature-line"></div><p>Assinatura do Profissional</p></div>
-            <script>window.onload = function() { setTimeout(function() { window.print(); }, 250); }</script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    const d = printWindow.document;
+    d.open();
+    // Skeleton sem dados do usuário — conteúdo vai via textContent (anti-XSS)
+    d.write("<!DOCTYPE html><html><head></head><body></body></html>");
+    d.close();
+
+    d.title = doc.title;
+
+    const style = d.createElement("style");
+    style.textContent = `
+      @media print {
+        @page { margin: 2cm; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        button { display: none; }
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        line-height: 1.6;
+        color: #000;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+      }
+      .content {
+        white-space: pre-wrap;
+        line-height: 1.8;
+        font-size: 12pt;
+      }
+      .meta {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      .signature-area {
+        margin-top: 80px;
+        text-align: center;
+      }
+      .signature-line {
+        border-top: 1px solid #000;
+        width: 300px;
+        margin: 60px auto 10px;
+      }
+    `;
+    d.head.appendChild(style);
+
+    const h1 = d.createElement("h1");
+    h1.textContent = doc.title;
+    d.body.appendChild(h1);
+
+    const meta = d.createElement("div");
+    meta.className = "meta";
+    meta.textContent = format(new Date(doc.created_at), "dd 'de' MMMM 'de' yyyy", {
+      locale: ptBR,
+    });
+    d.body.appendChild(meta);
+
+    const content = d.createElement("div");
+    content.className = "content";
+    // textContent + white-space:pre-wrap: título/conteúdo (incl. Solicitação de Exame) nunca viram HTML
+    content.textContent = doc.content;
+    d.body.appendChild(content);
+
+    const signature = d.createElement("div");
+    signature.className = "signature-area";
+    const line = d.createElement("div");
+    line.className = "signature-line";
+    const sigLabel = d.createElement("p");
+    sigLabel.textContent = "Assinatura do Profissional";
+    signature.appendChild(line);
+    signature.appendChild(sigLabel);
+    d.body.appendChild(signature);
+
+    const script = d.createElement("script");
+    script.textContent =
+      "window.onload = function() { setTimeout(function() { window.print(); }, 250); };";
+    d.body.appendChild(script);
   };
 
   const handleGeneratePDF = async (doc: Document) => {
@@ -267,7 +325,7 @@ export const HistoricoDocumentosModal = ({
         clinicAddress: addressStr || undefined,
         clinicEmail: (config as any)?.email_contato || undefined,
         clinicWhatsapp: (config as any)?.whatsapp || undefined,
-        clinicLogoUrl: (config as any)?.logotipo_url || undefined,
+        clinicLogoUrl: await resolveClinicLogoUrl((config as any)?.logotipo_url),
         clinicCity: clinicCity || undefined,
         corPrimaria: (config as any)?.cor_primaria || undefined,
         layoutCabecalho: (config as any)?.layout_cabecalho || undefined,

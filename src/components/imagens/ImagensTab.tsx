@@ -15,6 +15,13 @@ import { Upload, FileImage, FileText, Trash2, Download, Eye } from "lucide-react
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import {
+  downloadPatientFile,
+  getSignedFileUrl,
+  removePatientFiles,
+  uploadPatientFile,
+} from "@/lib/storage";
+import { SignedFileImage } from "@/components/storage/SignedFileImage";
 
 interface PatientFile {
   id: string;
@@ -98,11 +105,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
       const fileExtension = selectedFile.name.split(".").pop();
       const filePath = `${patientId}/${Date.now()}-${fileName}.${fileExtension}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("patient-files")
-        .upload(filePath, selectedFile);
-
-      if (uploadError) throw uploadError;
+      await uploadPatientFile(filePath, selectedFile);
 
       // Salvar metadados no banco
       const { error: dbError } = await supabase.from("patient_files").insert({
@@ -134,12 +137,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
     if (!confirm(`Deseja realmente excluir "${file.file_name}"?`)) return;
 
     try {
-      // Deletar do storage
-      const { error: storageError } = await supabase.storage
-        .from("patient-files")
-        .remove([file.file_path]);
-
-      if (storageError) throw storageError;
+      await removePatientFiles([file.file_path]);
 
       // Deletar do banco
       const { error: dbError } = await supabase
@@ -159,13 +157,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
 
   const handleDownload = async (file: PatientFile) => {
     try {
-      const { data, error } = await supabase.storage
-        .from("patient-files")
-        .download(file.file_path);
-
-      if (error) throw error;
-
-      // Criar URL e fazer download
+      const data = await downloadPatientFile(file.file_path);
       const url = URL.createObjectURL(data);
       const a = document.createElement("a");
       a.href = url;
@@ -182,11 +174,8 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
 
   const handlePreview = async (file: PatientFile) => {
     try {
-      const { data } = supabase.storage
-        .from("patient-files")
-        .getPublicUrl(file.file_path);
-
-      setPreviewUrl(data.publicUrl);
+      const signed = await getSignedFileUrl(file.file_path);
+      setPreviewUrl(signed);
     } catch (error) {
       console.error("Erro ao visualizar arquivo:", error);
       toast.error("Erro ao visualizar arquivo");
@@ -238,14 +227,11 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
             <Card key={file.id} className="overflow-hidden">
               <div className="aspect-video bg-muted flex items-center justify-center">
                 {file.file_type.startsWith("image/") ? (
-                  <img
-                    src={
-                      supabase.storage
-                        .from("patient-files")
-                        .getPublicUrl(file.file_path).data.publicUrl
-                    }
+                  <SignedFileImage
+                    path={file.file_path}
                     alt={file.file_name}
                     className="w-full h-full object-cover"
+                    fallback={<FileImage className="h-16 w-16 text-muted-foreground" />}
                   />
                 ) : (
                   <FileText className="h-16 w-16 text-muted-foreground" />

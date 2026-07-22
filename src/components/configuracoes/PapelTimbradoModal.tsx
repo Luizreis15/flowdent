@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Upload, FileText, Eye } from "lucide-react";
+import { uploadPatientFile } from "@/lib/storage";
+import { SignedClinicLogo } from "@/components/storage/SignedFileImage";
 
 interface PapelTimbradoModalProps {
   open: boolean;
@@ -114,19 +116,10 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
       setUploading(true);
 
       const fileExt = file.name.split(".").pop();
-      const fileName = `${clinicaId}/logo.${fileExt}`;
+      const filePath = `clinicas/${clinicaId}/logo.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("patient-files")
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from("patient-files")
-        .getPublicUrl(fileName);
-
-      setLogoUrl(urlData.publicUrl);
+      await uploadPatientFile(filePath, file, { upsert: true });
+      setLogoUrl(filePath);
       toast.success("Logo enviado com sucesso!");
     } catch (error) {
       console.error("Erro ao fazer upload:", error);
@@ -205,9 +198,9 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
                 <div className="flex items-center gap-4">
                   {logoUrl ? (
                     <div className="border rounded-lg p-2 bg-muted">
-                      <img 
-                        src={logoUrl} 
-                        alt="Logo" 
+                      <SignedClinicLogo
+                        src={logoUrl}
+                        alt="Logo"
                         className="h-16 w-auto object-contain"
                       />
                     </div>
@@ -357,9 +350,9 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
                 }`}
               >
                 {cabecalho.exibir_logo && logoUrl ? (
-                  <img 
-                    src={logoUrl} 
-                    alt="Logo" 
+                  <SignedClinicLogo
+                    src={logoUrl}
+                    alt="Logo"
                     style={{ height: `${cabecalho.altura_logo}px` }}
                     className="object-contain"
                   />

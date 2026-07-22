@@ -17,6 +17,7 @@ import { PaymentDrawer } from "./PaymentDrawer";
 import { RenegociacaoModal } from "./RenegociacaoModal";
 import { formatCurrency } from "@/lib/utils";
 import { generateRecibo, type ReciboData } from "@/utils/generateRecibo";
+import { resolveClinicLogoUrl } from "@/lib/storage";
 import { format, startOfMonth, endOfMonth, subMonths, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -324,7 +325,7 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
         clinicCnpj: clinic?.cnpj || undefined,
         clinicPhone: clinic?.telefone || undefined,
         clinicAddress: addressStr,
-        clinicLogoUrl: configRes.data?.logotipo_url || undefined,
+        clinicLogoUrl: await resolveClinicLogoUrl(configRes.data?.logotipo_url),
       });
     } catch {
       toast.error("Erro ao gerar recibo");

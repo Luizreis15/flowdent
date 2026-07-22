@@ -34,6 +34,7 @@ import {
   Plus,
 } from "lucide-react";
 import { generateRecibo, type ReciboData } from "@/utils/generateRecibo";
+import { resolveClinicLogoUrl } from "@/lib/storage";
 import { RenegociacaoModal } from "@/components/financeiro/RenegociacaoModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -286,7 +287,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
         clinicCnpj: clinic?.cnpj || undefined,
         clinicPhone: clinic?.telefone || undefined,
         clinicAddress: addressStr,
-        clinicLogoUrl: configRes.data?.logotipo_url || undefined,
+        clinicLogoUrl: await resolveClinicLogoUrl(configRes.data?.logotipo_url),
         description: receipt.description || undefined,
       });
     } catch (error) {

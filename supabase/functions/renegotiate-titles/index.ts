@@ -7,9 +7,9 @@ const corsHeaders = {
 };
 
 interface RenegotiateRequest {
-  clinic_id: string;
-  patient_id: string;
-  created_by: string;
+  clinic_id?: string;
+  patient_id?: string; // ignorado — derivado dos títulos
+  created_by?: string;
   title_ids: string[];
   reason?: string;
   discount_amount: number;
@@ -59,18 +59,22 @@ serve(async (req) => {
 
     const body: RenegotiateRequest = await req.json();
     const {
-      patient_id, title_ids, reason,
+      title_ids, reason,
       discount_amount, entry_amount, entry_method, entry_due_date,
       installments, installment_method, first_due_date,
     } = body;
     const clinic_id = callerClinic; // ignora valor enviado pelo cliente
     const created_by = callerId; // ignora valor enviado pelo cliente
 
-    if (!patient_id || !title_ids?.length || !first_due_date) {
+    if (!title_ids?.length || !first_due_date) {
       return jsonResp({ error: "Missing required fields" }, 400);
     }
 
-    // 1. Fetch original titles
+    if (!installments || installments < 1) {
+      return jsonResp({ error: "installments must be at least 1" }, 400);
+    }
+
+    // 1. Fetch original titles (escopo da clínica do caller)
     const { data: originalTitles, error: fetchErr } = await supabase
       .from("receivable_titles")
       .select("*")
@@ -80,6 +84,18 @@ serve(async (req) => {
     if (fetchErr || !originalTitles?.length) {
       return jsonResp({ error: "Titles not found" }, 404);
     }
+
+    // Todos os títulos pedidos devem existir na clínica (anti-tampering de IDs)
+    if (originalTitles.length !== title_ids.length) {
+      return jsonResp({ error: "One or more titles not found in this clinic" }, 404);
+    }
+
+    // patient_id derivado dos títulos — nunca confiar no body
+    const patientIds = [...new Set(originalTitles.map((t: any) => t.patient_id).filter(Boolean))];
+    if (patientIds.length !== 1) {
+      return jsonResp({ error: "All titles must belong to the same patient" }, 400);
+    }
+    const patient_id: string = patientIds[0];
 
     // Only renegotiate open/partial titles
     const eligible = originalTitles.filter(

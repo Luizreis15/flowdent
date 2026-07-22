@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Palette, Upload, Image, Instagram, Globe, Loader2 } from "lucide-react";
+import { uploadPatientFile } from "@/lib/storage";
+import { SignedClinicLogo } from "@/components/storage/SignedFileImage";
 
 export interface BrandingConfig {
   logotipo_url: string | null;
@@ -62,17 +63,10 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
       const ext = file.name.split(".").pop();
       const filePath = `clinicas/${clinicaId}/logo.${ext}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("patient-files")
-        .upload(filePath, file, { upsert: true });
+      await uploadPatientFile(filePath, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from("patient-files")
-        .getPublicUrl(filePath);
-
-      onChange({ ...value, logotipo_url: `${urlData.publicUrl}?t=${Date.now()}` });
+      // Guarda path relativo — signed URL é resolvida na hora de exibir/imprimir
+      onChange({ ...value, logotipo_url: filePath });
       toast({ title: "Sucesso", description: "Logo enviado com sucesso" });
     } catch (error) {
       console.error("Erro ao enviar logo:", error);
@@ -104,7 +98,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
           <div className="flex items-center gap-4">
             {value.logotipo_url ? (
               <div className="relative w-20 h-20 border rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center">
-                <img
+                <SignedClinicLogo
                   src={value.logotipo_url}
                   alt="Logo da clínica"
                   className="max-w-full max-h-full object-contain"

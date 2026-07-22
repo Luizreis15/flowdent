@@ -10,13 +10,11 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import TestimonialCarousel from "@/components/auth/TestimonialCarousel";
 import logoFlowdent from '@/assets/logo-flowdent.png';
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, passwordSchema } from "@/lib/password";
 
 const signupSchema = z.object({
   email: z.string().email("Email inválido").max(255, "Email deve ter menos de 255 caracteres"),
-  password: z.string()
-    .min(8, "Senha deve ter pelo menos 8 caracteres")
-    .max(128, "Senha deve ter menos de 128 caracteres")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Senha deve conter letra maiúscula, minúscula e número"),
+  password: passwordSchema,
   fullName: z.string()
     .trim()
     .min(2, "Nome deve ter pelo menos 2 caracteres")
@@ -353,11 +351,11 @@ const Cadastro = () => {
                   <Input
                     id="signup-password"
                     type="password"
-                    placeholder="Deve conter no mínimo 8 caracteres"
+                    placeholder={PASSWORD_HINT}
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     required
-                    minLength={8}
+                    minLength={PASSWORD_MIN_LENGTH}
                     className="h-12"
                   />
                 </div>

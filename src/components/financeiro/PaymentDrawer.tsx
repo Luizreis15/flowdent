@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { generateRecibo, type ReciboData } from "@/utils/generateRecibo";
+import { resolveClinicLogoUrl } from "@/lib/storage";
 
 interface ReceivableTitle {
   id: string;
@@ -229,7 +230,7 @@ export const PaymentDrawer = ({
         clinicCnpj: clinic?.cnpj || undefined,
         clinicPhone: clinic?.telefone || undefined,
         clinicAddress: addressStr,
-        clinicLogoUrl: configRes.data?.logotipo_url || undefined,
+        clinicLogoUrl: await resolveClinicLogoUrl(configRes.data?.logotipo_url),
       };
 
       await generateRecibo(reciboData);
