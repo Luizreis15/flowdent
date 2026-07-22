@@ -10,11 +10,7 @@ export const DOMAINS = {
 // Verifica se está em ambiente de desenvolvimento/preview
 export const isDevEnvironment = (): boolean => {
   const hostname = window.location.hostname;
-  return (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname.includes('lovableproject.com')
-  );
+  return hostname === 'localhost' || hostname === '127.0.0.1';
 };
 
 // Em desenvolvimento, localhost age como o domínio do APP
@@ -23,9 +19,7 @@ export const isAppDomain = (): boolean => {
   return (
     hostname === DOMAINS.APP ||
     hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname.includes('lovableproject.com') ||
-    hostname.includes('lovable.app')
+    hostname === '127.0.0.1'
   );
 };
 

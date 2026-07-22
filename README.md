@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# Flowdent
 
-## Project info
+Sistema de gestão para clínicas odontológicas — agendamento, prontuário digital, odontograma, ortodontia, financeiro, CRM e automações via WhatsApp.
 
-**URL**: https://lovable.dev/projects/e70292ea-fa8f-4f50-9411-edff56e90689
+## Stack
 
-## How can I edit this code?
+- [Vite](https://vitejs.dev/) + [React](https://react.dev/) + TypeScript
+- [shadcn/ui](https://ui.shadcn.com/) + Tailwind CSS
+- [Supabase](https://supabase.com/) — Postgres, Auth e Edge Functions
+- Deploy: [Vercel](https://vercel.com/) (frontend) + Supabase (backend)
 
-There are several ways of editing your application.
+## Rodando localmente
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/e70292ea-fa8f-4f50-9411-edff56e90689) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requisitos: Node.js e npm.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+O app sobe em `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Variáveis de ambiente
 
-**Use GitHub Codespaces**
+Crie um `.env` na raiz do projeto com as credenciais do projeto Supabase:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+VITE_SUPABASE_PROJECT_ID=
+```
 
-## What technologies are used for this project?
+## Build
 
-This project is built with:
+```sh
+npm run build
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Gera os arquivos estáticos em `dist/`.
 
-## How can I deploy this project?
+## Lint
 
-Simply open [Lovable](https://lovable.dev/projects/e70292ea-fa8f-4f50-9411-edff56e90689) and click on Share -> Publish.
+```sh
+npm run lint
+```
 
-## Can I connect a custom domain to my Lovable project?
+## Supabase
 
-Yes, you can!
+Migrations e Edge Functions ficam em `supabase/`. Requer o [Supabase CLI](https://supabase.com/docs/guides/cli) autenticado e linkado ao projeto (`supabase link`).
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```sh
+# Aplicar migrations pendentes no banco
+supabase db push
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+# Publicar todas as Edge Functions
+supabase functions deploy
+
+# Publicar uma função específica
+supabase functions deploy <nome-da-função>
+```
+
+## Deploy
+
+O frontend é publicado na Vercel a partir do branch `main` (deploy automático a cada push). Variáveis `VITE_SUPABASE_*` precisam estar configuradas no projeto da Vercel (Project Settings → Environment Variables), já que são embutidas no build.
