@@ -1,25 +1,5 @@
-import DashboardLayout from "@/components/DashboardLayout";
 import Ortodontia from "./Ortodontia";
-import { useAuth } from "@/contexts/AuthContext";
-import { Skeleton } from "@/components/ui/skeleton";
 
-export default function OrtodontiaWrapper() {
-  const { profile, isLoading } = useAuth();
+const OrtodontiaWrapper = () => <Ortodontia />;
 
-  if (isLoading) {
-    return (
-      <DashboardLayout user={profile}>
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-[400px]" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  return (
-    <DashboardLayout user={profile}>
-      <Ortodontia />
-    </DashboardLayout>
-  );
-}
+export default OrtodontiaWrapper;

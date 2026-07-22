@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
 import Agenda from "./Agenda";
 import MobileAgenda from "@/pages/mobile/MobileAgenda";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -11,13 +10,12 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const AgendaWrapper = () => {
   const isMobile = useIsMobile();
-  const { profile, clinicId, isLoading } = useAuth();
+  const { clinicId, isLoading } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isNewAppointment = searchParams.get("new") === "true";
   const [mobileModalOpen, setMobileModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  // On mobile, intercept ?new=true and open the mobile modal instead
   useEffect(() => {
     if (isMobile && isNewAppointment && clinicId) {
       setMobileModalOpen(true);
@@ -27,18 +25,16 @@ const AgendaWrapper = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout user={profile}>
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-[400px]" />
-        </div>
-      </DashboardLayout>
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-[400px]" />
+      </div>
     );
   }
 
   if (isMobile && clinicId) {
     return (
-      <DashboardLayout user={profile}>
+      <>
         <MobileAgenda clinicId={clinicId} />
         <NovoAgendamentoMobileModal
           open={mobileModalOpen}
@@ -48,15 +44,11 @@ const AgendaWrapper = () => {
             queryClient.invalidateQueries({ queryKey: ["mobile-agenda"] });
           }}
         />
-      </DashboardLayout>
+      </>
     );
   }
 
-  return (
-    <DashboardLayout user={profile}>
-      <Agenda />
-    </DashboardLayout>
-  );
+  return <Agenda />;
 };
 
 export default AgendaWrapper;

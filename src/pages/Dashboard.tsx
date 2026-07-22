@@ -1,4 +1,3 @@
-import DashboardLayout from "@/components/DashboardLayout";
 import TrialBanner from "@/components/TrialBanner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -17,31 +16,28 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout user={profile}>
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-48" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-24 md:h-32" />
-            ))}
-          </div>
-          <Skeleton className="h-[300px] md:h-[400px]" />
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-24 md:h-32" />
+          ))}
         </div>
-      </DashboardLayout>
+        <Skeleton className="h-[300px] md:h-[400px]" />
+      </div>
     );
   }
 
-  // Mobile Home
   if (isMobile && activeClinicId) {
     return (
-      <DashboardLayout user={profile}>
+      <>
         {!isSuperAdmin && status === "trialing" && trialEnd && (
-          <TrialBanner 
-            daysLeft={Math.ceil((new Date(trialEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} 
+          <TrialBanner
+            daysLeft={Math.ceil((new Date(trialEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}
           />
         )}
         <MobileHome user={profile} clinicId={activeClinicId} />
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -52,23 +48,22 @@ const Dashboard = () => {
     return "Boa noite";
   };
 
-  const firstName = profile?.full_name?.split(' ')[0] || "Usuário";
+  const firstName = profile?.full_name?.split(" ")[0] || "Usuário";
 
   return (
-    <DashboardLayout user={profile}>
+    <>
       {!isSuperAdmin && status === "trialing" && trialEnd && (
-        <TrialBanner 
-          daysLeft={Math.ceil((new Date(trialEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} 
+        <TrialBanner
+          daysLeft={Math.ceil((new Date(trialEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}
         />
       )}
-      
+
       <div className="space-y-6">
         <div>
           <h1 className="text-xl lg:text-2xl font-semibold text-foreground">
-            {isSuperAdmin 
-              ? "Painel Super Admin" 
-              : `${getGreeting()}, ${firstName}`
-            }
+            {isSuperAdmin
+              ? "Painel Super Admin"
+              : `${getGreeting()}, ${firstName}`}
           </h1>
           {!isSuperAdmin && (
             <p className="text-sm text-muted-foreground mt-0.5">
@@ -95,7 +90,7 @@ const Dashboard = () => {
           </>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

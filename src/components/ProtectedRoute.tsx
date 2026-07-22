@@ -19,7 +19,9 @@ export default function ProtectedRoute({ children, requiredRole, requiredPermiss
   const { isAuthenticated, isLoading, perfil, isSuperAdmin } = useAuth();
   const { can, loading: permLoading } = usePermissions();
 
-  if (isLoading || permLoading) return <PageLoader />;
+  // Auth blocking; permissões só bloqueiam se a rota exige checagem aqui
+  if (isLoading) return <PageLoader />;
+  if (requiredPermission && permLoading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/auth" replace />;
 
   if (requiredRole && requiredRole.length > 0) {
