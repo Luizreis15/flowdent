@@ -29,7 +29,8 @@ UPDATE public.profiles SET clinic_id = '00000000-0000-0000-0000-00000000c11b' WH
 INSERT INTO public.usuarios (id, clinica_id, nome, email, perfil)
 VALUES
   ('00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-00000000c11a', 'Vitima', 'vitima@teste.local', 'admin'),
-  ('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-00000000c11b', 'Atacante', 'atacante@teste.local', 'admin');
+  ('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-00000000c11b', 'Atacante', 'atacante@teste.local', 'admin')
+ON CONFLICT (id) DO UPDATE SET clinica_id = EXCLUDED.clinica_id, perfil = EXCLUDED.perfil;
 
 INSERT INTO public.patients (id, clinic_id, full_name, phone)
 VALUES ('00000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000c11a', 'Paciente da Vitima', '11999999999');

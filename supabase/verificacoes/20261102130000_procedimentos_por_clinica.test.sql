@@ -23,7 +23,8 @@ INSERT INTO public.clinicas (id, nome, owner_user_id) VALUES
 INSERT INTO public.usuarios (id, clinica_id, nome, email, perfil) VALUES
   ('00000000-0000-0000-0000-0000000001a1', '00000000-0000-0000-0000-00000000ca0a', 'Admin A', 'adminA@teste.local', 'admin'),
   ('00000000-0000-0000-0000-0000000001a2', '00000000-0000-0000-0000-00000000ca0a', 'Recep A', 'recepA@teste.local', 'recepcao'),
-  ('00000000-0000-0000-0000-0000000001b1', '00000000-0000-0000-0000-00000000ca0b', 'Admin V', 'adminV@teste.local', 'admin');
+  ('00000000-0000-0000-0000-0000000001b1', '00000000-0000-0000-0000-00000000ca0b', 'Admin V', 'adminV@teste.local', 'admin')
+ON CONFLICT (id) DO UPDATE SET clinica_id = EXCLUDED.clinica_id, perfil = EXCLUDED.perfil;
 
 UPDATE public.profiles SET clinic_id = '00000000-0000-0000-0000-00000000ca0a'
 WHERE id IN ('00000000-0000-0000-0000-0000000001a1', '00000000-0000-0000-0000-0000000001a2');
