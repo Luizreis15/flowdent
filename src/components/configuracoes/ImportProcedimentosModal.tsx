@@ -148,9 +148,11 @@ export const ImportProcedimentosModal = ({
         return;
       }
 
-      // Inserir ou atualizar procedimentos
+      // Inserir ou atualizar procedimentos (novos ficam vinculados à clínica do usuário;
+      // procedimentos do catálogo do sistema só podem ser alterados por super admin)
       let inserted = 0;
       let updated = 0;
+      let ignored = 0;
 
       for (const proc of procedimentos) {
         const { data: existing } = await supabase
@@ -160,24 +162,30 @@ export const ImportProcedimentosModal = ({
           .maybeSingle();
 
         if (existing) {
-          await supabase
+          const { data: updatedRows, error: updateError } = await supabase
             .from("procedimentos")
             .update({
               especialidade: proc.especialidade,
               descricao: proc.descricao,
               valor: proc.valor,
             })
-            .eq("id", existing.id);
-          updated++;
+            .eq("id", existing.id)
+            .select("id");
+          if (!updateError && updatedRows && updatedRows.length > 0) updated++;
+          else ignored++;
         } else {
-          await supabase
+          const { error: insertError } = await supabase
             .from("procedimentos")
             .insert(proc);
-          inserted++;
+          if (!insertError) inserted++;
+          else ignored++;
         }
       }
 
-      toast.success(`Importação concluída: ${inserted} novos, ${updated} atualizados`);
+      toast.success(
+        `Importação concluída: ${inserted} novos, ${updated} atualizados` +
+          (ignored > 0 ? `, ${ignored} ignorados (catálogo do sistema ou erro)` : "")
+      );
       onSuccess();
       onOpenChange(false);
       setFile(null);
