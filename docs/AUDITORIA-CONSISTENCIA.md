@@ -14,6 +14,41 @@ Data: 2026-11-02 · Escopo: `supabase/migrations` (116 arquivos), `supabase/func
 
 ---
 
+## Status da execução (2026-11-02/03)
+
+Cada etapa tem migration em `supabase/migrations/`, rollback em `supabase/rollbacks/` e teste em
+`supabase/verificacoes/` (transação com ROLLBACK, saída "OK ..."). Todas testadas em banco local com
+controle negativo (o teste falha sem a correção) e aplicadas em produção via `supabase db push`,
+enviando só a migration da etapa.
+
+| Etapa | Itens | Migration | Teste local | Produção |
+|---|---|---|---|---|
+| 1 | A1, A7 | `20261102120000_guard_clinic_membership_and_billing` | 15/15 | aplicada |
+| 2 | 5, A2 | `20261102130000_procedimentos_por_clinica` | 28/28 | aplicada |
+| 3 | A3, A4, A6, A5 | `20261102140000_isolamento_audit_reviews_whatsapp` | 16/16 | aplicada; **deploy de `whatsapp-webhook` pendente** |
+| 4 | A8 | `20261102150000_vinculo_clinica_fonte_unica` | 20/20 | aplicada |
+| 5 | 1, 3, 4, 6 + edge functions | `20261102160000_marcar_legados` | regressão 79/79 | ver abaixo |
+
+Achados durante a execução:
+- **Produção tinha 1 clínica**: o isolamento estava quebrado, mas não houve vazamento entre clínicas.
+- **Onboarding**: o dono novo não conseguia criar a própria linha em `usuarios` (RLS exige já ser admin);
+  corrigido na etapa 4 com trigger em `clinicas`.
+- **Edge functions**: 14 de 24 não subiam num deploy novo (`esm.sh/@supabase/supabase-js@2.57.2` resolve
+  `storage-js@2.99.1`, inexistente). Corrigido na etapa 5 trocando para `npm:` (mesma versão); as 24 sobem
+  no runtime local. As funções publicadas continuam com o bundle antigo até um novo deploy.
+- **Migrations não recriam o banco do zero**: `20251030203313` exige `admin@admin.com` em `auth.users` e
+  `20260109011955` usa o UUID fixo de um usuário de produção. Para testar, foi usada uma pré-migration só
+  local com usuários fictícios.
+- **jspdf**: `eef353b` subiu para `^4.2.1` no `package.json`/`package-lock.json`, mas não no `bun.lock`.
+
+Pendente (decisão/execução do dono do projeto):
+1. `supabase functions deploy` das edge functions (o deploy pelo agente foi bloqueado pela política de permissões).
+2. Mesclar as branches e publicar o front (o modal de WhatsApp antigo não carrega com as novas permissões de coluna).
+3. Descartar `20260722143000_populate_empty_default_procedure_plans.sql` (não aplicada; não há planos vazios).
+4. Depois de validado em produção: `DROP` de `whatsapp_config`, `appointments.duracao_minutos` e
+   `tenant_feature_overrides`, e remoção de `WhatsAppConfigModal.tsx` (não montado).
+5. Remover das migrations antigas a dependência de dados de produção (ver acima), para permitir staging.
+
 ## Resumo por gravidade
 
 | # | Achado | Gravidade |

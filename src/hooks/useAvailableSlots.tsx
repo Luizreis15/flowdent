@@ -91,7 +91,7 @@ export function useAvailableSlots(
       const endOfDay = `${dateStr}T23:59:59`;
       const { data, error } = await supabase
         .from("appointments")
-        .select("appointment_date, duration_minutes, duracao_minutos")
+        .select("appointment_date, duration_minutes")
         .eq("dentist_id", professionalId!)
         .gte("appointment_date", startOfDay)
         .lte("appointment_date", endOfDay)
@@ -138,7 +138,7 @@ export function useAvailableSlots(
     existingAppointments?.forEach((apt) => {
       const aptDate = new Date(apt.appointment_date);
       const startMin = aptDate.getHours() * 60 + aptDate.getMinutes();
-      const duration = apt.duration_minutes || apt.duracao_minutos || slotConfig!.intervalo;
+      const duration = apt.duration_minutes || slotConfig!.intervalo;
       for (let m = startMin; m < startMin + duration; m += slotConfig!.intervalo) {
         occupiedMinutes.add(m);
       }
