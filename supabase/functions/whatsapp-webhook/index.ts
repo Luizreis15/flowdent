@@ -1,5 +1,16 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+// npm: em vez de esm.sh: o esm.sh passou a resolver @supabase/storage-js@2.99.1, que
+// não existe, e a função não sobe mais (BOOT_ERROR) num deploy novo.
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,6 +52,44 @@ serve(async (req) => {
       const instanceId = body.instanceId;
       const isFromMe = body.fromMe === true;
 
+      if (!instanceId) {
+        console.log('[WHATSAPP-WEBHOOK] No instanceId in payload');
+        return new Response(JSON.stringify({ error: 'Missing instanceId' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        });
+      }
+
+      // Buscar configuração da clínica pelo instance_id
+      const { data: config } = await supabase
+        .from('whatsapp_configs')
+        .select('clinica_id, webhook_verify_token')
+        .eq('instance_id', instanceId)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (!config) {
+        console.log('[WHATSAPP-WEBHOOK] No config for instanceId:', instanceId);
+        return new Response(JSON.stringify({ error: 'Instance not configured' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        });
+      }
+
+      // O segredo vai na URL registrada na Z-API (?token=...); sem ele, qualquer um que
+      // conhecesse o instanceId poderia injetar mensagens no CRM da clínica.
+      const providedToken = new URL(req.url).searchParams.get('token') ?? '';
+      const expectedToken = config.webhook_verify_token ?? '';
+      if (!expectedToken || !timingSafeEqual(providedToken, expectedToken)) {
+        console.log('[WHATSAPP-WEBHOOK] Invalid webhook token for instanceId:', instanceId);
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        });
+      }
+
+      const clinicaId = config.clinica_id;
+
       // Ignorar mensagens enviadas por nós mesmos
       if (isFromMe) {
         console.log('[WHATSAPP-WEBHOOK] Ignoring own message');
@@ -55,12 +104,21 @@ serve(async (req) => {
         // Pode ser StatusCallback, MessageStatusCallback, etc.
         console.log('[WHATSAPP-WEBHOOK] Non-message callback:', body.type);
 
-        // Se for status update, atualizar status da mensagem
+        // Se for status update, atualizar status da mensagem (só em conversas desta clínica)
         if (body.type === 'MessageStatusCallback' && body.messageId && body.status) {
-          await supabase
-            .from('crm_messages')
-            .update({ status: mapZApiStatus(body.status) })
-            .eq('whatsapp_message_id', body.messageId);
+          const { data: conversations } = await supabase
+            .from('crm_conversations')
+            .select('id')
+            .eq('clinica_id', clinicaId);
+
+          const conversationIds = (conversations || []).map((c: { id: string }) => c.id);
+          if (conversationIds.length > 0) {
+            await supabase
+              .from('crm_messages')
+              .update({ status: mapZApiStatus(body.status) })
+              .eq('whatsapp_message_id', body.messageId)
+              .in('conversation_id', conversationIds);
+          }
         }
 
         return new Response(JSON.stringify({ success: true }), {
@@ -68,32 +126,6 @@ serve(async (req) => {
           status: 200,
         });
       }
-
-      if (!instanceId) {
-        console.log('[WHATSAPP-WEBHOOK] No instanceId in payload');
-        return new Response(JSON.stringify({ error: 'Missing instanceId' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
-        });
-      }
-
-      // Buscar configuração da clínica pelo instance_id
-      const { data: config } = await supabase
-        .from('whatsapp_configs')
-        .select('clinica_id')
-        .eq('instance_id', instanceId)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (!config) {
-        console.log('[WHATSAPP-WEBHOOK] No config for instanceId:', instanceId);
-        return new Response(JSON.stringify({ error: 'Instance not configured' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404,
-        });
-      }
-
-      const clinicaId = config.clinica_id;
       const phone = (body.phone || '').replace(/\D/g, '');
       const senderName = body.senderName || phone;
       const messageContent = body.text?.message || body.image?.caption || body.document?.caption || '[Mídia]';

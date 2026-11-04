@@ -37,17 +37,18 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
 
       if (!profile?.clinic_id) return;
 
+      // Tokens não são legíveis pelo cliente; campos de token em branco mantêm os valores salvos
       const { data } = await supabase
         .from("whatsapp_configs" as any)
-        .select("*")
+        .select("instance_id, is_active")
         .eq("clinica_id", profile.clinic_id)
         .maybeSingle();
 
       if (data) {
         setExistingConfig(true);
         setInstanceId((data as any).instance_id || "");
-        setInstanceToken((data as any).instance_token || "");
-        setClientToken((data as any).client_token || "");
+        setInstanceToken("");
+        setClientToken("");
         setIsActive((data as any).is_active || false);
       }
     } catch (error) {
@@ -55,9 +56,10 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
     }
   };
 
-  const registerWebhook = async (instId: string, instToken: string, cToken: string) => {
+  const registerWebhook = async (instId: string, instToken: string, cToken: string, verifyToken: string) => {
     try {
-      const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-webhook`;
+      // O segredo na URL é validado pela edge function contra whatsapp_configs.webhook_verify_token
+      const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-webhook?token=${encodeURIComponent(verifyToken)}`;
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (cToken) headers['Client-Token'] = cToken;
 
@@ -98,7 +100,7 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
   };
 
   const handleSave = async () => {
-    if (!instanceId.trim() || !instanceToken.trim()) {
+    if (!instanceId.trim() || (!existingConfig && !instanceToken.trim())) {
       toast.error("Preencha o Instance ID e o Token");
       return;
     }
@@ -113,38 +115,38 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
 
       if (!profile?.clinic_id) throw new Error("Clínica não encontrada");
 
+      // Webhook só pode ser (re)registrado quando o token da instância foi informado agora
+      const shouldRegisterWebhook = isActive && !!instanceToken.trim();
+      const verifyToken = shouldRegisterWebhook ? crypto.randomUUID() : null;
+
+      const payload: Record<string, unknown> = {
+        connection_type: "web_qrcode",
+        instance_id: instanceId.trim(),
+        is_active: isActive,
+      };
+      if (instanceToken.trim()) payload.instance_token = instanceToken.trim();
+      if (clientToken.trim()) payload.client_token = clientToken.trim();
+      if (verifyToken) payload.webhook_verify_token = verifyToken;
+
       if (existingConfig) {
         const { error } = await supabase
           .from("whatsapp_configs" as any)
-          .update({
-            connection_type: "web_qrcode",
-            instance_id: instanceId.trim(),
-            instance_token: instanceToken.trim(),
-            client_token: clientToken.trim() || null,
-            is_active: isActive,
-          } as any)
+          .update(payload as any)
           .eq("clinica_id", profile.clinic_id);
 
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("whatsapp_configs" as any)
-          .insert({
-            clinica_id: profile.clinic_id,
-            connection_type: "web_qrcode",
-            instance_id: instanceId.trim(),
-            instance_token: instanceToken.trim(),
-            client_token: clientToken.trim() || null,
-            is_active: isActive,
-          } as any);
+          .insert({ ...payload, clinica_id: profile.clinic_id, client_token: clientToken.trim() || null } as any);
 
         if (error) throw error;
         setExistingConfig(true);
       }
 
       // Se ativou, registrar webhook na Z-API automaticamente
-      if (isActive) {
-        await registerWebhook(instanceId.trim(), instanceToken.trim(), clientToken.trim());
+      if (shouldRegisterWebhook && verifyToken) {
+        await registerWebhook(instanceId.trim(), instanceToken.trim(), clientToken.trim(), verifyToken);
       }
 
       toast.success(isActive ? "WhatsApp configurado e ativado!" : "Configuração salva (inativa)");
@@ -198,7 +200,7 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
               type="password"
               value={instanceToken}
               onChange={(e) => setInstanceToken(e.target.value)}
-              placeholder="Token da instância"
+              placeholder={existingConfig ? "Token salvo — preencha só para trocar" : "Token da instância"}
             />
           </div>
 
@@ -209,7 +211,7 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
               type="password"
               value={clientToken}
               onChange={(e) => setClientToken(e.target.value)}
-              placeholder="Token de segurança da instância"
+              placeholder={existingConfig ? "Token salvo — preencha só para trocar" : "Token de segurança da instância"}
             />
             <p className="text-xs text-muted-foreground mt-1">Encontre em: Z-API → Sua instância → Token de segurança</p>
           </div>
