@@ -1,9 +1,50 @@
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 
+const CABECALHOS_PERMITIDOS =
+  "authorization, x-client-info, apikey, content-type, x-internal-secret, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version";
+
+/** Origens do produto. ALLOWED_ORIGINS (separado por vírgula) acrescenta outras. */
+const ORIGENS_PADRAO = [
+  "https://flowdent.com.br",
+  "https://www.flowdent.com.br",
+  "https://app.flowdent.com.br",
+];
+
+function origemPermitida(origem: string): boolean {
+  if (!origem) return false;
+  const extras = (Deno.env.get("ALLOWED_ORIGINS") ?? "")
+    .split(",").map((o) => o.trim()).filter(Boolean);
+  if ([...ORIGENS_PADRAO, ...extras].includes(origem)) return true;
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origem)) return true;
+  if (/^https:\/\/flowdent[a-z0-9-]*\.vercel\.app$/.test(origem)) return true;
+  return false;
+}
+
+/**
+ * Cabeçalhos CORS para uma requisição. Ecoa a origem quando ela está na lista,
+ * senão devolve o domínio principal — o navegador bloqueia do outro lado.
+ *
+ * Nota de escopo: a autenticação do Flowdent é por bearer token em localStorage,
+ * não por cookie, então "*" nunca permitiu que um site hostil usasse a sessão de
+ * ninguém. Isto é higiene e defesa em profundidade, não fechamento de brecha.
+ * Funções chamadas só por servidor (webhooks e cron) não usam isto: navegador
+ * nenhum as chama, e webhook não manda cabeçalho Origin.
+ */
+export function cors(req: Request): Record<string, string> {
+  const origem = req.headers.get("Origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": origemPermitida(origem) ? origem : ORIGENS_PADRAO[0],
+    "Access-Control-Allow-Headers": CABECALHOS_PERMITIDOS,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
+
+/** @deprecated use cors(req). Mantido para as funções de servidor. */
 export const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-internal-secret, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Origin": ORIGENS_PADRAO[0],
+  "Access-Control-Allow-Headers": CABECALHOS_PERMITIDOS,
+  "Vary": "Origin",
 };
 
 export function jsonResp(body: unknown, status = 200) {
