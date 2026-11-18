@@ -34,13 +34,25 @@ test.describe("fluxos críticos", () => {
   test("o prontuário abre e enxerga o paciente semeado", async ({ page }) => {
     await entrar(page);
     await page.goto("/dashboard/prontuario");
-    await expect(page.getByText(/Paciente Semeado E2E/i).first()).toBeVisible({ timeout: 15_000 });
+
+    // A tela existe: o campo de busca é o elemento estável da página.
+    const busca = page.getByPlaceholder(/Buscar paciente/i);
+    await expect(busca).toBeVisible({ timeout: 15_000 });
+
+    // E a RLS deixa passar o paciente da própria clínica. Busca em vez de
+    // varrer a lista inteira: é o fluxo real e não depende de paginação.
+    await busca.fill("Paciente Semeado");
+    await expect(page.getByText(/Paciente Semeado E2E/i).first())
+      .toBeVisible({ timeout: 15_000 });
   });
 
   test("o financeiro abre", async ({ page }) => {
     await entrar(page);
     await page.goto("/dashboard/financeiro");
-    await expect(page.getByText(/financeiro|receber|pagar/i).first()).toBeVisible({ timeout: 15_000 });
+    // Pelo papel, não por texto solto: "Financeiro" também aparece no menu,
+    // e o .first() de um getByText podia cair num item oculto da navegação.
+    await expect(page.getByRole("heading", { name: /financeiro/i }).first())
+      .toBeVisible({ timeout: 15_000 });
   });
 
   test("nenhuma tela crítica quebra no console", async ({ page }) => {
