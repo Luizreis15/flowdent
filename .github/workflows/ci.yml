@@ -96,7 +96,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Sobe Supabase local
-        run: supabase db start
+        # `supabase db start` sobe SÓ o Postgres — foi o que fez o login expirar:
+        # sem GoTrue não há autenticação. O e2e precisa da pilha inteira.
+        run: supabase start
       - name: Semeia clínica e usuário de teste
         run: |
           DB_URL=$(supabase status --output json | jq -r '.DB_URL')
