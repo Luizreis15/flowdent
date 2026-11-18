@@ -42,9 +42,29 @@ VALUES ('00000000-0000-0000-0000-0000000e2e01', '00000000-0000-0000-0000-0000000
         'Usuario E2E', 'e2e@flowdent.local', 'admin')
 ON CONFLICT (id) DO UPDATE SET clinica_id = EXCLUDED.clinica_id, perfil = EXCLUDED.perfil;
 
+-- profiles explícito: as policies desta base ainda leem profiles.clinic_id, e
+-- fixture de teste não deve depender de gatilho de espelhamento ter rodado.
+INSERT INTO public.profiles (id, full_name, email, clinic_id)
+VALUES ('00000000-0000-0000-0000-0000000e2e01', 'Usuario E2E', 'e2e@flowdent.local',
+        '00000000-0000-0000-0000-00000000e2ec')
+ON CONFLICT (id) DO UPDATE SET clinic_id = EXCLUDED.clinic_id;
+
+-- Permissões da clínica. /dashboard/financeiro está atrás de
+-- <RequirePermission permission="financeiro.visualizar">, que lê
+-- clinic_permissions. Sem isto o admin da clínica nova não abre a tela.
+SELECT public.seed_default_permissions('00000000-0000-0000-0000-00000000e2ec');
+
 INSERT INTO public.patients (id, clinic_id, full_name, phone)
 VALUES ('00000000-0000-0000-0000-0000000e2e90', '00000000-0000-0000-0000-00000000e2ec',
         'Paciente Semeado E2E', '11911110000')
 ON CONFLICT (id) DO NOTHING;
 
 COMMIT;
+
+-- Confere o que foi semeado: se algo aqui vier zerado, o e2e falha por fixture
+-- e não por regressão do produto.
+SELECT
+  (SELECT count(*) FROM public.usuarios WHERE id = '00000000-0000-0000-0000-0000000e2e01') AS usuario,
+  (SELECT count(*) FROM public.profiles WHERE id = '00000000-0000-0000-0000-0000000e2e01' AND clinic_id IS NOT NULL) AS profile_com_clinica,
+  (SELECT count(*) FROM public.clinic_permissions WHERE clinic_id = '00000000-0000-0000-0000-00000000e2ec') AS permissoes,
+  (SELECT count(*) FROM public.patients WHERE clinic_id = '00000000-0000-0000-0000-00000000e2ec') AS pacientes;
