@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import logoFlowdent from "@/assets/logo-flowdent.png";
+import { Logo } from "@/components/brand/Logo";
 import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, passwordSchema } from "@/lib/password";
 
 const PortalAuth = () => {
@@ -305,7 +305,7 @@ const PortalAuth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src={logoFlowdent} alt="Flowdent" className="h-14 w-auto" />
+            <Logo className="h-10" />
           </div>
           <CardTitle className="text-2xl">
             {isResetPassword ? "Redefinir Senha" : "Portal do Paciente"}
