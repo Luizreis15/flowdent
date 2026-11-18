@@ -1,11 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import {
-  corsHeaders,
-  isInternalCall,
-  jsonResp,
-  requireUserClinic,
-} from "../_shared/auth.ts";
+import { cors, isInternalCall, jsonResp, requireUserClinic } from "../_shared/auth.ts";
 
 interface WhatsAppRequest {
   clinicId: string;
@@ -24,6 +19,7 @@ interface WhatsAppRequest {
 }
 
 serve(async (req) => {
+  const corsHeaders = cors(req);
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

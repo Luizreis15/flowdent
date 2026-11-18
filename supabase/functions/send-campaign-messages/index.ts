@@ -1,14 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import {
-  corsHeaders,
-  internalHeaders,
-  jsonResp,
-  requireInternalOrClinicUser,
-} from "../_shared/auth.ts";
+import { cors, internalHeaders, jsonResp, requireInternalOrClinicUser } from "../_shared/auth.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 serve(async (req) => {
+  const corsHeaders = cors(req);
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

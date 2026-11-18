@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { cors } from "../_shared/auth.ts";
 
 interface AllocationInput {
   sequence: number;
@@ -23,6 +19,13 @@ interface ApproveRequest {
 }
 
 serve(async (req) => {
+  const corsHeaders = cors(req);
+  function jsonError(message: string, status: number) {
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -352,12 +355,6 @@ serve(async (req) => {
 
 // === Helpers ===
 
-function jsonError(message: string, status: number) {
-  return new Response(
-    JSON.stringify({ error: message }),
-    { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-  );
-}
 
 function addMonths(dateStr: string, months: number): string {
   const d = new Date(dateStr + "T12:00:00");

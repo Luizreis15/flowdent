@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualidade:
+    name: Lint, tipos e build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: ESLint
+        # Hoje o projeto tem 468 erros herdados. O gate impede que o número cresça;
+        # baixá-lo é trabalho das fases 2 e 3 do quality gate.
+        run: |
+          npx eslint . -f json -o /tmp/lint.json || true
+          node -e '
+            const d=require("/tmp/lint.json");
+            const e=d.reduce((a,f)=>a+f.errorCount,0);
+            const w=d.reduce((a,f)=>a+f.warningCount,0);
+            const TETO=468;
+            console.log(`erros: ${e} (teto ${TETO}) · avisos: ${w}`);
+            if (e > TETO) { console.error("ESLint regrediu: erros acima do teto."); process.exit(1); }
+          '
+      - name: TypeScript
+        run: npx tsc --noEmit -p tsconfig.app.json
+      - name: Build
+        run: npx vite build
+
+  banco:
+    name: Testes de isolamento multi-tenant
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          # Pinado de propósito: com "latest" a action consulta a API do GitHub
+          # para resolver a release e estoura o limite de requisições anônimas.
+          version: 3.1.0
+      - name: Sobe Postgres local e aplica as migrations
+        run: supabase db start
+      - name: Roda as verificações
+        # Cada arquivo roda numa transação e faz ROLLBACK: não deixa dado.
+        # ON_ERROR_STOP=1 faz a falha de qualquer asserção derrubar o job.
+        run: |
+          DB_URL=$(supabase status --output json | jq -r '.DB_URL')
+          for f in supabase/verificacoes/*.test.sql; do
+            echo "──────── $f"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+  edge:
+    name: Edge functions (tipos)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.45.5
+      - name: deno check
+        # Pega o que o tsc do app não vê: as functions não entram no tsconfig.
+        # Foi exatamente aqui que um helper de módulo passou a referenciar uma
+        # const de handler e teria quebrado toda resposta de três funções.
+        run: |
+          for f in supabase/functions/*/index.ts; do
+            echo "──────── $f"
+            deno check --no-lock "$f"
+          done
+
+  e2e:
+    name: Fluxos críticos
+    # ubuntu-latest hoje é 26.04 e o Playwright ainda não instala chromium nele.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          # Pinado de propósito: com "latest" a action consulta a API do GitHub
+          # para resolver a release e estoura o limite de requisições anônimas.
+          version: 3.1.0
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Sobe Supabase local
+        # `supabase db start` sobe SÓ o Postgres — foi o que fez o login expirar:
+        # sem GoTrue não há autenticação. O e2e precisa da pilha inteira.
+        run: supabase start
+      - name: Semeia clínica e usuário de teste
+        run: |
+          DB_URL=$(supabase status --output json | jq -r '.DB_URL')
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f e2e/seed.sql
+      - name: Roda os fluxos
+        env:
+          VITE_SUPABASE_URL: http://127.0.0.1:54321
+        run: |
+          export VITE_SUPABASE_PUBLISHABLE_KEY=$(supabase status --output json | jq -r '.ANON_KEY')
+          npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
