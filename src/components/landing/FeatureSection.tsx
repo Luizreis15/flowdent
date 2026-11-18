@@ -1,8 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 interface FeatureSectionProps {
   badge: string;
@@ -27,15 +26,16 @@ export default function FeatureSection({
   imagePosition,
   id,
 }: FeatureSectionProps) {
+  const reduceMotion = useReducedMotion();
   const isImageLeft = imagePosition === 'left';
 
   return (
-    <section id={id} className="py-8 relative overflow-hidden">
+    <section id={id} className={`relative scroll-mt-24 overflow-hidden border-t border-slate-100 py-14 lg:py-20 ${isImageLeft ? "bg-slate-50" : "bg-white"}`}>
       <div className="container mx-auto px-4">
         <div className={`grid md:grid-cols-2 gap-6 lg:gap-10 items-center ${isImageLeft ? 'md:flex-row-reverse' : ''}`}>
           {/* Content Column */}
           <motion.div
-            initial={{ opacity: 0, x: isImageLeft ? 50 : -50 }}
+            initial={reduceMotion ? false : { opacity: 0, x: isImageLeft ? 24 : -24 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
@@ -43,12 +43,12 @@ export default function FeatureSection({
           >
             {/* Badge */}
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
+              initial={reduceMotion ? false : { opacity: 0, y: -12 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <Badge className="bg-[hsl(var(--flow-turquoise)/0.1)] text-[hsl(var(--flow-turquoise))] border border-[hsl(var(--flow-turquoise)/0.3)] px-4 py-2 text-sm font-semibold">
+              <Badge className="bg-[hsl(var(--flow-turquoise)/0.1)] text-teal-800 border border-[hsl(var(--flow-turquoise)/0.3)] px-4 py-2 text-sm font-semibold">
                 {badge}
               </Badge>
             </motion.div>
@@ -68,7 +68,7 @@ export default function FeatureSection({
               {benefits.map((benefit, index) => (
                 <motion.li
                   key={index}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={reduceMotion ? false : { opacity: 0, x: -12 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 * index }}
                   viewport={{ once: true }}
@@ -93,7 +93,7 @@ export default function FeatureSection({
                 size="lg"
               >
                 <a href="https://app.flowdent.com.br/cadastro">
-                  Experimente Grátis
+                  {ctaText}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </a>
               </Button>
@@ -102,7 +102,7 @@ export default function FeatureSection({
 
           {/* Image Column */}
           <motion.div
-            initial={{ opacity: 0, x: isImageLeft ? -50 : 50 }}
+            initial={reduceMotion ? false : { opacity: 0, x: isImageLeft ? -24 : 24 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
@@ -112,6 +112,8 @@ export default function FeatureSection({
               <img
                 src={imageSrc}
                 alt={imageAlt}
+                loading="lazy"
+                decoding="async"
                 className="w-full rounded-2xl shadow-2xl"
               />
               {/* Decorative Gradient */}

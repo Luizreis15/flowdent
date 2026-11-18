@@ -1,97 +1,31 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Play, CheckCircle } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
 
 export default function CTASection() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <section id="contato" className="py-10 relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--flowdent-blue))] via-[hsl(var(--flow-turquoise))] to-[hsl(var(--health-mint))] -z-10"></div>
-      
-      {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center max-w-4xl mx-auto text-white"
-        >
-          {/* Headline */}
-          <h2 className="text-5xl font-bold mb-6">
-            Pronto para Transformar sua Clínica?
-          </h2>
-
-          {/* Subheadline */}
-          <p className="text-xl mb-8 opacity-90">
-            Junte-se a centenas de dentistas que já descobriram como é simples 
-            gerenciar uma clínica quando você tem as ferramentas certas.
-          </p>
-
-          {/* Benefits */}
-          <div className="flex flex-wrap justify-center gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>7 dias grátis</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>Sem cartão de crédito</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>Cancele quando quiser</span>
-            </div>
-          </div>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            viewport={{ once: true }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                size="lg"
-                asChild
-                className="bg-white text-[hsl(var(--flowdent-blue))] hover:bg-white/90 transition-all duration-300 text-lg px-8 py-6 shadow-xl"
-              >
-                <a href="https://app.flowdent.com.br/cadastro">
-                  Comece Grátis Agora
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </a>
-              </Button>
-            </motion.div>
-            
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-2 border-white bg-white text-[hsl(var(--flow-turquoise))] hover:bg-white/10 hover:text-white transition-all duration-300 text-lg px-8 py-6"
-              >
-                <Play className="mr-2 h-5 w-5" />
-                Agendar Demonstração
-              </Button>
-            </motion.div>
-          </motion.div>
-
-          {/* Trust Text */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            viewport={{ once: true }}
-            className="mt-8 text-sm opacity-80"
-          >
-            💙 Mais de 500 clínicas já confiaram no Flowdent para transformar sua gestão
-          </motion.p>
-        </motion.div>
-      </div>
+    <section id="contato" className="relative isolate overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 px-4 py-16 text-white sm:py-24">
+      <div aria-hidden="true" className="absolute -bottom-48 -right-32 -z-10 size-[32rem] rounded-full bg-teal-400/20 blur-3xl" />
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}
+        className="mx-auto max-w-3xl text-center"
+      >
+        <h2 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">Experimente o Flowdent na rotina da sua clínica.</h2>
+        <p className="mx-auto mt-5 max-w-lg text-lg text-blue-100">Veja como a sua equipe pode conectar agendamentos, prontuários e pagamentos ao longo de 7 dias.</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Button asChild size="lg" className="h-12 bg-white text-blue-900 hover:bg-blue-50">
+            <a href="https://app.flowdent.com.br/cadastro">Testar grátis por 7 dias <ArrowRight className="ml-2 size-4" /></a>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="h-12 border-white/60 bg-transparent text-white hover:bg-white/10 hover:text-white">
+            <a href="https://wa.me/5511915519060?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20uma%20demonstra%C3%A7%C3%A3o%20do%20Flowdent." target="_blank" rel="noopener noreferrer"><MessageCircle className="mr-2 size-4" /> Agendar demonstração</a>
+          </Button>
+        </div>
+      </motion.div>
     </section>
   );
 }
