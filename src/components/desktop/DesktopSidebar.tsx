@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/hooks/usePermissions";
-import logoFlowdent from "@/assets/logo-flowdent.png";
+import { Logo } from "@/components/brand/Logo";
 
 interface NavItem {
   name: string;
@@ -176,7 +176,7 @@ const DesktopSidebar = () => {
       {/* Logo */}
       <div className="flex items-center h-16 px-5 border-b border-sidebar-border flex-shrink-0">
         <Link to="/dashboard">
-          <img src={logoFlowdent} alt="Flowdent" className="h-9 w-auto" />
+          <Logo className="h-7" />
         </Link>
       </div>
 

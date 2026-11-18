@@ -1,5 +1,5 @@
 import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
-import logoFlowdent from '@/assets/logo-flowdent.png';
+import { Logo } from "@/components/brand/Logo";
 
 export default function LandingFooter() {
   return (
@@ -10,7 +10,7 @@ export default function LandingFooter() {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             {/* Logo e Descrição */}
             <div className="flex-1">
-              <img src={logoFlowdent} alt="Flowdent" className="h-10 w-auto mb-2" />
+              <Logo className="h-8 mb-2" />
               <p className="text-sm text-gray-600">
                 Desenvolvido pela Hera Digital em Santo André - São Paulo.<br />
                 Gestão inteligente para clínicas odontológicas.
