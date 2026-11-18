@@ -14,7 +14,13 @@ BEGIN
   LIMIT 1;
 
   IF v_user_id IS NULL THEN
-    RAISE EXCEPTION 'User with email admin@admin.com not found. Please register first.';
+    -- Era RAISE EXCEPTION, o que tornava a história de migrations irreproduzível:
+    -- num banco novo (CI, ambiente local, branch, recuperação) admin@admin.com não
+    -- existe e `supabase db start` abortava aqui. A migration já está aplicada em
+    -- produção, então afrouxar só afeta reconstruções. A conta foi revogada depois,
+    -- em 20260722105000_revoke_orphan_admin_admin.sql.
+    RAISE NOTICE 'User admin@admin.com not found in auth.users. Skipping super_admin role.';
+    RETURN;
   END IF;
 
   -- Insert or update user_roles to super_admin

@@ -20,6 +20,12 @@ interface ApproveRequest {
 
 serve(async (req) => {
   const corsHeaders = cors(req);
+  function jsonError(message: string, status: number) {
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -349,12 +355,6 @@ serve(async (req) => {
 
 // === Helpers ===
 
-function jsonError(message: string, status: number) {
-  return new Response(
-    JSON.stringify({ error: message }),
-    { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-  );
-}
 
 function addMonths(dateStr: string, months: number): string {
   const d = new Date(dateStr + "T12:00:00");

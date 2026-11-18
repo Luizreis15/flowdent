@@ -78,7 +78,8 @@ jobs:
 
   e2e:
     name: Fluxos críticos
-    runs-on: ubuntu-latest
+    # ubuntu-latest hoje é 26.04 e o Playwright ainda não instala chromium nele.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
