@@ -2,121 +2,248 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* =========================================================================
+   Flowdent — design tokens
+   Derivados dos pixels do logo: azul do símbolo em matiz 224, lettering em 187.
+   A rampa herda a matiz da marca e calibra a saturação: 85% serve a um símbolo
+   olhado por um segundo, não a uma superfície encarada oito horas.
+   Todas as cores em tripla HSL, consumidas como hsl(var(--token)).
+   ========================================================================= */
 
 @layer base {
   :root {
-    /* Flowdent Brand Colors */
-    --flowdent-blue: 205 84% 29%;        /* #0A4D8C */
-    --flow-turquoise: 192 100% 42%;      /* #00B4D8 */
-    --health-mint: 169 61% 54%;          /* #48C9B0 */
-    
-    /* Neutral Colors */
-    --slate-gray: 210 22% 24%;           /* #2C3E50 */
-    --silver-cloud: 204 6% 61%;          /* #95A5A6 */
-    --cloud-white: 192 15% 94%;          /* #ECF0F1 */
-    --pure-white: 0 0% 100%;             /* #FFFFFF */
-    --warm-sand: 30 50% 60%;             /* Tom bege/areia */
-    
-    /* Status Colors */
-    --success-green: 145 63% 42%;        /* #27AE60 */
-    --warning-amber: 37 90% 51%;         /* #F39C12 */
-    --error-red: 6 78% 57%;              /* #E74C3C */
+    /* --- Primitivas: tinta (marca), acento (lettering), bone (neutro quente) --- */
+    --tinta-50: 222 46% 96%;
+    --tinta-100: 222 46% 91%;
+    --tinta-200: 222 44% 82%;
+    --tinta-300: 222 40% 70%;
+    --tinta-400: 222 42% 58%;
+    --tinta-500: 222 48% 46%;
+    --tinta-600: 222 56% 37%;
+    --tinta-700: 222 62% 29%;
+    --tinta-800: 222 66% 23%;
+    --tinta-900: 222 68% 17%;
+    --tinta-950: 222 66% 11%;
 
-    /* Card Color Variants */
-    --card-blue: 205 84% 96%;
-    --card-green: 145 63% 96%;
-    --card-turquoise: 192 100% 96%;
-    --card-amber: 37 90% 96%;
-    --card-purple: 270 60% 96%;
-    --card-mint: 169 61% 96%;
+    --acento-50: 187 44% 96%;
+    --acento-100: 187 45% 90%;
+    --acento-200: 187 43% 80%;
+    --acento-300: 187 42% 66%;
+    --acento-400: 187 43% 55%;
+    --acento-500: 187 45% 45%;
+    --acento-600: 187 50% 36%;
+    --acento-700: 187 55% 28%;
+    --acento-800: 187 58% 21%;
+    --acento-900: 187 60% 15%;
 
-    /* Shadcn mappings */
-    --background: 210 20% 98%;
-    --foreground: 210 22% 24%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 22% 24%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 22% 24%;
-    --primary: 205 84% 29%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 192 100% 42%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 210 15% 45%;
-    --accent: 169 61% 54%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 6 78% 57%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 210 20% 92%;
-    --input: 210 20% 92%;
-    --ring: 205 84% 29%;
-    --radius: 0.75rem;
+    --bone-0: 38 0% 100%;
+    --bone-50: 38 30% 98%;
+    --bone-100: 38 24% 95%;
+    --bone-200: 38 18% 90%;
+    --bone-300: 38 14% 80%;
+    --bone-400: 38 11% 68%;
+    --bone-500: 38 8% 55%;
+    --bone-600: 38 8% 42%;
+    --bone-700: 38 10% 30%;
+    --bone-800: 38 11% 21%;
+    --bone-900: 38 12% 14%;
+    --bone-950: 38 14% 8%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(205 84% 29%) 0%, hsl(192 100% 42%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(192 15% 94%) 100%);
-    --gradient-card-blue: linear-gradient(135deg, hsl(205 84% 97%) 0%, hsl(192 100% 95%) 100%);
-    --gradient-card-green: linear-gradient(135deg, hsl(145 63% 97%) 0%, hsl(169 61% 95%) 100%);
-    --gradient-card-amber: linear-gradient(135deg, hsl(37 90% 97%) 0%, hsl(37 90% 93%) 100%);
-    --gradient-sidebar: linear-gradient(180deg, hsl(205 84% 98%) 0%, hsl(0 0% 100%) 100%);
-    
-    --shadow-sm: 0 1px 2px 0 hsl(210 22% 24% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(210 22% 24% / 0.1), 0 2px 4px -2px hsl(210 22% 24% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(210 22% 24% / 0.1), 0 4px 6px -4px hsl(210 22% 24% / 0.1);
-    --shadow-xl: 0 20px 25px -5px hsl(210 22% 24% / 0.1), 0 8px 10px -6px hsl(210 22% 24% / 0.1);
+    /* --- Nomes históricos, repontados para a paleta da marca ---
+       Mantidos porque há mais de 500 referências no código. Não renomear. */
+    --flowdent-blue: 222 62% 29%;      /* era 205 84% 29% */
+    --flow-turquoise: 187 50% 36%;     /* era 192 100% 42% — saturação de 100% fora */
+    --health-mint: 187 43% 55%;        /* era 169 61% 54% — terceira matiz eliminada */
+    --slate-gray: 38 12% 14%;
+    --silver-cloud: 38 8% 55%;
+    --cloud-white: 38 18% 90%;
+    --pure-white: 38 0% 100%;
+    --warm-sand: 38 14% 80%;
+    --success-green: 148 45% 33%;
+    --warning-amber: 40 77% 31%;
+    --error-red: 4 58% 42%;
 
-    --sidebar-background: 205 84% 98%;
-    --sidebar-foreground: 210 22% 24%;
-    --sidebar-primary: 205 84% 29%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 205 84% 94%;
-    --sidebar-accent-foreground: 205 84% 29%;
-    --sidebar-border: 210 20% 92%;
-    --sidebar-ring: 205 84% 29%;
+    /* --- Semânticos novos --- */
+    --surface-pagina: 38 30% 98%;
+    --surface-elevada: 38 0% 100%;
+    --surface-afundada: 38 24% 95%;
+    --borda: 38 18% 90%;
+    --borda-forte: 38 14% 80%;
+    --texto-primario: 38 12% 14%;
+    --texto-secundario: 38 8% 42%;
+    --texto-suave: 38 8% 55%;
+    --acao: 222 62% 29%;
+    --acao-hover: 222 66% 23%;
+    --acao-sobre: 38 0% 100%;
+    --acao-tenue: 222 46% 96%;
+    --foco: 222 48% 46%;
+    --acento: 187 55% 28%;
+    --acento-tenue: 187 45% 90%;
+    --sinal-ok: 148 45% 33%;
+    --sinal-ok-tenue: 138 25% 92%;
+    --sinal-espera: 40 77% 31%;
+    --sinal-espera-tenue: 43 58% 92%;
+    --sinal-alerta: 4 58% 42%;
+    --sinal-alerta-tenue: 7 47% 93%;
+
+    /* --- Odontograma: convenção tradicional, calibrada --- */
+    --clinico-a-realizar: 4 58% 42%;
+    --clinico-executado: 148 45% 33%;
+    --clinico-protese: 206 64% 34%;
+    --clinico-ausente: 38 10% 30%;
+    --clinico-dente: 38 0% 100%;
+    --clinico-contorno: 38 14% 80%;
+
+    /* --- Tintas de cartão, agora dentro do sistema --- */
+    --card-blue: 222 46% 96%;
+    --card-green: 138 25% 92%;
+    --card-turquoise: 187 44% 96%;
+    --card-amber: 43 58% 92%;
+    --card-purple: 222 46% 91%;
+    --card-mint: 187 45% 90%;
+
+    /* --- Mapeamento shadcn --- */
+    --background: 38 30% 98%;
+    --foreground: 38 12% 14%;
+    --card: 38 0% 100%;
+    --card-foreground: 38 12% 14%;
+    --popover: 38 0% 100%;
+    --popover-foreground: 38 12% 14%;
+    --primary: 222 62% 29%;
+    --primary-foreground: 38 0% 100%;
+    --primary-hover: 222 66% 23%;
+    --secondary: 187 50% 36%;
+    --secondary-foreground: 38 0% 100%;
+    --secondary-hover: 187 55% 28%;
+    --muted: 38 24% 95%;
+    --muted-foreground: 38 8% 42%;
+    --accent: 38 24% 95%;
+    --accent-foreground: 38 12% 14%;
+    --destructive: 4 58% 42%;
+    --destructive-foreground: 38 0% 100%;
+    --border: 38 18% 90%;
+    --input: 38 18% 90%;
+    --ring: 222 48% 46%;
+    --radius: 0.5rem;
+
+    --gradient-hero: linear-gradient(135deg, hsl(222 66% 23%) 0%, hsl(222 56% 37%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(38 0% 100%) 0%, hsl(38 30% 98%) 100%);
+    --gradient-card-blue: linear-gradient(135deg, hsl(222 46% 96%) 0%, hsl(222 46% 91%) 100%);
+    --gradient-card-green: linear-gradient(135deg, hsl(138 25% 92%) 0%, hsl(187 44% 96%) 100%);
+    --gradient-card-amber: linear-gradient(135deg, hsl(43 58% 92%) 0%, hsl(43 58% 92%) 100%);
+    --gradient-sidebar: linear-gradient(180deg, hsl(38 24% 95%) 0%, hsl(38 30% 98%) 100%);
+
+    /* Sombra só onde algo sobrepõe de verdade. Em fluxo, a separação é borda. */
+    --shadow-sm: 0 1px 2px 0 hsl(38 12% 14% / 0.05);
+    --shadow-md: 0 2px 6px -1px hsl(38 12% 14% / 0.08), 0 1px 2px -1px hsl(38 12% 14% / 0.06);
+    --shadow-lg: 0 6px 16px -4px hsl(38 12% 14% / 0.10), 0 1px 3px -1px hsl(38 12% 14% / 0.08);
+    --shadow-xl: 0 16px 40px -8px hsl(38 12% 14% / 0.16), 0 2px 6px -2px hsl(38 12% 14% / 0.10);
+
+    --sidebar-background: 38 24% 95%;
+    --sidebar-foreground: 38 12% 14%;
+    --sidebar-primary: 222 62% 29%;
+    --sidebar-primary-foreground: 38 0% 100%;
+    --sidebar-accent: 222 46% 96%;
+    --sidebar-accent-foreground: 222 62% 29%;
+    --sidebar-border: 38 18% 90%;
+    --sidebar-ring: 222 48% 46%;
   }
 
   .dark {
-    --background: 210 22% 24%;
-    --foreground: 0 0% 100%;
-    --card: 210 22% 24%;
-    --card-foreground: 0 0% 100%;
-    --popover: 210 22% 24%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 192 100% 42%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 205 84% 29%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 204 6% 61%;
-    --muted-foreground: 192 15% 94%;
-    --accent: 169 61% 54%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 6 78% 57%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 204 6% 61%;
-    --input: 204 6% 61%;
-    --ring: 192 100% 42%;
+    /* O tema escuro anterior usava prata (204 6% 61%) como borda sobre fundo
+       escuro, o que corta a tela. Aqui a borda é um passo acima da superfície. */
+    --flowdent-blue: 222 42% 58%;
+    --flow-turquoise: 187 43% 55%;
+    --health-mint: 187 42% 66%;
+    --slate-gray: 40 26% 93%;
+    --silver-cloud: 35 9% 63%;
+    --cloud-white: 36 11% 18%;
+    --pure-white: 38 0% 100%;
+    --warm-sand: 38 11% 68%;
+    --success-green: 146 38% 65%;
+    --warning-amber: 38 62% 64%;
+    --error-red: 6 68% 73%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(192 100% 42%) 0%, hsl(169 61% 54%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(210 22% 24%) 0%, hsl(210 22% 28%) 100%);
+    --surface-pagina: 38 14% 8%;
+    --surface-elevada: 40 11% 11%;
+    --surface-afundada: 38 11% 15%;
+    --borda: 36 11% 18%;
+    --borda-forte: 33 9% 25%;
+    --texto-primario: 40 26% 93%;
+    --texto-secundario: 35 9% 63%;
+    --texto-suave: 35 7% 48%;
+    --acao: 222 42% 58%;
+    --acao-hover: 222 40% 70%;
+    --acao-sobre: 222 66% 11%;
+    --acao-tenue: 222 45% 16%;
+    --foco: 222 40% 70%;
+    --acento: 187 42% 66%;
+    --acento-tenue: 187 42% 15%;
+    --sinal-ok: 146 38% 65%;
+    --sinal-ok-tenue: 145 32% 14%;
+    --sinal-espera: 38 62% 64%;
+    --sinal-espera-tenue: 38 45% 12%;
+    --sinal-alerta: 6 68% 73%;
+    --sinal-alerta-tenue: 6 38% 13%;
 
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.4);
-    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.5), 0 8px 10px -6px hsl(0 0% 0% / 0.5);
+    --clinico-a-realizar: 6 68% 73%;
+    --clinico-executado: 146 38% 65%;
+    --clinico-protese: 206 58% 71%;
+    --clinico-ausente: 38 11% 68%;
+    --clinico-dente: 38 11% 15%;
+    --clinico-contorno: 36 9% 33%;
 
-    --sidebar-background: 210 22% 24%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 192 100% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 204 6% 61%;
-    --sidebar-accent-foreground: 192 100% 42%;
-    --sidebar-border: 204 6% 61%;
-    --sidebar-ring: 192 100% 42%;
+    --card-blue: 222 45% 16%;
+    --card-green: 145 32% 14%;
+    --card-turquoise: 187 42% 15%;
+    --card-amber: 38 45% 12%;
+    --card-purple: 222 40% 20%;
+    --card-mint: 187 36% 18%;
+
+    --background: 38 14% 8%;
+    --foreground: 40 26% 93%;
+    --card: 40 11% 11%;
+    --card-foreground: 40 26% 93%;
+    --popover: 40 11% 11%;
+    --popover-foreground: 40 26% 93%;
+    --primary: 222 42% 58%;
+    --primary-foreground: 222 66% 11%;
+    --primary-hover: 222 40% 70%;
+    --secondary: 187 43% 55%;
+    --secondary-foreground: 222 66% 11%;
+    --secondary-hover: 187 42% 66%;
+    --muted: 38 11% 15%;
+    --muted-foreground: 35 9% 63%;
+    --accent: 38 11% 15%;
+    --accent-foreground: 40 26% 93%;
+    --destructive: 6 68% 73%;
+    --destructive-foreground: 38 14% 8%;
+    --border: 36 11% 18%;
+    --input: 36 11% 18%;
+    --ring: 222 40% 70%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(222 68% 17%) 0%, hsl(222 62% 29%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(40 11% 11%) 0%, hsl(38 14% 8%) 100%);
+    --gradient-card-blue: linear-gradient(135deg, hsl(222 45% 16%) 0%, hsl(222 68% 17%) 100%);
+    --gradient-card-green: linear-gradient(135deg, hsl(145 32% 14%) 0%, hsl(187 42% 15%) 100%);
+    --gradient-card-amber: linear-gradient(135deg, hsl(38 45% 12%) 0%, hsl(38 45% 12%) 100%);
+    --gradient-sidebar: linear-gradient(180deg, hsl(40 11% 11%) 0%, hsl(38 14% 8%) 100%);
+
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.30);
+    --shadow-md: 0 2px 6px -1px hsl(0 0% 0% / 0.40), 0 1px 2px -1px hsl(0 0% 0% / 0.30);
+    --shadow-lg: 0 6px 16px -4px hsl(0 0% 0% / 0.50), 0 1px 3px -1px hsl(0 0% 0% / 0.40);
+    --shadow-xl: 0 16px 40px -8px hsl(0 0% 0% / 0.62), 0 2px 6px -2px hsl(0 0% 0% / 0.46);
+
+    --sidebar-background: 40 11% 11%;
+    --sidebar-foreground: 40 26% 93%;
+    --sidebar-primary: 222 42% 58%;
+    --sidebar-primary-foreground: 222 66% 11%;
+    --sidebar-accent: 222 45% 16%;
+    --sidebar-accent-foreground: 222 40% 70%;
+    --sidebar-border: 36 11% 18%;
+    --sidebar-ring: 222 40% 70%;
   }
 }
-
 @layer base {
   * {
     @apply border-border;
@@ -147,10 +274,15 @@ All colors MUST be HSL.
     padding-top: env(safe-area-inset-top, 0);
   }
 
-  /* Touch-friendly interactive elements */
-  button, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
+  /* Alvo de toque de 44px — SÓ em ponteiro grosseiro.
+     Como regra global isto valia também no desktop, onde todo ícone e todo
+     link passava a ocupar 44px: é a causa principal da interface inflada e
+     do vazio entre elementos em tela de recepção. */
+  @media (pointer: coarse) {
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
   }
 
   /* Smaller buttons explicitly set */
@@ -199,7 +331,7 @@ All colors MUST be HSL.
 
 /* Card premium */
 .card-mobile {
-  border-radius: 1rem;
+  border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
@@ -209,7 +341,7 @@ All colors MUST be HSL.
 /* Input premium */
 .input-mobile {
   height: 48px;
-  border-radius: 0.75rem;
+  border-radius: calc(var(--radius) - 2px);
   font-size: 0.9375rem;
   padding: 0 1rem;
 }
@@ -217,7 +349,7 @@ All colors MUST be HSL.
 /* Button premium */
 .btn-mobile {
   height: 48px;
-  border-radius: 0.75rem;
+  border-radius: calc(var(--radius) - 2px);
   font-size: 0.9375rem;
   font-weight: 600;
   transition: transform 120ms ease, opacity 150ms ease;
