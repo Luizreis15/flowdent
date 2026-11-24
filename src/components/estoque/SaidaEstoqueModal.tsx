@@ -168,10 +168,10 @@ export function SaidaEstoqueModal({ open, onOpenChange }: SaidaEstoqueModalProps
       
       reset();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Erro ao registrar saída",
-        description: error.message,
+        description: (error as Error).message,
         variant: "destructive",
       });
     } finally {
@@ -183,7 +183,7 @@ export function SaidaEstoqueModal({ open, onOpenChange }: SaidaEstoqueModalProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Saída de Estoque</DialogTitle>
+          <DialogTitle>Saída de estoque</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -283,7 +283,7 @@ export function SaidaEstoqueModal({ open, onOpenChange }: SaidaEstoqueModalProps
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting || totalAvailable === 0}>
-              {isSubmitting ? "Salvando..." : "Confirmar Saída"}
+              {isSubmitting ? "Salvando…" : "Confirmar saída"}
             </Button>
           </div>
         </form>

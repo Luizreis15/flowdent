@@ -75,10 +75,10 @@ export function NovoProdutoModal({ open, onOpenChange }: NovoProdutoModalProps) 
       queryClient.invalidateQueries({ queryKey: ["products"] });
       reset();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Erro ao cadastrar produto",
-        description: error.message,
+        description: (error as Error).message,
         variant: "destructive",
       });
     } finally {
@@ -90,13 +90,13 @@ export function NovoProdutoModal({ open, onOpenChange }: NovoProdutoModalProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Novo Produto</DialogTitle>
+          <DialogTitle>Novo produto</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <Label htmlFor="nome">Nome do Produto *</Label>
+              <Label htmlFor="nome">Nome do produto *</Label>
               <Input id="nome" {...register("nome")} required />
             </div>
 
@@ -106,7 +106,7 @@ export function NovoProdutoModal({ open, onOpenChange }: NovoProdutoModalProps) 
             </div>
 
             <div>
-              <Label htmlFor="ean">EAN / Código de Barras</Label>
+              <Label htmlFor="ean">Código de barras (EAN)</Label>
               <Input id="ean" {...register("ean")} />
             </div>
 
@@ -139,22 +139,22 @@ export function NovoProdutoModal({ open, onOpenChange }: NovoProdutoModalProps) 
             </div>
 
             <div>
-              <Label htmlFor="estoque_minimo">Estoque Mínimo</Label>
+              <Label htmlFor="estoque_minimo">Estoque mínimo</Label>
               <Input id="estoque_minimo" type="number" step="0.01" {...register("estoque_minimo")} />
             </div>
 
             <div>
-              <Label htmlFor="estoque_maximo">Estoque Máximo</Label>
+              <Label htmlFor="estoque_maximo">Estoque máximo</Label>
               <Input id="estoque_maximo" type="number" step="0.01" {...register("estoque_maximo")} />
             </div>
 
             <div>
-              <Label htmlFor="preco_venda">Preço de Venda</Label>
+              <Label htmlFor="preco_venda">Preço de venda</Label>
               <Input id="preco_venda" type="number" step="0.01" {...register("preco_venda")} />
             </div>
 
             <div>
-              <Label htmlFor="metodo_custeio">Método de Custeio</Label>
+              <Label htmlFor="metodo_custeio">Método de custeio</Label>
               <Select defaultValue="media_ponderada" onValueChange={(value) => setValue("metodo_custeio", value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -172,7 +172,7 @@ export function NovoProdutoModal({ open, onOpenChange }: NovoProdutoModalProps) 
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Salvar Produto"}
+              {isSubmitting ? "Salvando…" : "Salvar produto"}
             </Button>
           </div>
         </form>

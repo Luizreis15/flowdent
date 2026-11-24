@@ -1,160 +1,138 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns";
+import { format, subMonths, startOfMonth, eachMonthOfInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import type { ReportFilters } from "./RelatorioFilters";
-import { Users, UserCheck, UserPlus, CalendarCheck, TrendingUp, TrendingDown, RotateCcw } from "lucide-react";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { CORES_GRAFICO } from "@/lib/coresGrafico";
+import { CartaoGrafico } from "./comum";
+import { DICA, EIXO, GRADE, STATUS, dentistasFiltrados, dentroDoIntervalo, intervaloDoFiltro, pct } from "./dados";
 
 interface Props { clinicId: string; filters: ReportFilters; }
 
-const KpiCard = ({ title, value, icon: Icon, color }: { title: string; value: string | number; icon: React.ElementType; color: string }) => (
-  <Card>
-    <CardContent className="p-4 flex items-center gap-3">
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <p className="text-xs text-muted-foreground">{title}</p>
-        <p className="text-xl font-bold text-foreground">{value}</p>
-      </div>
-    </CardContent>
-  </Card>
-);
-
 const VisaoGeralTab = ({ clinicId, filters }: Props) => {
   const [loading, setLoading] = useState(true);
-  const [kpis, setKpis] = useState({ totalPatients: 0, activePatients: 0, newPatients: 0, totalAppts: 0, attendanceRate: 0, cancelRate: 0, rescheduleRate: 0 });
-  const [monthlyData, setMonthlyData] = useState<any[]>([]);
-  const [newPatientsData, setNewPatientsData] = useState<any[]>([]);
+  const [kpis, setKpis] = useState({ totalPatients: 0, activePatients: 0, newPatients: 0, totalAppts: 0, attendanceRate: 0, cancelRate: 0 });
+  const [monthlyData, setMonthlyData] = useState<{ month: string; realizadas: number; faltas: number }[]>([]);
+  const [newPatientsData, setNewPatientsData] = useState<{ month: string; novos: number }[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      const startStr = format(filters.startDate, "yyyy-MM-dd");
-      const endStr = format(filters.endDate, "yyyy-MM-dd");
+      const { inicio, fim } = intervaloDoFiltro(filters);
       const sixMonthsAgo = format(subMonths(new Date(), 6), "yyyy-MM-dd");
+      // Os gráficos mostram os 6 meses que terminam no fim do filtro, não só o período filtrado
+      const inicioSerie = startOfMonth(subMonths(filters.endDate, 5));
+      const serie = intervaloDoFiltro({ startDate: inicioSerie, endDate: filters.endDate });
 
-      const { data: profs } = await supabase.from("profissionais").select("id, especialidade").eq("clinica_id", clinicId);
-      let profIds = profs?.map((p) => p.id) || [];
-      if (filters.dentistId) profIds = profIds.filter((id) => id === filters.dentistId);
-      if (filters.especialidade) {
-        const filtered = profs?.filter((p) => p.especialidade === filters.especialidade).map((p) => p.id) || [];
-        profIds = profIds.filter((id) => filtered.includes(id));
-      }
+      const profIds = await dentistasFiltrados(clinicId, filters);
 
-      // Patients
       const { count: totalPatients } = await supabase.from("patients").select("*", { count: "exact", head: true }).eq("clinic_id", clinicId);
-      const { count: newPatients } = await supabase.from("patients").select("*", { count: "exact", head: true }).eq("clinic_id", clinicId).gte("created_at", startStr).lte("created_at", endStr);
+      const { count: newPatients } = await supabase.from("patients").select("*", { count: "exact", head: true })
+        .eq("clinic_id", clinicId).gte("created_at", inicio).lt("created_at", fim);
 
-      // Active patients (had appointment in last 6 months)
       let activeCount = 0;
+      let appts: { status: string; appointment_date: string }[] = [];
+      let apptsSerie: { status: string; appointment_date: string }[] = [];
       if (profIds.length > 0) {
-        const { data: activeAppts } = await supabase.from("appointments").select("patient_id").in("dentist_id", profIds).gte("appointment_date", sixMonthsAgo).eq("status", "realizado");
+        const { data: activeAppts } = await supabase.from("appointments").select("patient_id")
+          .in("dentist_id", profIds).gte("appointment_date", sixMonthsAgo).eq("status", STATUS.realizado);
         activeCount = new Set(activeAppts?.map((a) => a.patient_id) || []).size;
+
+        let q = supabase.from("appointments").select("status, appointment_date")
+          .in("dentist_id", profIds).gte("appointment_date", serie.inicio).lt("appointment_date", serie.fim);
+        if (filters.status) q = q.eq("status", filters.status);
+        const { data } = await q;
+        apptsSerie = data || [];
+        appts = apptsSerie.filter((a) => dentroDoIntervalo(a.appointment_date, { inicio, fim }));
       }
 
-      // Appointments in period
-      let apptQuery = supabase.from("appointments").select("status, appointment_date");
-      if (profIds.length > 0) apptQuery = apptQuery.in("dentist_id", profIds);
-      else apptQuery = apptQuery.eq("dentist_id", "none");
-      apptQuery = apptQuery.gte("appointment_date", startStr).lte("appointment_date", endStr);
-      if (filters.status) apptQuery = apptQuery.eq("status", filters.status);
-      const { data: appts } = await apptQuery;
-      const total = appts?.length || 0;
-      const realized = appts?.filter((a) => a.status === "realizado").length || 0;
-      const canceled = appts?.filter((a) => a.status === "cancelado").length || 0;
-      const rescheduled = appts?.filter((a) => a.status === "remarcado").length || 0;
+      const realized = appts.filter((a) => a.status === STATUS.realizado).length;
+      const missed = appts.filter((a) => a.status === STATUS.faltou).length;
+      const canceled = appts.filter((a) => a.status === STATUS.cancelado).length;
 
       setKpis({
         totalPatients: totalPatients || 0,
         activePatients: activeCount,
         newPatients: newPatients || 0,
-        totalAppts: total,
-        attendanceRate: total > 0 ? Math.round((realized / total) * 100) : 0,
-        cancelRate: total > 0 ? Math.round((canceled / total) * 100) : 0,
-        rescheduleRate: total > 0 ? Math.round((rescheduled / total) * 100) : 0,
+        totalAppts: appts.length,
+        // Comparecimento conta só consultas encerradas: consultas futuras não são falta
+        attendanceRate: pct(realized, realized + missed),
+        cancelRate: pct(canceled, appts.length),
       });
 
-      // Monthly chart data
-      const months = eachMonthOfInterval({ start: subMonths(filters.endDate, 5), end: filters.endDate });
-      const mData = months.map((m) => {
-        const mStr = format(m, "yyyy-MM");
-        const mAppts = appts?.filter((a) => a.appointment_date.startsWith(mStr)) || [];
+      const months = eachMonthOfInterval({ start: inicioSerie, end: filters.endDate });
+      setMonthlyData(months.map((m) => {
+        const mAppts = apptsSerie.filter((a) => format(new Date(a.appointment_date), "yyyy-MM") === format(m, "yyyy-MM"));
         return {
           month: format(m, "MMM", { locale: ptBR }),
-          total: mAppts.length,
-          realizadas: mAppts.filter((a) => a.status === "realizado").length,
-          faltas: mAppts.filter((a) => a.status === "faltou").length,
+          realizadas: mAppts.filter((a) => a.status === STATUS.realizado).length,
+          faltas: mAppts.filter((a) => a.status === STATUS.faltou).length,
         };
-      });
-      setMonthlyData(mData);
+      }));
 
-      // New patients monthly
       const { data: patientsAll } = await supabase.from("patients").select("created_at").eq("clinic_id", clinicId)
-        .gte("created_at", format(subMonths(filters.endDate, 5), "yyyy-MM-dd"));
-      const npData = months.map((m) => {
-        const mStr = format(m, "yyyy-MM");
-        return {
-          month: format(m, "MMM", { locale: ptBR }),
-          novos: (patientsAll || []).filter((p) => p.created_at.startsWith(mStr)).length,
-        };
-      });
-      setNewPatientsData(npData);
+        .gte("created_at", serie.inicio).lt("created_at", serie.fim);
+      setNewPatientsData(months.map((m) => ({
+        month: format(m, "MMM", { locale: ptBR }),
+        novos: (patientsAll || []).filter((p) => format(new Date(p.created_at), "yyyy-MM") === format(m, "yyyy-MM")).length,
+      })));
 
       setLoading(false);
     };
     fetch();
   }, [clinicId, filters]);
 
-  if (loading) return <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-[92px] rounded-lg" />
+        <div className="grid gap-6 lg:grid-cols-2"><Skeleton className="h-[340px] rounded-lg" /><Skeleton className="h-[340px] rounded-lg" /></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Total Pacientes" value={kpis.totalPatients} icon={Users} color="bg-blue-100 text-blue-600" />
-        <KpiCard title="Pacientes Ativos" value={kpis.activePatients} icon={UserCheck} color="bg-green-100 text-green-600" />
-        <KpiCard title="Novos no Período" value={kpis.newPatients} icon={UserPlus} color="bg-purple-100 text-purple-600" />
-        <KpiCard title="Total Consultas" value={kpis.totalAppts} icon={CalendarCheck} color="bg-orange-100 text-orange-600" />
-        <KpiCard title="Comparecimento" value={`${kpis.attendanceRate}%`} icon={TrendingUp} color="bg-emerald-100 text-emerald-600" />
-        <KpiCard title="Cancelamento" value={`${kpis.cancelRate}%`} icon={TrendingDown} color="bg-red-100 text-red-600" />
-        <KpiCard title="Remarcação" value={`${kpis.rescheduleRate}%`} icon={RotateCcw} color="bg-amber-100 text-amber-600" />
-      </div>
+      <FaixaIndicadores
+        compacto
+        itens={[
+          { rotulo: "Pacientes", valor: kpis.totalPatients, nota: `${kpis.activePatients} ativos em 6 meses` },
+          { rotulo: "Novos no período", valor: kpis.newPatients },
+          { rotulo: "Consultas", valor: kpis.totalAppts },
+          { rotulo: "Comparecimento", valor: kpis.attendanceRate, sufixo: "%", nota: "das consultas encerradas" },
+          { rotulo: "Cancelamento", valor: kpis.cancelRate, sufixo: "%", tom: kpis.cancelRate >= 20 ? "alerta" : "padrao" },
+        ]}
+      />
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader><CardTitle className="text-sm">Evolução Mensal de Consultas</CardTitle></CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="month" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="realizadas" name="Realizadas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="faltas" name="Faltas" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <CartaoGrafico titulo="Consultas por mês" nota="Últimos 6 meses">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={monthlyData} barGap={2}>
+              <CartesianGrid {...GRADE} />
+              <XAxis dataKey="month" {...EIXO} />
+              <YAxis {...EIXO} axisLine={false} allowDecimals={false} width={32} />
+              <Tooltip {...DICA} />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 13 }} />
+              <Bar dataKey="realizadas" name="Finalizadas" fill={CORES_GRAFICO.destaque} radius={[3, 3, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="faltas" name="Faltas" fill={CORES_GRAFICO.neutra} radius={[3, 3, 0, 0]} maxBarSize={28} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CartaoGrafico>
 
-        <Card>
-          <CardHeader><CardTitle className="text-sm">Pacientes Novos por Mês</CardTitle></CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={newPatientsData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="month" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip />
-                <Line type="monotone" dataKey="novos" name="Novos" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <CartaoGrafico titulo="Pacientes novos por mês" nota="Últimos 6 meses">
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={newPatientsData}>
+              <CartesianGrid {...GRADE} />
+              <XAxis dataKey="month" {...EIXO} />
+              <YAxis {...EIXO} axisLine={false} allowDecimals={false} width={32} />
+              <Tooltip {...DICA} cursor={{ stroke: CORES_GRAFICO.grade }} />
+              <Line type="monotone" dataKey="novos" name="Novos" stroke={CORES_GRAFICO.destaque} strokeWidth={2} dot={{ r: 3, fill: CORES_GRAFICO.destaque }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </CartaoGrafico>
       </div>
     </div>
   );

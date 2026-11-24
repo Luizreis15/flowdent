@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subMonths } from "date-fns";
-import { Download, Users, UserCheck, UserX, AlertTriangle } from "lucide-react";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { BotaoExportar } from "./comum";
+import { STATUS } from "./dados";
 import type { ReportFilters } from "./RelatorioFilters";
 import { useRelatorioExport } from "@/hooks/useRelatorioExport";
 
@@ -18,18 +19,6 @@ interface PatientRow {
   status: string;
   totalAppts: number;
 }
-
-const KpiCard = ({ title, value, icon: Icon, color }: { title: string; value: number; icon: React.ElementType; color: string }) => (
-  <Card>
-    <CardContent className="p-4 flex items-center gap-3">
-      <div className={`p-2 rounded-lg ${color}`}><Icon className="h-5 w-5" /></div>
-      <div>
-        <p className="text-xs text-muted-foreground">{title}</p>
-        <p className="text-xl font-bold text-foreground">{value}</p>
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const PacientesTab = ({ clinicId, filters }: Props) => {
   const [loading, setLoading] = useState(true);
@@ -48,7 +37,7 @@ const PacientesTab = ({ clinicId, filters }: Props) => {
       const profMap = new Map((profs || []).map((p) => [p.id, p.nome]));
       const profIds = profs?.map((p) => p.id) || [];
 
-      let appts: any[] = [];
+      let appts: { patient_id: string; appointment_date: string; dentist_id: string; status: string }[] = [];
       if (profIds.length > 0) {
         const { data } = await supabase.from("appointments").select("patient_id, appointment_date, dentist_id, status").in("dentist_id", profIds);
         appts = data || [];
@@ -82,7 +71,7 @@ const PacientesTab = ({ clinicId, filters }: Props) => {
           lastAppt: lastAppt ? format(new Date(lastAppt.appointment_date), "dd/MM/yyyy") : "Sem consultas",
           dentist: lastAppt ? (profMap.get(lastAppt.dentist_id) || "-") : "-",
           status: isActive ? "Ativo" : "Inativo",
-          totalAppts: pAppts.filter((a) => a.status === "realizado").length,
+          totalAppts: pAppts.filter((a) => a.status === STATUS.realizado).length,
         });
       });
 
@@ -97,58 +86,58 @@ const PacientesTab = ({ clinicId, filters }: Props) => {
 
   const columns = [
     { header: "Nome", key: "name" },
-    { header: "Última Consulta", key: "lastAppt" },
+    { header: "Última consulta", key: "lastAppt" },
     { header: "Dentista", key: "dentist" },
     { header: "Status", key: "status" },
-    { header: "Total Consultas", key: "totalAppts" },
+    { header: "Consultas finalizadas", key: "totalAppts" },
   ];
 
-  if (loading) return <div className="space-y-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>;
+  if (loading) return <div className="space-y-6"><Skeleton className="h-[92px] rounded-lg" /><Skeleton className="h-96 rounded-lg" /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Total" value={kpis.total} icon={Users} color="bg-blue-100 text-blue-600" />
-        <KpiCard title="Ativos" value={kpis.active} icon={UserCheck} color="bg-green-100 text-green-600" />
-        <KpiCard title="Inativos" value={kpis.inactive} icon={UserX} color="bg-gray-100 text-gray-600" />
-        <KpiCard title="Sem retorno 12+ meses" value={kpis.noReturn} icon={AlertTriangle} color="bg-red-100 text-red-600" />
-      </div>
+      <FaixaIndicadores
+        compacto
+        itens={[
+          { rotulo: "Pacientes", valor: kpis.total },
+          { rotulo: "Ativos", valor: kpis.active, nota: "Consulta nos últimos 6 meses" },
+          { rotulo: "Inativos", valor: kpis.inactive },
+          { rotulo: "Sem retorno há 12 meses", valor: kpis.noReturn, tom: kpis.noReturn > 0 ? "espera" : "padrao" },
+        ]}
+      />
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-sm">Pacientes</CardTitle>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="text-xs" onClick={() => exportToCSV(rows, columns, "pacientes")}>
-              <Download className="h-3.5 w-3.5 mr-1" /> CSV
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs" onClick={() => exportToExcel(rows, columns, "pacientes")}>
-              <Download className="h-3.5 w-3.5 mr-1" /> Excel
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs" onClick={() => exportToPDF(rows, columns, "pacientes", "Relatório de Pacientes")}>
-              <Download className="h-3.5 w-3.5 mr-1" /> PDF
-            </Button>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <div>
+            <CardTitle className="text-[15px]">Pacientes que mais consultam</CardTitle>
+            <p className="mt-0.5 text-[13px] text-muted-foreground">Os 50 primeiros, por consultas finalizadas</p>
           </div>
+          <BotaoExportar
+            onCSV={() => exportToCSV(rows, columns, "pacientes")}
+            onExcel={() => exportToExcel(rows, columns, "pacientes")}
+            onPDF={() => exportToPDF(rows, columns, "pacientes", "Relatório de pacientes")}
+          />
         </CardHeader>
-        <CardContent>
-          <div className="overflow-auto max-h-[500px]">
+        <CardContent className="p-0">
+          <div className="max-h-[500px] overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  {columns.map((c) => <TableHead key={c.key} className="text-xs">{c.header}</TableHead>)}
+                  {columns.map((c) => <TableHead key={c.key} className={c.key === "totalAppts" ? "text-right" : undefined}>{c.header}</TableHead>)}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((row, i) => (
                   <TableRow key={i}>
-                    <TableCell className="text-sm font-medium">{row.name}</TableCell>
-                    <TableCell className="text-sm">{row.lastAppt}</TableCell>
-                    <TableCell className="text-sm">{row.dentist}</TableCell>
+                    <TableCell className="font-medium">{row.name}</TableCell>
+                    <TableCell className="tabular-nums text-muted-foreground">{row.lastAppt}</TableCell>
+                    <TableCell>{row.dentist}</TableCell>
                     <TableCell>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${row.status === "Ativo" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+                      <span className={`inline-flex rounded-md px-2 py-0.5 text-xs font-medium ${row.status === "Ativo" ? "bg-sinal-ok-tenue text-sinal-ok" : "bg-muted text-muted-foreground"}`}>
                         {row.status}
                       </span>
                     </TableCell>
-                    <TableCell className="text-sm text-center">{row.totalAppts}</TableCell>
+                    <TableCell className="text-right tabular-nums">{row.totalAppts}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
