@@ -68,11 +68,11 @@ export default function CRMAtendimento() {
           </p>
           <div className="flex flex-col gap-3 max-w-sm mx-auto mb-6">
             <div className="p-3 border rounded-lg text-left">
-              <p className="font-semibold text-sm">📱 WhatsApp Web (Gratuito)</p>
+              <p className="font-semibold text-sm">WhatsApp Web (gratuito)</p>
               <p className="text-xs text-muted-foreground">Conecte escaneando QR Code</p>
             </div>
             <div className="p-3 border rounded-lg text-left">
-              <p className="font-semibold text-sm">🏢 API Oficial Meta</p>
+              <p className="font-semibold text-sm">API oficial da Meta</p>
               <p className="text-xs text-muted-foreground">Credenciais Meta/Facebook (pago)</p>
             </div>
           </div>

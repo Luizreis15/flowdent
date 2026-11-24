@@ -39,6 +39,7 @@ const routeTitles: Record<string, { title: string; parent?: string }> = {
   "/dashboard/produtos": { title: "Produtos", parent: "Estoque" },
   "/dashboard/movimentacoes": { title: "Movimentações", parent: "Estoque" },
   "/dashboard/crm": { title: "CRM" },
+  "/dashboard/crm/atendimento": { title: "Atendimento", parent: "CRM" },
   "/dashboard/portal-paciente": { title: "Portal do Paciente" },
   "/dashboard/ia-assistente": { title: "IA Assistente" },
   "/dashboard/configuracoes": { title: "Configurações" },
