@@ -13,7 +13,12 @@ import {
 } from "@/components/ui/select";
 import { FaceOclusal, FaceStatus } from "@/components/odontograma/FaceOclusal";
 import { DenteVestibular } from "@/components/odontograma/DenteVestibular";
-import { larguraDente } from "@/components/odontograma/anatomia";
+import {
+  type CondicaoDente,
+  condicaoDoProcedimento,
+  condicaoPrevalente,
+  larguraDente,
+} from "@/components/odontograma/anatomia";
 import { ProcedimentosTable } from "@/components/odontograma/ProcedimentosTable";
 
 interface OdontogramaTabProps {
@@ -42,6 +47,8 @@ interface DenteData {
     palatina: FaceStatus;
   };
   procedures: any[];
+  /** Ausente, extração ou implante indicados/concluídos, derivados do nome do procedimento */
+  condicao: CondicaoDente | null;
 }
 
 // Cada arcada é dividida na linha média: quadrantes à esquerda e à direita do paciente
@@ -167,11 +174,16 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
                   oclusal: null,
                   palatina: null,
                 },
-                procedures: []
+                procedures: [],
+                condicao: null,
               };
             }
             
             dataMap[denteNum].procedures.push(item);
+            dataMap[denteNum].condicao = condicaoPrevalente(
+              dataMap[denteNum].condicao,
+              condicaoDoProcedimento(item.procedure_name, item.treatment_status === "completed"),
+            );
             
             // Atualizar status das faces
             const status = getVisualStatus(item.treatment_status);
@@ -254,7 +266,8 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
   const legenda: { rotulo: string; cor: string }[] = [
     { rotulo: "A realizar", cor: "bg-clinico-a-realizar" },
     { rotulo: "Executado", cor: "bg-clinico-executado" },
-    { rotulo: "Existente", cor: "bg-clinico-protese" },
+    { rotulo: "Existente / prótese", cor: "bg-clinico-protese" },
+    { rotulo: "Ausente", cor: "bg-clinico-ausente" },
   ];
 
   return (
@@ -282,6 +295,10 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
               {rotulo}
             </span>
           ))}
+          <span className="flex items-center gap-1.5">
+            <span className="font-mono text-[13px] leading-none text-clinico-a-realizar" aria-hidden>×</span>
+            Extração indicada
+          </span>
         </div>
       </div>
 
@@ -293,6 +310,7 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
             render={(dente) => (
               <DenteVestibular
                 key={`vest-sup-${dente}`}
+                condicao={dentesData[dente]?.condicao}
                 numero={dente}
                 status={getVestibularStatus(dente)}
                 onClick={() => handleDenteClick(dente)}
@@ -307,6 +325,7 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
             render={(dente) => (
               <FaceOclusal
                 key={`ocl-sup-${dente}`}
+                condicao={dentesData[dente]?.condicao}
                 numero={dente}
                 faces={dentesData[dente]?.faces || getDefaultFaces()}
                 onFaceClick={(face) => handleFaceClick(dente, face)}
@@ -320,6 +339,7 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
             render={(dente) => (
               <DenteVestibular
                 key={`pal-sup-${dente}`}
+                condicao={dentesData[dente]?.condicao}
                 numero={dente}
                 status={dentesData[dente]?.faces.palatina || null}
                 onClick={() => handleDenteClick(dente)}
@@ -341,6 +361,7 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
             render={(dente) => (
               <DenteVestibular
                 key={`ling-inf-${dente}`}
+                condicao={dentesData[dente]?.condicao}
                 numero={dente}
                 status={dentesData[dente]?.faces.palatina || null}
                 onClick={() => handleDenteClick(dente)}
@@ -356,6 +377,7 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
             render={(dente) => (
               <FaceOclusal
                 key={`ocl-inf-${dente}`}
+                condicao={dentesData[dente]?.condicao}
                 numero={dente}
                 faces={dentesData[dente]?.faces || getDefaultFaces()}
                 onFaceClick={(face) => handleFaceClick(dente, face)}
@@ -369,6 +391,7 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
             render={(dente) => (
               <DenteVestibular
                 key={`vest-inf-${dente}`}
+                condicao={dentesData[dente]?.condicao}
                 numero={dente}
                 status={getVestibularStatus(dente)}
                 onClick={() => handleDenteClick(dente)}

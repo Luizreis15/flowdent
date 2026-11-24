@@ -60,7 +60,7 @@ const DesktopHeader = ({ user, clinicName }: DesktopHeaderProps) => {
   const pageTitle = currentRoute.title;
 
   return (
-    <header className="hidden lg:flex fixed top-[var(--faixa-h,0px)] left-[260px] right-0 z-30 h-16 items-center justify-between border-b border-border bg-background/90 px-8 backdrop-blur-sm">
+    <header className="hidden lg:flex print:!hidden fixed top-[var(--faixa-h,0px)] left-[260px] right-0 z-30 h-16 items-center justify-between border-b border-border bg-background/90 px-8 backdrop-blur-sm">
       {/* Left: Title + Breadcrumb */}
       <div className="flex flex-col justify-center min-w-0">
         <h1 className="text-[15px] font-medium leading-5 text-foreground">{pageTitle}</h1>

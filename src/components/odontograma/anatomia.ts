@@ -271,3 +271,55 @@ export function caminhoSulcos(a: Anatomia): string {
 
 /** Largura em px que o dente ocupa na fileira, para alinhar as vistas em colunas. */
 export const larguraDente = (numero: number) => anatomiaDe(numero).largura * ESCALA_ODONTOGRAMA + 4;
+
+/**
+ * Implante osseointegrado no lugar da raiz (coroa para baixo, colo em y=0):
+ * corpo cônico com roscas e plataforma no colo.
+ */
+export function caminhosImplante(a: Anatomia): { corpo: string; roscas: string; plataforma: string } {
+  const meia = Math.min(a.colo * 0.3, 2.1);
+  const comp = a.raiz * 0.82;
+  const ponta = meia * 0.55;
+  const corpo = [
+    `M ${f(-meia)} -0.4`,
+    `L ${f(-meia)} ${f(-comp * 0.78)}`,
+    `L ${f(-ponta)} ${f(-comp)}`,
+    `L ${f(ponta)} ${f(-comp)}`,
+    `L ${f(meia)} ${f(-comp * 0.78)}`,
+    `L ${f(meia)} -0.4`,
+    "Z",
+  ].join(" ");
+  const passos = 7;
+  let roscas = "";
+  for (let i = 1; i <= passos; i++) {
+    const y = -0.4 - ((comp * 0.78 - 0.4) * i) / (passos + 0.5);
+    roscas += `M ${f(-meia - 0.35)} ${f(y + 0.25)} L ${f(meia + 0.35)} ${f(y - 0.25)} `;
+  }
+  const plataforma = `M ${f(-meia - 0.25)} 0.1 L ${f(meia + 0.25)} 0.1 L ${f(meia + 0.25)} -0.5 L ${f(-meia - 0.25)} -0.5 Z`;
+  return { corpo, roscas: roscas.trim(), plataforma };
+}
+
+/** Condição do dente inteiro, derivada dos procedimentos (não substitui o status por face). */
+export type CondicaoDente = "ausente" | "extracao_indicada" | "implante" | "implante_indicado";
+
+const EXTRACAO = /(exodontia|extra[cç][aã]o)/i;
+const IMPLANTE = /(^|[^a-z])implante/i;
+const REIMPLANTE = /reimplante/i;
+
+/** Classifica um procedimento pelo nome e status do tratamento. */
+export function condicaoDoProcedimento(nome: string | null | undefined, concluido: boolean): CondicaoDente | null {
+  if (!nome) return null;
+  if (IMPLANTE.test(nome) && !REIMPLANTE.test(nome)) return concluido ? "implante" : "implante_indicado";
+  if (EXTRACAO.test(nome)) return concluido ? "ausente" : "extracao_indicada";
+  return null;
+}
+
+/** Quando há vários procedimentos no mesmo dente, o estado mais "final" prevalece. */
+const PRIORIDADE: Record<CondicaoDente, number> = {
+  implante: 4,
+  ausente: 3,
+  implante_indicado: 2,
+  extracao_indicada: 1,
+};
+export const condicaoPrevalente = (atual: CondicaoDente | null, nova: CondicaoDente | null) =>
+  !nova ? atual : !atual || PRIORIDADE[nova] > PRIORIDADE[atual] ? nova : atual;

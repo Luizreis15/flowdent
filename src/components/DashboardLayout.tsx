@@ -66,7 +66,7 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
     >
       {/* Impersonation Banner */}
       {impersonation && (
-        <div className="fixed top-0 left-0 right-0 z-[60] flex h-11 items-center justify-between border-b border-sinal-espera/20 bg-sinal-espera-tenue px-4 text-sinal-espera">
+        <div className="fixed top-0 left-0 right-0 z-[60] flex h-11 print:hidden items-center justify-between border-b border-sinal-espera/20 bg-sinal-espera-tenue px-4 text-sinal-espera">
           <div className="flex items-center gap-2">
             <Eye className="h-4 w-4" />
             <span className="text-sm font-medium">
@@ -99,7 +99,7 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
 
       {/* Mobile Navbar - hidden on home page since MobileHome has its own hero header */}
       {!isHomePage && (
-        <div className="lg:hidden">
+        <div className="lg:hidden print:hidden">
           <Navbar user={user} />
         </div>
       )}
@@ -118,7 +118,7 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
         {/* Main content */}
         <main className={cn(
           "flex-1 min-w-0",
-          "lg:ml-[260px] lg:mt-16",
+          "lg:ml-[260px] lg:mt-16 print:!m-0 print:!p-0",
           "pb-[calc(72px+env(safe-area-inset-bottom,0px)+8px)] lg:pb-4"
         )}>
           <div className={cn(
@@ -131,7 +131,9 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <MobileBottomNav user={user} />
+      <div className="print:hidden">
+        <MobileBottomNav user={user} />
+      </div>
     </div>
   );
 };
