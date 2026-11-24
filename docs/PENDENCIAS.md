@@ -1,151 +1,152 @@
 # Pendências — FlowDent
 
-Ponto de retomada. Atualizado em 2026-11-23.
-Contexto completo: [AUDITORIA-CONSISTENCIA.md](AUDITORIA-CONSISTENCIA.md) (seção "Status da execução").
+Ponto de retomada. Atualizado em 2026-11-24, após o merge do PR #12 (`661becb`).
+Contexto da auditoria de banco: [AUDITORIA-CONSISTENCIA.md](AUDITORIA-CONSISTENCIA.md) (seção "Status da execução").
 
-## Atualização 2026-11-23
+## Onde paramos
 
-- PRs mesclados desde a auditoria: #2 (quality gates ESLint, fase 1) e #3 (design system: tokens, densidade).
-- **Migrations do PR #3 aplicadas em produção**: `20261118100000` (REVOKE em funções de gatilho e
-  `complete_user_onboarding`), `20261118110000` (`search_path`), `20261118120000` (17 policies passam a usar
-  `get_user_clinic_id()`; nenhuma policy lê mais `profiles`). Testadas localmente (79/79) antes.
-- **P3 concluído**: legados renomeados (`20261123100000`) e removidos (`20261123110000`);
-  `WhatsAppConfigModal.tsx` removido; `types.ts` regenerado do banco.
-- **Landing parada por decisão do dono** (possível LP com profissional externo). PRs #6 e #7 ficam em rascunho.
-- **Redesign do app (telas internas) pedido pelo dono**, ainda não iniciado. Perguntas em aberto: escopo só
-  app?, mesclar PR #5 (logo) antes?, referência visual? Proposta: casca do app + componentes base primeiro,
-  depois dashboard, agenda, paciente, financeiro.
-- PRs abertos: #4 (CI + e2e, rascunho), #5 (logo, aberto), #6/#7 (landing, rascunho).
-- **Acesso ao banco**: o Supabase CLI perdeu permissão (403 na conta logada). Usar o conector Supabase do
-  claude.ai (`execute_sql`). O conector recusa `DROP POLICY`/`DROP TABLE`: nesses casos, gerar o SQL
-  (com o `INSERT` em `supabase_migrations.schema_migrations`) e o dono roda no SQL Editor.
-- Banco local de teste: o outro projeto do dono (`gendex2.0`) ocupa as portas 5432x; a cópia de teste usa
-  544xx (api 54421, db 54422).
-
-## Onde paramos (2026-11-04)
-
-- Auditoria de consistência concluída (etapas 1–5). Migrations `20261102120000` … `20261102160000`
-  **aplicadas em produção**; 24 edge functions publicadas; front publicado na Vercel (build com npm).
-- Projeto Supabase de produção: `iuoarrfjpsbtvomhfchr` (único ambiente; não há staging).
-- Testes de banco: `supabase/verificacoes/*.test.sql` (79 verificações). Rodam em transação com ROLLBACK.
-- Produção tinha 1 clínica e 1 usuário com clínica (dono, perfil admin, não é super admin).
+- **Produção** (Vercel + Supabase `iuoarrfjpsbtvomhfchr`, único ambiente, sem staging): 1 clínica, ~780 pacientes
+  reais. Tudo abaixo já está publicado.
+- **Auditoria de consistência (nov/2026):** concluída. Isolamento entre clínicas, catálogo de procedimentos por
+  clínica, fonte única do vínculo usuário↔clínica, legados removidos (`20261123110000`). Migrations do PR #3
+  (`20261118100000`, `…110000`, `…120000`) aplicadas.
+- **Redesign das telas internas:** etapas 1 a 5 publicadas (PRs #10, #11 e #12). Ver seção "Redesign".
+- **Landing:** parada por decisão do dono (possível LP com profissional externo). PRs #6 e #7 em rascunho.
+- PRs abertos: #4 (CI + e2e + CORS, rascunho), #6 e #7 (landing, rascunho).
 
 ## Antes de começar qualquer pendência
 
 ```bash
 cd "/Users/samiragouvea/Desktop/Digital Hera/Flowdent/flowdent"
-git fetch origin && git switch main && git pull     # main local ainda está antes do merge
-git status                                           # ver alterações locais (item P2)
-supabase migration list --linked                     # só 20260722143000 deve aparecer pendente
+git fetch origin && git switch main && git pull
+git status          # alterações locais do dono (P2) devem continuar lá, fora de commits
 ```
 
-Regras do projeto (definidas pelo dono): branch própria (nunca na main), migrations novas e reversíveis
-com rollback em `supabase/rollbacks/`, sem apagar dados, testar em banco local antes, rodar build + lint
-+ testes ao final de cada correção, responder em português.
+Regras do projeto (definidas pelo dono):
+- Branch própria (nunca na main), PR, build + lint + testes ao final de cada correção, responder em português.
+- Migrations novas e reversíveis, com rollback em `supabase/rollbacks/` e teste em `supabase/verificacoes/`;
+  sem apagar dados; testar em banco local antes.
+- **Design: a ementa de identidade é a referência.** Paleta, raios (cartão 8px, botão/input 6px), alturas de
+  controle (28/32/40) e escala tipográfica (h1 26/700, h2 20/600, seção 18/600, tabela 13, cabeçalho de tabela
+  13/600) são **fechados**. Não criar cores fora dos tokens (`tinta`, `acento`, `bone`, `sinal-*`, `clinico-*`).
+  Rótulos pequenos em caixa alta ("OCUPAÇÃO", "CONTATO") fazem parte da referência aprovada.
+- Merge na main e deploy de edge functions: o dono aprova; o agente só mescla com autorização explícita.
 
-**Atenção ao usar `supabase db push`:** ele envia todas as migrations pendentes, inclusive a
-`20260722143000` (ver P2). Sempre rode `--dry-run` antes e retire essa migration da pasta se ela ainda existir.
+**Acesso ao banco:** o Supabase CLI dá 403 na conta logada. Usar o conector Supabase do claude.ai
+(`execute_sql`), aplicando a migration e o `INSERT` em `supabase_migrations.schema_migrations` (versão do
+arquivo) na mesma transação. O conector recusa `DROP POLICY`/`DROP TABLE`: nesses casos, entregar o SQL na tela
+(e `pbcopy < arquivo`) para o dono colar no SQL Editor — confirmar que o projeto selecionado é o
+`iuoarrfjpsbtvomhfchr` (já rodou uma vez no projeto errado).
+
+**`supabase db push`** envia todas as migrations pendentes, inclusive a `20260722143000` (P2). Sempre `--dry-run`
+antes e retirar essa migration da pasta se ela ainda existir.
+
+---
+
+## Redesign das telas internas — estado
+
+| Etapa | PR | O que entrou |
+|---|---|---|
+| 1 | #10 | Componentes base na escala da ementa; cores cruas do Tailwind mapeadas só para tokens existentes; sidebar e cabeçalho; correção do cabeçalho escondido sob a faixa de impersonação; **odontograma anatômico** em vetor (dentes na rampa bone, status em cor chapada da convenção clínica) e correção de mesial/distal (quadrantes 2 e 3) e vestibular/lingual (arcada inferior) |
+| 2 | #11 | `CabecalhoPagina`, `FaixaIndicadores`, `SeloStatus` (`src/components/sistema`) + `src/lib/statusConsulta.ts`; Financeiro, Dashboard, Agenda e Pacientes no padrão da referência "PROPOSTO"; bugs de dados do dashboard (ver abaixo) |
+| 3 | #12 | Ficha do paciente e abas |
+| 4 | #12 | Modais e formulários |
+| 5 | #12 | Textos: 101 exclamações removidas (landing e mensagens ao paciente fora) |
+
+Bugs de dados corrigidos no caminho (PR #11):
+- Métricas do dashboard presas no carregamento: `clinic-config` devolvia `undefined`; faturamento mandava os
+  780 IDs de pacientes na URL (`.in(...)`). Agora filtra pela clínica via join.
+- "Pagamentos atrasados" sempre 0: usava `payments.due_date` (coluna inexistente). Agora `receivable_titles`
+  com a regra de vencido do Contas a Receber (7 vencidos em 2026-11-24).
+
+Próximas etapas sugeridas do redesign (não iniciadas):
+1. Telas ainda não revisadas uma a uma: CRM, Ortodontia, Próteses, Estoque, Relatórios, Configurações,
+   Portal do Paciente, IA Assistente, Super Admin. Mesmo método: `CabecalhoPagina`, `FaixaIndicadores`,
+   selos tênues, ações em caixa normal.
+2. Layout mobile: com a faixa de impersonação ativa há uma faixa vazia sob ela (navbar mobile escondida);
+   revisar a casca mobile (`Navbar`, `MobileBottomNav`, `MobileHome`).
+3. **Família tipográfica: decisão aberta do dono** (ementa, seção 4). Hoje roda na fonte de sistema.
+   Requisitos: numerais tabulares, pesos 400–700, legível a 13px, acentuação completa, Google Fonts ou
+   licença web. A Geist foi testada e retirada por não ter sido aprovada.
+4. Títulos e botões em "Title Case" ("Novo Paciente", "Ver Horários", "Agendar Consulta") → caixa de frase,
+   se o dono quiser padronizar.
 
 ---
 
 ## P1 — Conferências manuais em produção (dono do projeto)
 
-Bloqueia: nada, mas valida as etapas 3 e 4.
-
-1. CRM → modal "Configurar WhatsApp (Z-API)": deve abrir sem erro. Com configuração salva, os campos de
-   token aparecem vazios com "Token salvo — preencha só para trocar".
-2. Onboarding com conta nova (clínica e consultório liberal): o dono deve terminar como **admin** e
-   conseguir abrir Configurações.
-3. Se algo falhar, verificar no banco (só leitura):
-   ```sql
-   select u.id, u.perfil, u.clinica_id, p.clinic_id
-   from usuarios u join profiles p on p.id = u.id
-   order by u.created_at desc limit 5;
-   ```
+1. Com a **conta da clínica** (não como super admin): abrir "Novo orçamento" e "Aprovar orçamento" e conferir
+   os modais; conferir no Dashboard "Pagamentos atrasados" = número real.
+2. CRM → "Configurar WhatsApp (Z-API)": abre sem erro; com configuração salva, tokens aparecem vazios com
+   "Token salvo — preencha só para trocar".
+3. Onboarding com conta nova (clínica e consultório liberal): o dono termina como **admin** e abre Configurações.
+4. Encerrar a impersonação ("Encerrar" na faixa) depois de usar, para fechar o registro na auditoria.
 
 ## P2 — Alterações locais não commitadas (decisão do dono)
 
-Na pasta do projeto, fora de qualquer commit:
+Na pasta do projeto, fora de qualquer commit (não incluir em PRs sem o dono pedir):
 - `src/components/configuracoes/ProcedimentosTab.tsx` e `src/utils/criarPlanoPadrao.ts`: lógica para
-  "popular Tabela Padrão vazia". Partem do modelo antigo do catálogo (antes da etapa 2). Revisar: com
-  RLS nova, `criarPlanoPadrao` copia catálogo do sistema + procedimentos da própria clínica — provavelmente
-  continua correto, mas precisa ser testado antes de commitar.
-- `supabase/migrations/20260722143000_populate_empty_default_procedure_plans.sql`: **não aplicar**.
-  Faz `CROSS JOIN` do catálogo inteiro com o plano padrão de todas as clínicas; hoje não há planos vazios.
-  Recomendação: apagar o arquivo.
+  "popular Tabela Padrão vazia". Partem do modelo antigo do catálogo. Com a RLS nova, `criarPlanoPadrao`
+  copia catálogo do sistema + procedimentos da própria clínica — testar antes de commitar.
+  Atenção ao rodar scripts que editam o código em massa: excluir esses dois arquivos.
+- `supabase/migrations/20260722143000_populate_empty_default_procedure_plans.sql`: **não aplicar**
+  (`CROSS JOIN` do catálogo com o plano padrão de todas as clínicas; não há planos vazios). Recomendação: apagar.
 
-Passos: perguntar ao dono → se aprovar, criar branch, ajustar/commitar os dois arquivos, apagar a migration.
+## P3 — Legados do schema
 
-## P3 — Remoção definitiva de legados (após P1 validado)
+**Concluído em 2026-11-23** (`20261123100000` renomear, `20261123110000` dropar; `WhatsAppConfigModal.tsx`
+removido; `types.ts` regenerado).
 
-Marcados com `COMMENT 'LEGADO…'` na migration `20261102160000`. Todos com 0 linhas em 2026-11-02.
-
-| Objeto | Referências restantes |
-|---|---|
-| tabela `whatsapp_config` | só `src/components/configuracoes/WhatsAppConfigModal.tsx` (não montado em nenhuma tela) |
-| coluna `appointments.duracao_minutos` | nenhuma (app parou de ler na etapa 5) |
-| tabela `tenant_feature_overrides` | nenhuma |
-
-Passos:
-1. ~~Revalidar contagens e referências~~ — feito em 2026-11-23.
-2. ~~Remover `WhatsAppConfigModal.tsx`~~ — feito (branch `chore/remover-legados`).
-3. ~~Renomear para `_legacy_*`~~ — aplicado em produção (`20261123100000_renomear_legados`).
-4. ~~DROP dos `_legacy_*`~~ — aplicado em produção em 2026-11-23 (`20261123110000_dropar_legados`, rodado
-   pelo dono no SQL Editor). **P3 concluído.**
-5. ~~Regenerar `src/integrations/supabase/types.ts`~~ — feito na mesma branch (`chore/dropar-legados`).
-
-## P4 — Achados da auditoria ainda não tratados
+## P4 — Achados ainda não tratados
 
 Em ordem de prioridade sugerida:
 
-1. **RPCs SECURITY DEFINER que aceitam qualquer `_user_id`**: `get_user_clinic_id`, `has_role`,
-   `get_user_perfil`, `is_super_admin` revelam clínica/perfil de outros usuários.
-   Passo: `REVOKE EXECUTE … FROM anon`; avaliar `REVOKE` de `authenticated` e versões sem parâmetro.
-   Cuidado: são usadas dentro de policies e por `requireUserClinic` (edge functions, via service_role).
-2. **Referências cruzadas em INSERT**: policies validam o `clinic_id` do registro, mas não que o
-   `patient_id`/`professional_id`/`procedure_id` referenciado seja da mesma clínica (ex.: `budgets`,
-   `budget_items.procedure_id`, `appointments.dentist_id`). Mesma técnica do trigger
-   `guard_plano_item_procedimento` (etapa 2).
-3. **`send-whatsapp` lê colunas inexistentes** (`mensagem_confirmacao`, `mensagem_lembrete` em
-   `whatsapp_configs`): sempre cai no texto padrão. Decidir se as mensagens personalizadas devem existir
-   (seriam funcionalidade nova → precisa de aprovação).
-4. **`producao_eventos` vazia**: o fechamento de comissões (`FechamentoComissoesModal.tsx`) lê uma tabela
-   que nada preenche. Investigar de onde deveria vir a produção.
-5. **Tabelas incompletas**: `cadeiras` (cadastro sem uso na agenda), `repasse_regras` (sem tela de escrita).
-   Só documentar/decidir; não é correção estrutural.
-6. **Catálogo de procedimentos**: o dono da clínica não altera mais os 335 procedimentos do sistema pela
-   importação (só super admin). Se for necessário, decidir entre dar papel de super admin ou atribuir o
-   catálogo à clínica.
-7. ~~17 policies ainda leem `profiles.clinic_id` direto~~ — resolvido por `20261118120000` (PR #3).
-   Item 1 acima foi parcialmente tratado por `20261118100000` (funções de gatilho e onboarding); as 6
-   funções usadas em policies continuam expostas por necessidade.
+1. **Super admin não lê `receivable_titles`** (só há policy por clínica): visualizando uma clínica, o super
+   admin vê "Pagamentos atrasados" = 0 e o Contas a Receber vazio. Decidir se o super admin deve ler
+   (policy `is_super_admin`) — impersonação hoje é só no cliente, as consultas rodam como super admin.
+2. **RPCs SECURITY DEFINER com `_user_id` livre** (`get_user_clinic_id`, `has_role`, `get_user_perfil`,
+   `is_super_admin`): revelam clínica/perfil de outros usuários. `20261118100000` tratou as de gatilho e o
+   onboarding; estas 6 seguem expostas porque estão dentro de policies. Avaliar versões sem parâmetro.
+3. **Referências cruzadas em INSERT**: policies validam o `clinic_id` do registro, mas não que o
+   `patient_id`/`professional_id`/`procedure_id` referenciado seja da mesma clínica (`budgets`,
+   `budget_items.procedure_id`, `appointments.dentist_id`). Mesma técnica do trigger `guard_plano_item_procedimento`.
+4. **Consultas com listas de IDs na URL** (`.in("patient_id", ids)`): quebram com muitos pacientes. Corrigidas
+   no dashboard; `Ortodontia.tsx` usa o padrão com lista pequena (ok hoje). Procurar outros casos ao mexer nas telas.
+5. **`send-whatsapp` lê colunas inexistentes** (`mensagem_confirmacao`, `mensagem_lembrete`): sempre cai no
+   texto padrão. Mensagens personalizadas seriam funcionalidade nova → precisa de aprovação.
+6. **`producao_eventos` vazia**: o fechamento de comissões lê uma tabela que nada preenche.
+7. **Tabelas incompletas**: `cadeiras` (sem uso na agenda), `repasse_regras` (sem tela de escrita).
+8. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
+   importação (só super admin). Decidir se precisa.
 
 ## P5 — Higiene do repositório
 
-1. **Migrations não recriam o banco do zero** (impede staging/CI):
-   - `20251030203313` exige `admin@admin.com` em `auth.users`;
-   - `20260109011955` insere o UUID fixo de um usuário de produção em `user_roles`;
-   - `20260121125350` faz `UPDATE` de trial de uma clínica específica.
-   Para testar localmente foi usada uma pré-migration só local
-   (`20251030203000_local_only_seed_admin.sql`, numa cópia em scratchpad). Solução definitiva a desenhar
-   sem editar migrations já aplicadas (ex.: `supabase/seed.sql` local).
-2. ~~Regenerar tipos~~ — feito em 2026-11-23 (via conector Supabase). Para refazer: `supabase gen types typescript --linked > src/integrations/supabase/types.ts`
-   (colunas novas: `procedimentos.clinica_id`; funções novas: `is_clinic_admin` etc.). Rodar build depois.
-3. **Testes automatizados**: não existem no front. Sugestão: rodar `supabase/verificacoes/*.test.sql` em CI
-   com `supabase start` (depende do item 1).
-4. **Lint**: 561 problemas pré-existentes (maioria `no-explicit-any`). Não bloqueia.
-5. **Supabase CLI** local está na v2.98.2 (há v3.0.0).
-6. **Vercel**: aviso de `install-scripts` do npm (`@swc/core`, `core-js`, `esbuild`) — inofensivo hoje.
-7. Branches já mescladas podem ser apagadas: `fix/isolamento-clinicas`, `fix/procedimentos-por-clinica`,
-   `fix/isolamento-etapa3`, `fix/vinculo-clinica-fonte-unica`, `chore/consistencia-etapa5`.
+1. **Migrations não recriam o banco do zero** (impede staging/CI): `20251030203313` exige `admin@admin.com`,
+   `20260109011955` usa UUID fixo de produção, `20260121125350` faz `UPDATE` de trial de uma clínica.
+   Desenhar solução sem editar migrations aplicadas (ex.: `supabase/seed.sql` local).
+2. **CI (PR #4, rascunho)**: teto de lint em 468 erros — a `main` está em 465; dá para baixar. Os testes de
+   `supabase/verificacoes/` dependem do item 1.
+3. **Lint**: 465 erros / 590 avisos pré-existentes (maioria `no-explicit-any`). Não bloqueia.
+4. **Vercel**: variáveis `VITE_SUPABASE_*` agora valem também para **Preview** (antes os previews abriam em
+   branco). Aviso de `install-scripts` do npm — inofensivo.
+5. **Supabase CLI** local v2.98.2 (há v3) e sem permissão no projeto (403).
+6. Branches já mescladas que podem ser apagadas: `fix/isolamento-clinicas`, `fix/procedimentos-por-clinica`,
+   `fix/isolamento-etapa3`, `fix/vinculo-clinica-fonte-unica`, `chore/consistencia-etapa5`,
+   `chore/remover-legados`, `chore/dropar-legados`, `design/redesign-app`, `design/telas-etapa2`,
+   `design/ficha-paciente`, `marca/logotipo-svg`.
 
-## Como testar localmente (receita usada nas etapas)
+## Como testar localmente
 
-1. Docker Desktop aberto.
-2. Copiar `supabase/config.toml` e `supabase/migrations/` para uma pasta temporária e acrescentar a
-   pré-migration local `20251030203000_local_only_seed_admin.sql` com os usuários fictícios que as
-   migrations antigas exigem (`admin@admin.com` e o UUID `9fa2445b-2561-4fe2-bb3a-507427294f32`).
-3. `supabase start --workdir <pasta> -x studio,imgproxy,inbucket,edge-runtime,logflare,vector,supavisor,realtime`
-4. `psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -v ON_ERROR_STOP=1 -f supabase/verificacoes/<teste>.sql`
-5. Edge functions: `supabase functions serve --workdir <pasta> --no-verify-jwt` e OPTIONS em cada função.
-6. Ao final: `supabase stop --no-backup --workdir <pasta>`.
+**Banco** (receita usada na auditoria):
+1. Docker Desktop aberto. O outro projeto do dono (`gendex2.0`) ocupa as portas 5432x: usar uma cópia de
+   `supabase/` numa pasta temporária com portas 544xx no `config.toml` (api 54421, db 54422).
+2. Acrescentar à cópia a pré-migration local `20251030203000_local_only_seed_admin.sql` com os usuários fictícios
+   que as migrations antigas exigem (`admin@admin.com` e o UUID `9fa2445b-2561-4fe2-bb3a-507427294f32`).
+3. `supabase start --workdir <pasta> -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,realtime`
+4. `psql postgresql://postgres:postgres@127.0.0.1:54422/postgres -v ON_ERROR_STOP=1 -f supabase/verificacoes/<teste>.sql`
+5. Ao final: `supabase stop --no-backup --workdir <pasta>`.
+
+**Front:** `npx vite --port 5179` usa o `.env` (Supabase de produção). Para ver telas da clínica como super
+admin: Super Admin → Locatários → ícone de pessoa (impersonação, registrada em `admin_impersonation_logs`).
+Para conferir o odontograma com marcações sem gravar dados, montar uma prévia local temporária e apagá-la
+antes do commit.
