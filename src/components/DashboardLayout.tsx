@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, type CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, X, ArrowLeft } from "lucide-react";
@@ -60,21 +60,24 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background"
+      style={{ "--faixa-h": impersonation ? "44px" : "0px" } as CSSProperties}
+    >
       {/* Impersonation Banner */}
       {impersonation && (
-        <div className="fixed top-0 left-0 right-0 bg-amber-500 text-amber-950 px-4 py-2 flex items-center justify-between z-[60]">
+        <div className="fixed top-0 left-0 right-0 z-[60] flex h-11 items-center justify-between border-b border-sinal-espera/20 bg-sinal-espera-tenue px-4 text-sinal-espera">
           <div className="flex items-center gap-2">
             <Eye className="h-4 w-4" />
-            <span className="font-medium text-sm md:text-base">
-              Visualizando: {impersonation.clinicName}
+            <span className="text-sm font-medium">
+              Visualizando como {impersonation.clinicName}
             </span>
           </div>
           <div className="flex items-center gap-1 md:gap-2">
             <Button
               size="sm"
               variant="outline"
-              className="bg-amber-400 border-amber-600 hover:bg-amber-300 text-amber-950 text-xs md:text-sm"
+              className="h-8 border-sinal-espera/25 bg-transparent text-sinal-espera hover:bg-sinal-espera/10"
               onClick={() => navigate("/admin/clinics")}
             >
               <ArrowLeft className="h-3 w-3 md:h-4 md:w-4 mr-1" />
@@ -84,7 +87,7 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
             <Button
               size="sm"
               variant="ghost"
-              className="hover:bg-amber-400 text-amber-950"
+              className="h-8 text-sinal-espera hover:bg-sinal-espera/10 hover:text-sinal-espera"
               onClick={handleEndImpersonation}
             >
               <X className="h-4 w-4" />

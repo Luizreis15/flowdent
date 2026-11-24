@@ -1,5 +1,37 @@
 import type { Config } from "tailwindcss";
 
+/*
+ * As telas usam cores cruas do Tailwind (bg-green-600, text-blue-500…) em mais de 500
+ * lugares. Em vez de trocar uma a uma, as famílias são redefinidas como rampas
+ * calibradas dentro da paleta Flowdent: o significado fica (verde = ok, vermelho =
+ * alerta, âmbar = espera), a matiz saturada de fora da marca sai.
+ */
+const LUMINOSIDADE: Record<string, number> = {
+  50: 96, 100: 92, 200: 84, 300: 72, 400: 60, 500: 48, 600: 39, 700: 31, 800: 24, 900: 18, 950: 11,
+};
+const rampa = (matiz: number, saturacao: number) =>
+  Object.fromEntries(
+    Object.entries(LUMINOSIDADE).map(([passo, l]) => [passo, `hsl(${matiz} ${saturacao}% ${l}% / <alpha-value>)`]),
+  );
+
+const ok = rampa(148, 38);       // sinal-ok
+const alerta = rampa(4, 56);     // sinal-alerta
+const espera = rampa(38, 64);    // sinal-espera
+const tinta = rampa(222, 48);    // azul da marca
+const acento = rampa(187, 44);   // verde-azulado do lettering
+const ameixa = rampa(286, 18);   // categorias que precisavam de uma terceira matiz, contida
+const bone = rampa(38, 6);       // neutros
+
+const coresCalibradas = {
+  green: ok, emerald: ok, lime: ok,
+  red: alerta, rose: alerta,
+  amber: espera, orange: espera, yellow: espera,
+  blue: tinta, sky: tinta, indigo: tinta,
+  teal: acento, cyan: acento,
+  purple: ameixa, violet: ameixa, fuchsia: ameixa, pink: ameixa,
+  gray: bone, slate: bone, zinc: bone, neutral: bone, stone: bone,
+};
+
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
@@ -14,6 +46,7 @@ export default {
     },
     extend: {
       colors: {
+        ...coresCalibradas,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,6 +101,17 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      fontFamily: {
+        sans: ["Geist", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+      },
+      // Hierarquia vem de tamanho e cor, não de peso. bold/extrabold/black (238 usos)
+      // ficam em 600, o teto do sistema.
+      fontWeight: {
+        bold: "600",
+        extrabold: "600",
+        black: "600",
+      },
       backgroundImage: {
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-card': 'var(--gradient-card)',
@@ -100,13 +144,13 @@ export default {
         'linha-padrao': '44px',
       },
       fontSize: {
-        'h1': ['1.625rem', { lineHeight: '2rem', fontWeight: '700', letterSpacing: '-0.01em' }],
-        'h2': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
-        'section': ['1.125rem', { lineHeight: '1.5rem', fontWeight: '600' }],
+        'h1': ['1.75rem', { lineHeight: '2.125rem', fontWeight: '500', letterSpacing: '-0.015em' }],
+        'h2': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '500' }],
+        'section': ['1rem', { lineHeight: '1.5rem', fontWeight: '500' }],
         'body': ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '400' }],
         'body-sm': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '400' }],
         'table': ['0.8125rem', { lineHeight: '1.25rem', fontWeight: '400' }],
-        'table-header': ['0.8125rem', { lineHeight: '1.125rem', fontWeight: '600', letterSpacing: '0.02em' }],
+        'table-header': ['0.75rem', { lineHeight: '1rem', fontWeight: '500' }],
       },
       keyframes: {
         "accordion-down": {
