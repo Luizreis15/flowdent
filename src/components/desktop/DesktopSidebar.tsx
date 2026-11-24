@@ -114,34 +114,33 @@ const DesktopSidebar = () => {
           <CollapsibleTrigger asChild>
             <button
               className={cn(
-                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all",
-                "hover:bg-sidebar-accent",
+                "flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
                 active
-                  ? "border-l-[3px] border-l-primary bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                  : "border-l-[3px] border-l-transparent text-sidebar-foreground/70"
+                  ? "bg-card text-foreground font-medium shadow-sm ring-1 ring-sidebar-border [&>svg:first-child]:text-primary"
+                  : "text-sidebar-foreground/70 hover:bg-bone-200/60 hover:text-sidebar-foreground"
               )}
             >
-              <item.icon className="h-[18px] w-[18px] flex-shrink-0" />
+              <item.icon className="h-4 w-4 flex-shrink-0 stroke-[1.75]" />
               <span className="flex-1 text-left">{item.name}</span>
               <ChevronDown
                 className={cn(
-                  "h-4 w-4 transition-transform",
+                  "h-4 w-4 text-sidebar-foreground/40 transition-transform duration-200",
                   isOpen && "rotate-180"
                 )}
               />
             </button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="ml-9 mt-1 space-y-0.5">
+            <div className="ml-[34px] mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
               {item.subItems.map((sub) => (
                 <Link
                   key={sub.href}
                   to={sub.href}
                   className={cn(
-                    "block rounded-md px-3 py-2 text-[13px] transition-colors",
+                    "flex h-8 items-center rounded-md px-2.5 text-[13px] transition-colors duration-150",
                     isActive(sub.href)
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                      ? "bg-card text-foreground font-medium ring-1 ring-sidebar-border"
+                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-bone-200/60"
                   )}
                 >
                   {sub.name}
@@ -158,41 +157,39 @@ const DesktopSidebar = () => {
         key={item.name}
         to={item.href}
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all",
-          "hover:bg-sidebar-accent",
+          "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
           active
-            ? "border-l-[3px] border-l-primary bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-            : "border-l-[3px] border-l-transparent text-sidebar-foreground/70"
+            ? "bg-card text-foreground font-medium shadow-sm ring-1 ring-sidebar-border [&>svg:first-child]:text-primary"
+            : "text-sidebar-foreground/70 hover:bg-bone-200/60 hover:text-sidebar-foreground"
         )}
       >
-        <item.icon className="h-[18px] w-[18px] flex-shrink-0" />
+        <item.icon className="h-4 w-4 flex-shrink-0 stroke-[1.75]" />
         <span>{item.name}</span>
       </Link>
     );
   };
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 w-[260px] border-r border-sidebar-border bg-sidebar">
+    <aside className="hidden lg:flex flex-col fixed left-0 top-[var(--faixa-h,0px)] bottom-0 z-40 w-[260px] border-r border-sidebar-border bg-sidebar">
       {/* Logo */}
-      <div className="flex items-center h-16 px-5 border-b border-sidebar-border flex-shrink-0">
+      <div className="flex items-center h-16 px-5 flex-shrink-0">
         <Link to="/dashboard">
           <Logo className="h-7" />
         </Link>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 py-3">
-        <nav className="space-y-0.5 px-3">
+      <ScrollArea className="flex-1 pb-4">
+        <nav className="px-3">
           {isSuperAdmin && (
             <Link
               to="/super-admin"
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm mb-2 transition-all",
-                "bg-primary/5 border border-primary/15 hover:bg-primary/10",
-                "border-l-[3px] border-l-primary text-primary font-medium"
+                "mb-1 flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
+                "text-sidebar-foreground/70 hover:bg-bone-200/60 hover:text-sidebar-foreground"
               )}
             >
-              <Shield className="h-[18px] w-[18px] flex-shrink-0" />
+              <Shield className="h-4 w-4 flex-shrink-0 stroke-[1.75]" />
               <span>Super Admin</span>
             </Link>
           )}
@@ -201,23 +198,17 @@ const DesktopSidebar = () => {
             const visibleItems = group.items.filter(canAccess);
             if (visibleItems.length === 0) return null;
             return (
-              <div key={group.title} className="mb-3">
-                <div className="px-3 pt-2 pb-1">
-                  <span className="text-[11px] font-semibold text-sidebar-foreground/40 tracking-wider uppercase">
-                    {group.title}
-                  </span>
+              <div key={group.title} className={cn("space-y-0.5", groupIndex > 0 && "pt-4")}>
+                <div className="px-2.5 pb-1.5 pt-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">{group.title}</span>
                 </div>
                 {visibleItems.map(renderNavItem)}
-                {groupIndex < navGroups.length - 1 && (
-                  <div className="mx-4 mt-3 border-t border-sidebar-border" />
-                )}
               </div>
             );
           })}
         </nav>
 
-        {/* Separator */}
-        <div className="mx-5 my-3 border-t border-sidebar-border" />
+        <div className="mx-5 my-4 border-t border-sidebar-border" />
 
         {/* Bottom items */}
         <nav className="space-y-0.5 px-3">

@@ -51,14 +51,18 @@ const DesktopHeader = ({ user, clinicName }: DesktopHeaderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const currentRoute = routeTitles[location.pathname] || { title: "Página" };
+  const currentRoute =
+    routeTitles[location.pathname] ||
+    (location.pathname.startsWith("/dashboard/prontuario/")
+      ? { title: "Ficha do paciente", parent: "Pacientes" }
+      : { title: "Página" });
   const pageTitle = currentRoute.title;
 
   return (
-    <header className="hidden lg:flex fixed top-0 left-[260px] right-0 z-30 h-16 items-center justify-between border-b border-border bg-card px-8">
+    <header className="hidden lg:flex fixed top-[var(--faixa-h,0px)] left-[260px] right-0 z-30 h-16 items-center justify-between border-b border-border bg-background/90 px-8 backdrop-blur-sm">
       {/* Left: Title + Breadcrumb */}
       <div className="flex flex-col justify-center min-w-0">
-        <h1 className="text-lg font-semibold text-foreground leading-tight">{pageTitle}</h1>
+        <h1 className="text-[15px] font-medium leading-5 text-foreground">{pageTitle}</h1>
         <Breadcrumb>
           <BreadcrumbList className="text-xs">
             <BreadcrumbItem>
@@ -93,8 +97,8 @@ const DesktopHeader = ({ user, clinicName }: DesktopHeaderProps) => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar pacientes, consultas..."
-            className="pl-9 h-9 bg-muted/50 border-border text-sm"
+            placeholder="Buscar"
+            className="pl-9 h-9 bg-card border-border text-sm"
           />
         </div>
       </div>

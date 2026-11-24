@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { FaceOclusal, FaceStatus } from "@/components/odontograma/FaceOclusal";
 import { DenteVestibular } from "@/components/odontograma/DenteVestibular";
+import { larguraDente } from "@/components/odontograma/anatomia";
 import { ProcedimentosTable } from "@/components/odontograma/ProcedimentosTable";
 
 interface OdontogramaTabProps {
@@ -42,6 +43,63 @@ interface DenteData {
   };
   procedures: any[];
 }
+
+// Cada arcada é dividida na linha média: quadrantes à esquerda e à direita do paciente
+const metades = (arr: number[]) => [arr.slice(0, arr.length / 2), arr.slice(arr.length / 2)];
+
+const Fileira = ({
+  rotulo,
+  numeros,
+  render,
+}: {
+  rotulo: string;
+  numeros: number[];
+  render: (dente: number) => React.ReactNode;
+}) => {
+  const [esquerda, direita] = metades(numeros);
+  return (
+    <div className="flex items-center">
+      <span className="w-20 shrink-0 text-xs text-muted-foreground">{rotulo}</span>
+      <div className="flex flex-1 items-center justify-center">
+        <div className="flex items-center justify-end">{esquerda.map(render)}</div>
+        <div className="mx-2 w-px self-stretch bg-border" aria-hidden />
+        <div className="flex items-center justify-start">{direita.map(render)}</div>
+      </div>
+    </div>
+  );
+};
+
+/** Numeração FDI em etiquetas mono: a assinatura do odontograma. */
+const NumerosFdi = ({
+  numeros,
+  selecionado,
+  onSelecionar,
+}: {
+  numeros: number[];
+  selecionado: number | null;
+  onSelecionar: (dente: number) => void;
+}) => (
+  <Fileira
+    rotulo=""
+    numeros={numeros}
+    render={(dente) => (
+      <div key={`fdi-${dente}`} className="flex shrink-0 justify-center" style={{ width: larguraDente(dente) }}>
+        <button
+          type="button"
+          onClick={() => onSelecionar(dente)}
+          className={cn(
+            "h-5 min-w-[26px] rounded border px-1 font-mono text-[11px] leading-[18px] tabular-nums transition-colors duration-150",
+            selecionado === dente
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border bg-card text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {dente}
+        </button>
+      </div>
+    )}
+  />
+);
 
 export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabProps) => {
   const [denticao, setDenticao] = useState<"permanente" | "decidua">("permanente");
@@ -193,200 +251,140 @@ export const OdontogramaTab = ({ patientId, onAddProcedimento }: OdontogramaTabP
     );
   }
 
+  const legenda: { rotulo: string; cor: string }[] = [
+    { rotulo: "A realizar", cor: "bg-clinico-a-realizar" },
+    { rotulo: "Executado", cor: "bg-clinico-executado" },
+    { rotulo: "Existente", cor: "bg-clinico-protese" },
+  ];
+
   return (
-    <div className="flex gap-6">
-      {/* Odontograma Principal */}
-      <div className="flex-1 space-y-4">
-        {/* Header com Dentição + Legenda */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Select 
-              value={denticao} 
-              onValueChange={(v) => setDenticao(v as "permanente" | "decidua")}
-            >
-              <SelectTrigger className="w-[140px] h-8">
-                <SelectValue placeholder="Dentição" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="permanente">Permanente</SelectItem>
-                <SelectItem value="decidua">Decídua</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Bookmark className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          {/* Legenda */}
-          <div className="flex items-center gap-6 text-sm">
-            <span className="font-medium text-muted-foreground">Legenda</span>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-sm" />
-              <span className="text-xs">A realizar</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded-sm" />
-              <span className="text-xs">Executado</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-sm" />
-              <span className="text-xs">Existente</span>
-            </div>
-          </div>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Select value={denticao} onValueChange={(v) => setDenticao(v as "permanente" | "decidua")}>
+            <SelectTrigger className="h-8 w-[140px]">
+              <SelectValue placeholder="Dentição" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="permanente">Permanente</SelectItem>
+              <SelectItem value="decidua">Decídua</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Salvar marcação">
+            <Bookmark className="h-4 w-4" />
+          </Button>
         </div>
 
-        {/* Odontograma Visual */}
-        <div className="border rounded-lg p-4 bg-card">
-          {/* Arcada Superior */}
-          <div className="space-y-1">
-            {/* Vestibular Superior */}
-            <div className="flex items-center">
-              <span className="w-20 text-xs text-muted-foreground">Vestibular</span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.superior.map(dente => (
-                  <DenteVestibular
-                    key={`vest-sup-${dente}`}
-                    numero={dente}
-                    status={getVestibularStatus(dente)}
-                    onClick={() => handleDenteClick(dente)}
-                    arcada="superior"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Oclusal Superior */}
-            <div className="flex items-center">
-              <span className="w-20 text-xs text-muted-foreground">Oclusal</span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.superior.map(dente => (
-                  <FaceOclusal
-                    key={`ocl-sup-${dente}`}
-                    numero={dente}
-                    faces={dentesData[dente]?.faces || getDefaultFaces()}
-                    onFaceClick={(face) => handleFaceClick(dente, face)}
-                    selected={selectedDente === dente}
-                    size="sm"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Palatina Superior */}
-            <div className="flex items-center">
-              <span className="w-20 text-xs text-muted-foreground">Palatina</span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.superior.map(dente => (
-                  <DenteVestibular
-                    key={`pal-sup-${dente}`}
-                    numero={dente}
-                    status={dentesData[dente]?.faces.palatina || null}
-                    onClick={() => handleDenteClick(dente)}
-                    arcada="inferior"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Numeração Central */}
-          <div className="my-4 border-t border-b py-2">
-            <div className="flex items-center">
-              <span className="w-20"></span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.superior.map(dente => (
-                  <div 
-                    key={`num-sup-${dente}`} 
-                    className={cn(
-                      "w-6 text-center text-xs font-mono",
-                      selectedDente === dente ? "font-bold text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {dente}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center mt-1">
-              <span className="w-20"></span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.inferior.map(dente => (
-                  <div 
-                    key={`num-inf-${dente}`} 
-                    className={cn(
-                      "w-6 text-center text-xs font-mono",
-                      selectedDente === dente ? "font-bold text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {dente}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Arcada Inferior */}
-          <div className="space-y-1">
-            {/* Lingual Inferior */}
-            <div className="flex items-center">
-              <span className="w-20 text-xs text-muted-foreground">Lingual</span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.inferior.map(dente => (
-                  <DenteVestibular
-                    key={`ling-inf-${dente}`}
-                    numero={dente}
-                    status={dentesData[dente]?.faces.palatina || null}
-                    onClick={() => handleDenteClick(dente)}
-                    arcada="superior"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Oclusal Inferior */}
-            <div className="flex items-center">
-              <span className="w-20 text-xs text-muted-foreground">Oclusal</span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.inferior.map(dente => (
-                  <FaceOclusal
-                    key={`ocl-inf-${dente}`}
-                    numero={dente}
-                    faces={dentesData[dente]?.faces || getDefaultFaces()}
-                    onFaceClick={(face) => handleFaceClick(dente, face)}
-                    selected={selectedDente === dente}
-                    size="sm"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Vestibular Inferior */}
-            <div className="flex items-center">
-              <span className="w-20 text-xs text-muted-foreground">Vestibular</span>
-              <div className="flex gap-0.5 justify-center flex-1">
-                {dentes.inferior.map(dente => (
-                  <DenteVestibular
-                    key={`vest-inf-${dente}`}
-                    numero={dente}
-                    status={getVestibularStatus(dente)}
-                    onClick={() => handleDenteClick(dente)}
-                    arcada="inferior"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          {legenda.map(({ rotulo, cor }) => (
+            <span key={rotulo} className="flex items-center gap-1.5">
+              <span className={cn("h-2 w-2 rounded-full", cor)} />
+              {rotulo}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* Painel de Procedimentos */}
-      <div className="w-[340px] shrink-0">
-        <ProcedimentosTable
-          procedimentos={procedimentosTabela}
-          onAddProcedimento={onAddProcedimento}
-          onPrint={() => window.print()}
-        />
+      <div className="overflow-x-auto rounded-xl border bg-card px-6 py-5">
+        <div className="mx-auto w-max min-w-full space-y-1">
+          <Fileira
+            rotulo="Vestibular"
+            numeros={dentes.superior}
+            render={(dente) => (
+              <DenteVestibular
+                key={`vest-sup-${dente}`}
+                numero={dente}
+                status={getVestibularStatus(dente)}
+                onClick={() => handleDenteClick(dente)}
+                coroaPara="baixo"
+                selecionado={selectedDente === dente}
+              />
+            )}
+          />
+          <Fileira
+            rotulo="Oclusal"
+            numeros={dentes.superior}
+            render={(dente) => (
+              <FaceOclusal
+                key={`ocl-sup-${dente}`}
+                numero={dente}
+                faces={dentesData[dente]?.faces || getDefaultFaces()}
+                onFaceClick={(face) => handleFaceClick(dente, face)}
+                selected={selectedDente === dente}
+              />
+            )}
+          />
+          <Fileira
+            rotulo="Palatina"
+            numeros={dentes.superior}
+            render={(dente) => (
+              <DenteVestibular
+                key={`pal-sup-${dente}`}
+                numero={dente}
+                status={dentesData[dente]?.faces.palatina || null}
+                onClick={() => handleDenteClick(dente)}
+                coroaPara="cima"
+                vista="lingual"
+                selecionado={selectedDente === dente}
+              />
+            )}
+          />
+
+          <div className="space-y-1.5 py-3">
+            <NumerosFdi numeros={dentes.superior} selecionado={selectedDente} onSelecionar={handleDenteClick} />
+            <NumerosFdi numeros={dentes.inferior} selecionado={selectedDente} onSelecionar={handleDenteClick} />
+          </div>
+
+          <Fileira
+            rotulo="Lingual"
+            numeros={dentes.inferior}
+            render={(dente) => (
+              <DenteVestibular
+                key={`ling-inf-${dente}`}
+                numero={dente}
+                status={dentesData[dente]?.faces.palatina || null}
+                onClick={() => handleDenteClick(dente)}
+                coroaPara="baixo"
+                vista="lingual"
+                selecionado={selectedDente === dente}
+              />
+            )}
+          />
+          <Fileira
+            rotulo="Oclusal"
+            numeros={dentes.inferior}
+            render={(dente) => (
+              <FaceOclusal
+                key={`ocl-inf-${dente}`}
+                numero={dente}
+                faces={dentesData[dente]?.faces || getDefaultFaces()}
+                onFaceClick={(face) => handleFaceClick(dente, face)}
+                selected={selectedDente === dente}
+              />
+            )}
+          />
+          <Fileira
+            rotulo="Vestibular"
+            numeros={dentes.inferior}
+            render={(dente) => (
+              <DenteVestibular
+                key={`vest-inf-${dente}`}
+                numero={dente}
+                status={getVestibularStatus(dente)}
+                onClick={() => handleDenteClick(dente)}
+                coroaPara="cima"
+                selecionado={selectedDente === dente}
+              />
+            )}
+          />
+        </div>
       </div>
+
+      <ProcedimentosTable
+        procedimentos={procedimentosTabela}
+        onAddProcedimento={onAddProcedimento}
+        onPrint={() => window.print()}
+      />
     </div>
   );
 };

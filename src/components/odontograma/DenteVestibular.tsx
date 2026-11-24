@@ -1,64 +1,158 @@
+import { useId } from "react";
 import { cn } from "@/lib/utils";
-import { FaceStatus } from "./FaceOclusal";
+import type { FaceStatus } from "./FaceOclusal";
+import { ESCALA_ODONTOGRAMA, anatomiaDe, caminhoCoroa, caminhosRaizes, larguraDente } from "./anatomia";
+
+/** As raízes são exibidas um pouco encurtadas para o odontograma caber sem rolagem. */
+const RAIZ_EXIBIDA = 0.72;
+const MARGEM = 0.6;
+
+const COR_STATUS: Record<Exclude<FaceStatus, null>, string> = {
+  a_realizar: "hsl(var(--clinico-a-realizar))",
+  executado: "hsl(var(--clinico-executado))",
+  existente: "hsl(var(--clinico-protese))",
+};
 
 interface DenteVestibularProps {
   numero: number;
   status: FaceStatus;
   onClick?: () => void;
-  arcada: "superior" | "inferior";
+  /** Para onde a coroa aponta. No odontograma, sempre para a fileira oclusal. */
+  coroaPara: "baixo" | "cima";
+  vista?: "vestibular" | "lingual";
+  selecionado?: boolean;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  a_realizar: "fill-red-400 stroke-red-600",
-  executado: "fill-green-400 stroke-green-600",
-  existente: "fill-blue-400 stroke-blue-600",
-};
+export const DenteVestibular = ({
+  numero,
+  status,
+  onClick,
+  coroaPara,
+  vista = "vestibular",
+  selecionado = false,
+}: DenteVestibularProps) => {
+  const id = useId().replace(/:/g, "");
+  const a = anatomiaDe(numero);
+  const coroa = caminhoCoroa(a);
+  const { posteriores, anteriores, tronco } = caminhosRaizes(a);
 
-export const DenteVestibular = ({ numero, status, onClick, arcada }: DenteVestibularProps) => {
-  const getFillClass = () => {
-    if (!status) return "fill-muted stroke-muted-foreground/50";
-    return STATUS_COLORS[status] || "fill-muted stroke-muted-foreground/50";
-  };
+  const maiorRaiz = Math.max(...a.raizes.map((r) => r.comprimento ?? 1)) * a.raiz * RAIZ_EXIBIDA;
+  const meiaLargura = a.largura / 2 + MARGEM;
+  const topo = maiorRaiz + MARGEM;
+  const base = a.coroa + MARGEM;
+  const altura = topo + base;
+  const paraCima = coroaPara === "cima";
 
-  // Dentes anteriores (incisivos e caninos) têm formato diferente
-  const isAnterior = [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53, 61, 62, 63, 71, 72, 73, 81, 82, 83].includes(numero);
-  
-  // Rotação para arcada inferior
-  const rotation = arcada === "inferior" ? "rotate(180)" : "";
+  // viewBox no sistema "coroa para baixo"; para coroa para cima, o grupo é espelhado
+  const viewBox = paraCima
+    ? `${-meiaLargura} ${-base} ${meiaLargura * 2} ${altura}`
+    : `${-meiaLargura} ${-topo} ${meiaLargura * 2} ${altura}`;
+
+  const lingual = vista === "lingual";
+  const anterior = a.tipo === "incisivo" || a.tipo === "canino";
+  const corStatus = status ? COR_STATUS[status] : null;
 
   return (
-    <div 
-      className="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
+    <button
+      type="button"
       onClick={onClick}
+      aria-label={`Dente ${numero}, vista ${vista}`}
+      aria-pressed={selecionado}
+      className={cn(
+        "group flex shrink-0 justify-center rounded-md outline-none transition-colors duration-150",
+        "focus-visible:ring-2 focus-visible:ring-ring",
+        selecionado ? "bg-acao-tenue" : "hover:bg-muted/70",
+      )}
+      style={{ width: larguraDente(numero) }}
     >
       <svg
-        viewBox="0 0 24 32"
-        className="w-6 h-8"
-        style={{ transform: rotation }}
+        viewBox={viewBox}
+        width={meiaLargura * 2 * ESCALA_ODONTOGRAMA}
+        height={altura * ESCALA_ODONTOGRAMA}
+        className="overflow-visible"
+        aria-hidden
       >
-        {isAnterior ? (
-          // Dente anterior (incisivo/canino)
+        <defs>
+          {/* Somente a rampa bone da paleta fechada: o dente é neutro, a cor fica para o status */}
+          <linearGradient id={`esmalte-${id}`} x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" style={{ stopColor: "hsl(var(--bone-100))" }} />
+            <stop offset="0.35" style={{ stopColor: "hsl(var(--bone-0))" }} />
+            <stop offset="0.65" style={{ stopColor: lingual ? "hsl(var(--bone-50))" : "hsl(var(--bone-0))" }} />
+            <stop offset="1" style={{ stopColor: lingual ? "hsl(var(--bone-200))" : "hsl(var(--bone-100))" }} />
+          </linearGradient>
+          <linearGradient id={`incisal-${id}`} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0.6" style={{ stopColor: "hsl(var(--bone-200))", stopOpacity: 0 }} />
+            <stop offset="1" style={{ stopColor: "hsl(var(--bone-200))", stopOpacity: anterior ? 0.5 : 0.25 }} />
+          </linearGradient>
+          <radialGradient id={`brilho-${id}`} cx="0.36" cy="0.3" r="0.42">
+            <stop offset="0" style={{ stopColor: "hsl(var(--bone-0))", stopOpacity: 0.9 }} />
+            <stop offset="1" style={{ stopColor: "hsl(var(--bone-0))", stopOpacity: 0 }} />
+          </radialGradient>
+          <linearGradient id={`raiz-${id}`} x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" style={{ stopColor: "hsl(var(--bone-200))" }} />
+            <stop offset="0.45" style={{ stopColor: "hsl(var(--bone-100))" }} />
+            <stop offset="1" style={{ stopColor: "hsl(var(--bone-200))" }} />
+          </linearGradient>
+          <clipPath id={`coroa-${id}`}>
+            <path d={coroa} />
+          </clipPath>
+        </defs>
+
+        <g
+          transform={paraCima ? "scale(1,-1)" : undefined}
+          className="transition-[filter] duration-150 group-hover:brightness-[1.03]"
+        >
+          {/* Raízes: as palatinas/linguais atrás, mais escuras */}
+          <g transform={`scale(1, ${RAIZ_EXIBIDA})`} style={{ stroke: "hsl(var(--bone-400))" }} strokeWidth={0.16} strokeLinejoin="round">
+            {posteriores.map((d, i) => (
+              <path key={`p${i}`} d={d} style={{ fill: "hsl(var(--bone-300))" }} />
+            ))}
+            {anteriores.map((d, i) => (
+              <path key={`a${i}`} d={d} fill={`url(#raiz-${id})`} />
+            ))}
+            {tronco && (
+              <>
+                <path d={tronco.preenchimento} fill={`url(#raiz-${id})`} stroke="none" />
+                <path d={tronco.contorno} fill="none" />
+              </>
+            )}
+          </g>
+
+          {/* Coroa em esmalte */}
+          <path d={coroa} fill={`url(#esmalte-${id})`} />
+          <g clipPath={`url(#coroa-${id})`}>
+            <rect x={-meiaLargura} y={0} width={meiaLargura * 2} height={a.coroa + 1} fill={`url(#incisal-${id})`} />
+            {lingual && anterior && (
+              // cíngulo: a saliência no terço cervical da face lingual dos anteriores
+              <ellipse cx={0} cy={a.coroa * 0.26} rx={a.colo * 0.34} ry={a.coroa * 0.17} style={{ fill: "hsl(var(--bone-200))" }} opacity={0.6} />
+            )}
+            {corStatus && (
+              <rect
+                x={-meiaLargura}
+                y={-1}
+                width={meiaLargura * 2}
+                height={a.coroa + 2}
+                style={{ fill: corStatus }}
+              />
+            )}
+            <ellipse
+              cx={-a.largura * 0.12}
+              cy={a.coroa * 0.36}
+              rx={a.largura * 0.3}
+              ry={a.coroa * 0.34}
+              fill={`url(#brilho-${id})`}
+              opacity={corStatus ? 0.18 : lingual ? 0.45 : 0.8}
+            />
+          </g>
           <path
-            d="M12 2C8 2 5 5 5 9C5 14 6 22 8 26C9 28 11 30 12 30C13 30 15 28 16 26C18 22 19 14 19 9C19 5 16 2 12 2Z"
-            className={cn("transition-all stroke-2", getFillClass())}
+            d={coroa}
+            fill="none"
+            style={{ stroke: corStatus ?? "hsl(var(--bone-400))" }}
+            strokeWidth={corStatus ? 0.3 : 0.18}
+            strokeLinejoin="round"
           />
-        ) : (
-          // Dente posterior (pré-molar/molar)
-          <>
-            <path
-              d="M6 4C4 4 3 6 3 8C3 12 4 18 5 22C6 26 8 30 12 30C16 30 18 26 19 22C20 18 21 12 21 8C21 6 20 4 18 4"
-              className={cn("transition-all stroke-2", getFillClass())}
-            />
-            <path
-              d="M6 4C8 4 10 3 12 3C14 3 16 4 18 4"
-              className={cn("transition-all stroke-2", getFillClass())}
-            />
-            {/* Raízes para molares */}
-            <line x1="8" y1="28" x2="8" y2="30" className="stroke-muted-foreground/30 stroke-1" />
-            <line x1="16" y1="28" x2="16" y2="30" className="stroke-muted-foreground/30 stroke-1" />
-          </>
-        )}
+        </g>
       </svg>
-    </div>
+    </button>
   );
 };

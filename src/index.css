@@ -265,6 +265,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Numerais tabulares (requisito da ementa): valores alinham em coluna */
+  table, time, [data-numero] {
+    font-variant-numeric: tabular-nums;
+  }
+
   /* Safe area for mobile devices with notch/home indicator */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);

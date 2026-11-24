@@ -1,5 +1,35 @@
 import type { Config } from "tailwindcss";
 
+/*
+ * As telas usam cores cruas do Tailwind (bg-green-600, text-blue-500…) em mais de 500
+ * lugares, fora da paleta fechada. Cada família é apontada para tokens que JÁ existem
+ * (ementa de identidade, seção 3): nenhuma cor nova é criada.
+ *   azuis e roxos → rampa tinta · teal/ciano → rampa acento · cinzas → rampa bone
+ *   verdes → sinal-ok · vermelhos → sinal-alerta · âmbar/laranja/amarelo → sinal-espera
+ */
+const PASSOS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+const token = (nome: string) => `hsl(var(--${nome}) / <alpha-value>)`;
+const rampaDe = (prefixo: string, maior = 950) =>
+  Object.fromEntries(PASSOS.map((p) => [p, token(`${prefixo}-${Math.min(p, maior)}`)]));
+const sinal = (nome: string) =>
+  Object.fromEntries(PASSOS.map((p) => [p, token(p <= 200 ? `${nome}-tenue` : nome)]));
+
+const tinta = rampaDe("tinta");
+const acento = rampaDe("acento", 900);
+const bone = rampaDe("bone");
+const ok = sinal("sinal-ok");
+const alerta = sinal("sinal-alerta");
+const espera = sinal("sinal-espera");
+
+const coresDaPaleta = {
+  blue: tinta, sky: tinta, indigo: tinta, purple: tinta, violet: tinta, fuchsia: tinta, pink: tinta,
+  teal: acento, cyan: acento,
+  gray: bone, slate: bone, zinc: bone, neutral: bone, stone: bone,
+  green: ok, emerald: ok, lime: ok,
+  red: alerta, rose: alerta,
+  amber: espera, orange: espera, yellow: espera,
+};
+
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
@@ -14,6 +44,7 @@ export default {
     },
     extend: {
       colors: {
+        ...coresDaPaleta,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
