@@ -1,11 +1,26 @@
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 import type { FaceStatus } from "./FaceOclusal";
-import { ESCALA_ODONTOGRAMA, anatomiaDe, caminhoCoroa, caminhosRaizes, larguraDente } from "./anatomia";
+import {
+  ESCALA_ODONTOGRAMA,
+  type CondicaoDente,
+  anatomiaDe,
+  caminhoCoroa,
+  caminhosImplante,
+  caminhosRaizes,
+  larguraDente,
+} from "./anatomia";
 
 /** As raízes são exibidas um pouco encurtadas para o odontograma caber sem rolagem. */
 const RAIZ_EXIBIDA = 0.72;
 const MARGEM = 0.6;
+
+const DESCRICAO_CONDICAO: Record<CondicaoDente, string> = {
+  ausente: "ausente",
+  extracao_indicada: "extração indicada",
+  implante: "implante",
+  implante_indicado: "implante indicado",
+};
 
 const COR_STATUS: Record<Exclude<FaceStatus, null>, string> = {
   a_realizar: "hsl(var(--clinico-a-realizar))",
@@ -21,6 +36,8 @@ interface DenteVestibularProps {
   coroaPara: "baixo" | "cima";
   vista?: "vestibular" | "lingual";
   selecionado?: boolean;
+  /** Condição do dente inteiro (ausente, implante…), derivada dos procedimentos */
+  condicao?: CondicaoDente | null;
 }
 
 export const DenteVestibular = ({
@@ -30,6 +47,7 @@ export const DenteVestibular = ({
   coroaPara,
   vista = "vestibular",
   selecionado = false,
+  condicao = null,
 }: DenteVestibularProps) => {
   const id = useId().replace(/:/g, "");
   const a = anatomiaDe(numero);
@@ -50,13 +68,18 @@ export const DenteVestibular = ({
 
   const lingual = vista === "lingual";
   const anterior = a.tipo === "incisivo" || a.tipo === "canino";
-  const corStatus = status ? COR_STATUS[status] : null;
+  const ausente = condicao === "ausente";
+  const comImplante = condicao === "implante" || condicao === "implante_indicado";
+  // Coroa sobre implante concluído é prótese: azul da convenção clínica
+  const corStatus = condicao === "implante" ? COR_STATUS.existente : status ? COR_STATUS[status] : null;
+  const implante = comImplante ? caminhosImplante(a) : null;
+  const corX = ausente ? "hsl(var(--clinico-ausente))" : "hsl(var(--clinico-a-realizar))";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={`Dente ${numero}, vista ${vista}`}
+      aria-label={`Dente ${numero}, vista ${vista}${condicao ? `, ${DESCRICAO_CONDICAO[condicao]}` : ""}`}
       aria-pressed={selecionado}
       className={cn(
         "group flex shrink-0 justify-center rounded-md outline-none transition-colors duration-150",
@@ -101,9 +124,16 @@ export const DenteVestibular = ({
         <g
           transform={paraCima ? "scale(1,-1)" : undefined}
           className="transition-[filter] duration-150 group-hover:brightness-[1.03]"
+          opacity={ausente ? 0.32 : 1}
         >
-          {/* Raízes: as palatinas/linguais atrás, mais escuras */}
-          <g transform={`scale(1, ${RAIZ_EXIBIDA})`} style={{ stroke: "hsl(var(--bone-400))" }} strokeWidth={0.16} strokeLinejoin="round">
+          {/* Raízes: as palatinas/linguais atrás, mais escuras. Com implante concluído, a raiz sai. */}
+          <g
+            transform={`scale(1, ${RAIZ_EXIBIDA})`}
+            style={{ stroke: "hsl(var(--bone-400))" }}
+            strokeWidth={0.16}
+            strokeLinejoin="round"
+            opacity={condicao === "implante" ? 0 : condicao === "implante_indicado" ? 0.35 : 1}
+          >
             {posteriores.map((d, i) => (
               <path key={`p${i}`} d={d} style={{ fill: "hsl(var(--bone-300))" }} />
             ))}
@@ -117,6 +147,26 @@ export const DenteVestibular = ({
               </>
             )}
           </g>
+
+          {implante && (
+            <g transform={`scale(1, ${RAIZ_EXIBIDA})`} strokeLinejoin="round">
+              <path
+                d={implante.corpo}
+                style={{
+                  fill: condicao === "implante" ? "hsl(var(--bone-400))" : "none",
+                  stroke: condicao === "implante" ? "hsl(var(--bone-600))" : "hsl(var(--clinico-a-realizar))",
+                }}
+                strokeWidth={0.2}
+                strokeDasharray={condicao === "implante_indicado" ? "0.6 0.4" : undefined}
+              />
+              {condicao === "implante" && (
+                <>
+                  <path d={implante.roscas} style={{ stroke: "hsl(var(--bone-600))" }} strokeWidth={0.18} />
+                  <path d={implante.plataforma} style={{ fill: "hsl(var(--bone-500))" }} />
+                </>
+              )}
+            </g>
+          )}
 
           {/* Coroa em esmalte */}
           <path d={coroa} fill={`url(#esmalte-${id})`} />
@@ -152,6 +202,14 @@ export const DenteVestibular = ({
             strokeLinejoin="round"
           />
         </g>
+
+        {/* X de extração: vermelho quando indicada, cinza da convenção quando o dente já está ausente */}
+        {(ausente || condicao === "extracao_indicada") && (
+          <g transform={paraCima ? "scale(1,-1)" : undefined} style={{ stroke: corX }} strokeWidth={0.45} strokeLinecap="round">
+            <line x1={-a.largura * 0.5} y1={-maiorRaiz * 0.85} x2={a.largura * 0.5} y2={a.coroa} />
+            <line x1={a.largura * 0.5} y1={-maiorRaiz * 0.85} x2={-a.largura * 0.5} y2={a.coroa} />
+          </g>
+        )}
       </svg>
     </button>
   );

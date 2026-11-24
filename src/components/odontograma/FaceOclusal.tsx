@@ -2,6 +2,7 @@ import { useId } from "react";
 import { cn } from "@/lib/utils";
 import {
   ESCALA_ODONTOGRAMA,
+  type CondicaoDente,
   anatomiaDe,
   caminhoOclusal,
   caminhoSulcos,
@@ -19,6 +20,7 @@ interface FaceOclusalProps {
   faces: Record<Face, FaceStatus>;
   onFaceClick: (face: string) => void;
   selected?: boolean;
+  condicao?: CondicaoDente | null;
 }
 
 const COR_STATUS: Record<Exclude<FaceStatus, null>, string> = {
@@ -37,7 +39,7 @@ const NOME_FACE: Record<Face, string> = {
 
 const MARGEM = 0.7;
 
-export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false }: FaceOclusalProps) => {
+export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false, condicao = null }: FaceOclusalProps) => {
   const id = useId().replace(/:/g, "");
   const a = anatomiaDe(numero);
   const contorno = caminhoOclusal(a);
@@ -93,7 +95,7 @@ export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false }: Fa
 
         <path d={contorno} fill={`url(#oclusal-${id})`} />
 
-        <g clipPath={`url(#contorno-${id})`}>
+        <g clipPath={`url(#contorno-${id})`} opacity={condicao === "ausente" ? 0.32 : 1}>
           {setores.map(({ face, d }) => (
             <path
               key={face}
@@ -120,6 +122,29 @@ export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false }: Fa
         </g>
 
         <path d={contorno} fill="none" style={{ stroke: "hsl(var(--bone-400))" }} strokeWidth={0.2} strokeLinejoin="round" pointerEvents="none" />
+
+        {(condicao === "implante" || condicao === "implante_indicado") && (
+          // plataforma do implante vista de cima
+          <circle
+            r={Math.min(w, h) * 0.32}
+            fill="none"
+            style={{ stroke: condicao === "implante" ? "hsl(var(--bone-600))" : "hsl(var(--clinico-a-realizar))" }}
+            strokeWidth={0.35}
+            strokeDasharray={condicao === "implante_indicado" ? "0.6 0.4" : undefined}
+            pointerEvents="none"
+          />
+        )}
+        {(condicao === "ausente" || condicao === "extracao_indicada") && (
+          <g
+            style={{ stroke: condicao === "ausente" ? "hsl(var(--clinico-ausente))" : "hsl(var(--clinico-a-realizar))" }}
+            strokeWidth={0.45}
+            strokeLinecap="round"
+            pointerEvents="none"
+          >
+            <line x1={-w * 0.75} y1={-h * 0.75} x2={w * 0.75} y2={h * 0.75} />
+            <line x1={w * 0.75} y1={-h * 0.75} x2={-w * 0.75} y2={h * 0.75} />
+          </g>
+        )}
       </svg>
     </div>
   );

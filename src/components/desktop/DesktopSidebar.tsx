@@ -170,7 +170,7 @@ const DesktopSidebar = () => {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-[var(--faixa-h,0px)] bottom-0 z-40 w-[260px] border-r border-sidebar-border bg-sidebar">
+    <aside className="hidden lg:flex print:!hidden flex-col fixed left-0 top-[var(--faixa-h,0px)] bottom-0 z-40 w-[260px] border-r border-sidebar-border bg-sidebar">
       {/* Logo */}
       <div className="flex items-center h-16 px-5 flex-shrink-0">
         <Link to="/dashboard">

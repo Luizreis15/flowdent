@@ -481,7 +481,7 @@ const PatientDetails = () => {
             {/* Right column - Tabs (2/3) */}
             <div className="col-span-8 xl:col-span-9">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full h-auto p-1 gap-0.5 flex-nowrap justify-start overflow-x-auto scrollbar-hide bg-muted/50">
+                <TabsList className="print:hidden w-full h-auto p-1 gap-0.5 flex-nowrap justify-start overflow-x-auto scrollbar-hide bg-muted/50">
                   {tabItems.map((tab) => (
                     <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
                   ))}
