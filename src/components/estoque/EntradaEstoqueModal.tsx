@@ -22,6 +22,8 @@ interface ItemEntrada {
   custo_unitario: number;
 }
 
+const brl = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+
 export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalProps) {
   const { register, handleSubmit, reset, setValue } = useForm();
   const { toast } = useToast();
@@ -119,10 +121,10 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
           title: "Produto cadastrado",
           description: "Produto adicionado com sucesso",
         });
-      } catch (error: any) {
+      } catch (error) {
         toast({
           title: "Erro ao cadastrar produto",
-          description: error.message,
+          description: (error as Error).message,
           variant: "destructive",
         });
       } finally {
@@ -272,10 +274,10 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
       setItems([]);
       reset();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Erro ao registrar entrada",
-        description: error.message,
+        description: (error as Error).message,
         variant: "destructive",
       });
     } finally {
@@ -291,13 +293,13 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Entrada Manual de Estoque</DialogTitle>
+          <DialogTitle>Entrada de estoque</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Form to add items */}
           <div className="border rounded-lg p-4 space-y-4">
-            <h3 className="font-semibold">Adicionar Item</h3>
+            <h3 className="text-sm font-semibold">Adicionar item</h3>
             
             {/* Toggle between new product and existing product */}
             <div className="grid grid-cols-2 gap-2 mb-4">
@@ -307,7 +309,7 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
                 onClick={() => setIsNewProduct(false)}
                 className="w-full"
               >
-                Selecionar Produto
+                Produto cadastrado
               </Button>
               <Button
                 type="button"
@@ -315,7 +317,7 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
                 onClick={() => setIsNewProduct(true)}
                 className="w-full"
               >
-                Cadastrar Produto
+                Produto novo
               </Button>
             </div>
             
@@ -323,7 +325,7 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
               {isNewProduct ? (
                 <>
                   <div className="col-span-2">
-                    <Label htmlFor="new_product_name">Nome do Produto *</Label>
+                    <Label htmlFor="new_product_name">Nome do produto *</Label>
                     <Input
                       id="new_product_name"
                       value={newProductName}
@@ -332,7 +334,7 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
                     />
                   </div>
                   <div className="col-span-2">
-                    <Label htmlFor="new_product_brand">Fabricante/Marca</Label>
+                    <Label htmlFor="new_product_brand">Fabricante ou marca</Label>
                     <Input
                       id="new_product_brand"
                       value={newProductBrand}
@@ -370,7 +372,7 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
               </div>
 
               <div>
-                <Label htmlFor="custo_unitario">Custo Unitário *</Label>
+                <Label htmlFor="custo_unitario">Custo unitário *</Label>
                 <Input
                   id="custo_unitario"
                   type="number"
@@ -382,42 +384,43 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
 
             <Button type="button" onClick={handleSubmit(addItem)} className="w-full">
               <Plus className="mr-2 h-4 w-4" />
-              Adicionar Item
+              Adicionar item
             </Button>
           </div>
 
           {/* Items list */}
           {items.length > 0 && (
             <div className="border rounded-lg p-4">
-              <h3 className="font-semibold mb-4">Itens da Entrada ({items.length})</h3>
+              <h3 className="mb-3 text-sm font-semibold">Itens da entrada ({items.length})</h3>
               <div className="space-y-2">
                 {items.map((item, index) => (
                   <div key={index} className="flex items-center justify-between border-b pb-2">
                     <div className="flex-1">
-                      <p className="font-medium">{getProductName(item.product_id)}</p>
+                      <p className="text-sm font-medium">{getProductName(item.product_id)}</p>
                       <p className="text-sm text-muted-foreground">
-                        Qtd: {item.quantidade} • Custo: R$ {item.custo_unitario.toFixed(2)}
+                        {item.quantidade} × {brl(item.custo_unitario)}
                       </p>
-                      <p className="text-sm font-semibold">
-                        Total: R$ {(item.quantidade * item.custo_unitario).toFixed(2)}
-                      </p>
+                      
                     </div>
+                    <span className="mr-2 text-sm font-medium tabular-nums">{brl(item.quantidade * item.custo_unitario)}</span>
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-8 w-8"
                       onClick={() => removeItem(index)}
+                      aria-label="Remover item"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>
                 ))}
               </div>
 
               <div className="mt-4 pt-4 border-t">
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Valor Total da Entrada:</span>
-                  <span>
-                    R$ {items.reduce((sum, item) => sum + (item.quantidade * item.custo_unitario), 0).toFixed(2)}
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm text-muted-foreground">Total da entrada</span>
+                  <span className="text-lg font-semibold tabular-nums">
+                    {brl(items.reduce((sum, item) => sum + item.quantidade * item.custo_unitario, 0))}
                   </span>
                 </div>
               </div>
@@ -430,7 +433,7 @@ export function EntradaEstoqueModal({ open, onOpenChange }: EntradaEstoqueModalP
               Cancelar
             </Button>
             <Button onClick={onSubmit} disabled={isSubmitting || items.length === 0}>
-              {isSubmitting ? "Salvando..." : "Confirmar Entrada"}
+              {isSubmitting ? "Salvando…" : "Confirmar entrada"}
             </Button>
           </div>
         </div>

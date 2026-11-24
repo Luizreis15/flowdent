@@ -59,9 +59,9 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 | Fase | Escopo | PRs | Estado |
 |---|---|---|---|
 | **A — Fundação** | Cores escritas à mão → tokens; regra de lint de design; família tipográfica | 1–2 | Itens 1 e 2 em produção (PR #14); fonte aguarda decisão |
-| B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | B1 (Financeiro) em andamento |
-| C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | — |
-| D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | — |
+| B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | Concluída (PRs #15–#17) |
+| C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | Concluída (PRs #18–#19) |
+| D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | D1 (Estoque, Produtos, Movimentações, Relatórios) em PR; D2 a seguir |
 | E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | — |
 | F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | — |
 | G — Super admin | 21 telas internas | 1–2 | — |
@@ -81,6 +81,17 @@ Estimativa: 13–16 PRs. A–C levam o app a ~8; E e F fazem a diferença entre 
 3. **Família tipográfica — aguarda decisão do dono.** Proposta: 3 opções aplicadas no Dashboard e no
    odontograma para comparar. Requisitos da ementa: numerais tabulares, pesos 400–700, legível a 13px,
    acentuação completa, Google Fonts ou licença web.
+
+### Fase D1 — o que entrou
+
+- Estoque, Produtos e Movimentações no padrão "PROPOSTO" (cabeçalho, faixa de indicadores, selos tênues, estados vazios).
+- Relatórios: faixa de indicadores, gráficos com uma série em destaque, pizzas trocadas por lista ranqueada, um botão "Exportar".
+- Novo componente `EstadoVazio` (`src/components/sistema`), base para a fase E.
+- Bugs corrigidos: relatórios filtravam status em português (`realizado`, `faltou`…) que não existem no banco,
+  e comparecimento, faltas e ativos davam sempre 0; o último dia do período ficava de fora; o gráfico mensal
+  só recebia o período filtrado; Movimentações nunca carregava (join com `usuarios` inexistente);
+  "movimentações hoje" contava só entre as 10 últimas; busca de produtos quebrava com vírgula ou parêntese.
+- Retirados: indicador "Remarcação" (status inexistente) e o botão "Upload XML NFe", que abria um esboço.
 
 ## Decisões pendentes do dono
 

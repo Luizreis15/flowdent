@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Filter, X } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface ReportFilters {
@@ -23,11 +22,11 @@ interface Props {
   onFiltersChange: (filters: ReportFilters) => void;
 }
 
+// Valores gravados em appointments.status; "remarcado" não existe no banco e foi retirado.
 const statusOptions = [
-  { value: "realizado", label: "Realizado" },
-  { value: "cancelado", label: "Cancelado" },
-  { value: "remarcado", label: "Remarcado" },
-  { value: "faltou", label: "Faltou" },
+  { value: "completed", label: "Finalizado" },
+  { value: "cancelled", label: "Cancelado" },
+  { value: "no_show", label: "Faltou" },
 ];
 
 const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
@@ -61,14 +60,12 @@ const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-4 bg-card border border-border rounded-lg">
-      <Filter className="h-4 w-4 text-muted-foreground" />
-
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3">
       {/* Start Date */}
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left text-xs font-normal")}>
-            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+          <Button variant="outline" size="sm" className="w-[132px] justify-start font-normal tabular-nums">
+            <CalendarIcon className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
             {format(filters.startDate, "dd/MM/yyyy")}
           </Button>
         </PopoverTrigger>
@@ -83,13 +80,13 @@ const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
         </PopoverContent>
       </Popover>
 
-      <span className="text-xs text-muted-foreground">até</span>
+      <span className="text-[13px] text-muted-foreground">até</span>
 
       {/* End Date */}
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left text-xs font-normal")}>
-            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+          <Button variant="outline" size="sm" className="w-[132px] justify-start font-normal tabular-nums">
+            <CalendarIcon className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
             {format(filters.endDate, "dd/MM/yyyy")}
           </Button>
         </PopoverTrigger>
@@ -109,11 +106,11 @@ const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
         value={filters.dentistId || "all"}
         onValueChange={(v) => onFiltersChange({ ...filters, dentistId: v === "all" ? null : v })}
       >
-        <SelectTrigger className="w-[160px] h-9 text-xs">
+        <SelectTrigger className="h-controle-sm w-[160px] text-[13px]">
           <SelectValue placeholder="Dentista" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos dentistas</SelectItem>
+          <SelectItem value="all">Todos os dentistas</SelectItem>
           {dentistas.map((d) => (
             <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
           ))}
@@ -125,11 +122,11 @@ const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
         value={filters.especialidade || "all"}
         onValueChange={(v) => onFiltersChange({ ...filters, especialidade: v === "all" ? null : v })}
       >
-        <SelectTrigger className="w-[160px] h-9 text-xs">
+        <SelectTrigger className="h-controle-sm w-[200px] text-[13px]">
           <SelectValue placeholder="Especialidade" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todas especialidades</SelectItem>
+          <SelectItem value="all">Todas as especialidades</SelectItem>
           {especialidades.map((e) => (
             <SelectItem key={e} value={e}>{e}</SelectItem>
           ))}
@@ -141,11 +138,11 @@ const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
         value={filters.status || "all"}
         onValueChange={(v) => onFiltersChange({ ...filters, status: v === "all" ? null : v })}
       >
-        <SelectTrigger className="w-[140px] h-9 text-xs">
+        <SelectTrigger className="h-controle-sm w-[140px] text-[13px]">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos status</SelectItem>
+          <SelectItem value="all">Todos os status</SelectItem>
           {statusOptions.map((s) => (
             <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
           ))}
@@ -153,7 +150,7 @@ const RelatorioFilters = ({ clinicId, filters, onFiltersChange }: Props) => {
       </Select>
 
       {(filters.dentistId || filters.especialidade || filters.status) && (
-        <Button variant="ghost" size="sm" onClick={handleClear} className="text-xs h-9">
+        <Button variant="ghost" size="sm" onClick={handleClear}>
           <X className="h-3.5 w-3.5 mr-1" /> Limpar
         </Button>
       )}

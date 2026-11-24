@@ -11,7 +11,9 @@ import EspecialidadesTab from "@/components/relatorios/EspecialidadesTab";
 import DentistasTab from "@/components/relatorios/DentistasTab";
 import ComparecimentoTab from "@/components/relatorios/ComparecimentoTab";
 import RetencaoTab from "@/components/relatorios/RetencaoTab";
-import { subDays } from "date-fns";
+import { format, subDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
 
 const Relatorios = () => {
   const { clinicId, isLoading } = useClinicContext();
@@ -34,29 +36,29 @@ const Relatorios = () => {
   }
 
   if (!clinicId) {
-    return <p className="text-muted-foreground">Nenhuma clínica encontrada.</p>;
+    return <p className="text-sm text-muted-foreground">Nenhuma clínica encontrada.</p>;
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Relatórios Operacionais</h1>
-        <p className="text-sm text-muted-foreground mt-1">Análise estratégica do fluxo clínico</p>
-      </div>
+      <CabecalhoPagina
+        titulo="Relatórios"
+        subtitulo={`Fluxo clínico de ${format(filters.startDate, "d 'de' MMM", { locale: ptBR })} a ${format(filters.endDate, "d 'de' MMM 'de' yyyy", { locale: ptBR })}`}
+      />
 
       <RelatorioFilters clinicId={clinicId} filters={filters} onFiltersChange={setFilters} />
 
       <InsightsAutomaticos clinicId={clinicId} filters={filters} />
 
       <Tabs defaultValue="visao-geral" className="space-y-4">
-        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1 rounded-lg">
-          <TabsTrigger value="visao-geral" className="text-xs">Visão Geral</TabsTrigger>
-          <TabsTrigger value="pacientes" className="text-xs">Pacientes</TabsTrigger>
-          <TabsTrigger value="consultas" className="text-xs">Consultas</TabsTrigger>
-          <TabsTrigger value="especialidades" className="text-xs">Especialidades</TabsTrigger>
-          <TabsTrigger value="dentistas" className="text-xs">Dentistas</TabsTrigger>
-          <TabsTrigger value="comparecimento" className="text-xs">Comparecimento</TabsTrigger>
-          <TabsTrigger value="retencao" className="text-xs">Retenção</TabsTrigger>
+        <TabsList className="h-auto flex-wrap">
+          <TabsTrigger value="visao-geral">Visão geral</TabsTrigger>
+          <TabsTrigger value="pacientes">Pacientes</TabsTrigger>
+          <TabsTrigger value="consultas">Consultas</TabsTrigger>
+          <TabsTrigger value="especialidades">Especialidades</TabsTrigger>
+          <TabsTrigger value="dentistas">Dentistas</TabsTrigger>
+          <TabsTrigger value="comparecimento">Comparecimento</TabsTrigger>
+          <TabsTrigger value="retencao">Retenção</TabsTrigger>
         </TabsList>
 
         <TabsContent value="visao-geral">
