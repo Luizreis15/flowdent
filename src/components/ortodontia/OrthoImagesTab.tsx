@@ -36,10 +36,10 @@ const TIPO_IMAGEM_MAP: Record<string, string> = {
 };
 
 const FASE_MAP: Record<string, { label: string; color: string }> = {
-  inicial: { label: "Inicial", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
-  progresso: { label: "Progresso", color: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" },
-  final: { label: "Final", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
-  contencao: { label: "Contenção", color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
+  inicial: { label: "Inicial", color: "bg-acao-tenue text-acao" },
+  progresso: { label: "Progresso", color: "bg-sinal-espera-tenue text-sinal-espera" },
+  final: { label: "Final", color: "bg-sinal-ok-tenue text-sinal-ok" },
+  contencao: { label: "Contenção", color: "bg-acento-100 text-acento-800" },
 };
 
 export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
@@ -193,7 +193,7 @@ export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
                       fallback={<ImageIcon className="h-8 w-8 text-muted-foreground m-auto" />}
                     />
                     {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-[background-color,opacity] duration-150 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                       <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => openLightbox(img.file_path)}>
                         <ZoomIn className="w-4 h-4" />
                       </Button>

@@ -101,7 +101,7 @@ export function ReajusteAnualModal({ open, onOpenChange, onSuccess }: ReajusteAn
 
         {resultado ? (
           <div className="space-y-4 text-center py-4">
-            <div className="text-green-600 text-lg font-bold">✓ Reajuste Aplicado</div>
+            <div className="text-sinal-ok text-lg font-semibold">Reajuste aplicado</div>
             <p className="text-sm text-muted-foreground">
               {resultado.casesUpdated} caso(s) reajustado(s) e {resultado.titulosUpdated} parcela(s) atualizada(s).
             </p>
@@ -133,7 +133,7 @@ export function ReajusteAnualModal({ open, onOpenChange, onSuccess }: ReajusteAn
                           <span className="truncate">{c.patient?.full_name}</span>
                           <div className="flex items-center gap-2 shrink-0">
                             <span className="text-muted-foreground line-through">R$ {atual.toFixed(2)}</span>
-                            <span className="font-medium text-green-600">R$ {novo.toFixed(2)}</span>
+                            <span className="font-medium tabular-nums text-foreground">R$ {novo.toFixed(2)}</span>
                           </div>
                         </div>
                       );

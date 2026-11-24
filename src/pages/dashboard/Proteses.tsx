@@ -12,11 +12,11 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const COLUNAS = [
-  { id: "moldagem", titulo: "Coleta de Moldagem", cor: "bg-blue-500" },
-  { id: "enviado_lab", titulo: "Enviado ao Lab", cor: "bg-yellow-500" },
-  { id: "em_execucao", titulo: "Em Execução", cor: "bg-orange-500" },
-  { id: "pronto_instalacao", titulo: "Pronto p/ Instalação", cor: "bg-green-500" },
-  { id: "instalado", titulo: "Instalado", cor: "bg-gray-500" },
+  { id: "moldagem", titulo: "Coleta de moldagem", cor: "bg-tinta-500" },
+  { id: "enviado_lab", titulo: "Enviado ao laboratório", cor: "bg-acento-500" },
+  { id: "em_execucao", titulo: "Em execução", cor: "bg-sinal-espera" },
+  { id: "pronto_instalacao", titulo: "Pronto para instalação", cor: "bg-sinal-ok" },
+  { id: "instalado", titulo: "Instalado", cor: "bg-bone-400" },
 ];
 
 export default function Proteses() {
@@ -147,12 +147,13 @@ export default function Proteses() {
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, coluna.id)}
             >
-              <div className={`${coluna.cor} text-white rounded-t-lg p-3`}>
-                <h3 className="font-semibold text-sm">{coluna.titulo}</h3>
-                <p className="text-xs opacity-90">{protesesColuna.length} itens</p>
+              <div className="flex items-center gap-2 rounded-t-md border border-b-0 bg-card px-3 py-2.5">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${coluna.cor}`} aria-hidden />
+                <h3 className="flex-1 text-sm font-medium text-foreground">{coluna.titulo}</h3>
+                <span className="font-mono text-xs tabular-nums text-muted-foreground">{protesesColuna.length}</span>
               </div>
               
-              <div className="bg-muted/30 rounded-b-lg p-2 min-h-[500px] space-y-2">
+              <div className="bg-muted/40 rounded-b-md border border-t-0 p-2 min-h-[500px] space-y-2">
                 {protesesColuna.map((protese: any) => {
                   const totalEtapas = etapasCount?.[protese.id] || 0;
                   const etapaAtual = protese.etapa_atual;
@@ -162,7 +163,7 @@ export default function Proteses() {
                       key={protese.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, protese.id)}
-                      className="cursor-move hover:shadow-lg transition-shadow"
+                      className="cursor-move transition-colors duration-150 hover:border-primary/40"
                       onClick={() => abrirDetalhes(protese.id)}
                     >
                       <CardHeader className="p-3 pb-2">
@@ -232,7 +233,7 @@ export default function Proteses() {
 
                         {protese.atrasado && (
                           <Badge variant="destructive" className="text-xs w-full justify-center">
-                            ⚠️ Atrasado
+                            Atrasado
                           </Badge>
                         )}
                       </CardContent>

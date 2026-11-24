@@ -29,10 +29,10 @@ export const TipoReceituarioModal = ({
           {/* Receituário Impresso */}
           <button
             onClick={() => handleSelect("impresso")}
-            className="flex flex-col items-center gap-4 p-6 border-2 rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
+            className="flex flex-col items-center gap-4 p-6 border rounded-md hover:border-primary/50 hover:bg-acao-tenue transition-colors duration-150 group"
           >
-            <div className="p-4 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
-              <Printer className="h-12 w-12 text-blue-600" />
+            <div className="p-3 rounded-md bg-acao-tenue">
+              <Printer className="h-8 w-8 text-acao" />
             </div>
             <div className="text-center">
               <h3 className="font-semibold text-lg mb-2">Receituário impresso</h3>
@@ -45,10 +45,10 @@ export const TipoReceituarioModal = ({
           {/* Receituário Digital */}
           <button
             onClick={() => handleSelect("digital")}
-            className="flex flex-col items-center gap-4 p-6 border-2 rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
+            className="flex flex-col items-center gap-4 p-6 border rounded-md hover:border-primary/50 hover:bg-acao-tenue transition-colors duration-150 group"
           >
-            <div className="p-4 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
-              <Smartphone className="h-12 w-12 text-purple-600" />
+            <div className="p-3 rounded-md bg-acento-100">
+              <Smartphone className="h-8 w-8 text-acento-700" />
             </div>
             <div className="text-center">
               <h3 className="font-semibold text-lg mb-2">Receituário digital</h3>

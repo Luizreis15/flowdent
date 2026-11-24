@@ -100,13 +100,13 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {documentTypes.map((doc) => (
-          <Card key={doc.type} className="hover:shadow-md transition-shadow">
+          <Card key={doc.type}>
             <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
-              <div className={`${doc.color} rounded-lg p-6 text-white`}>
-                <doc.icon className="h-12 w-12" />
+              <div className="rounded-md bg-acao-tenue p-3 text-acao">
+                <doc.icon className="h-6 w-6" />
               </div>
               
-              <h3 className="font-semibold text-lg">{doc.title}</h3>
+              <h3 className="text-[15px] font-medium">{doc.title}</h3>
               
               <div className="w-full space-y-2">
                 <Button
@@ -128,13 +128,13 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
         ))}
 
         {/* Card Personalizado */}
-        <Card className="hover:shadow-md transition-shadow border-2 border-dashed">
+        <Card className="border-dashed">
           <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
-            <div className="rounded-lg p-6 border-2 border-dashed border-muted-foreground/30 text-muted-foreground">
-              <Plus className="h-12 w-12" />
+            <div className="rounded-md border border-dashed border-muted-foreground/30 p-3 text-muted-foreground">
+              <Plus className="h-6 w-6" />
             </div>
             
-            <h3 className="font-semibold text-lg">Personalizado</h3>
+            <h3 className="text-[15px] font-medium">Personalizado</h3>
             
             <div className="w-full space-y-2">
               <Button

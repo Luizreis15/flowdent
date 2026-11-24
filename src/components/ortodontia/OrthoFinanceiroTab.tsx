@@ -72,7 +72,7 @@ export function OrthoFinanceiroTab({
 
   const getStatusBadge = (status: string, dueDate: string) => {
     if (status === "paid") {
-      return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-[10px]">Pago</Badge>;
+      return <Badge className="border-transparent bg-sinal-ok-tenue text-sinal-ok text-[10px]">Pago</Badge>;
     }
     if (new Date(dueDate) < new Date()) {
       return <Badge variant="destructive" className="text-[10px]">Vencido</Badge>;
@@ -148,16 +148,16 @@ export function OrthoFinanceiroTab({
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <CheckCircle className="w-5 h-5 mx-auto text-green-500 mb-1" />
+            <CheckCircle className="w-5 h-5 mx-auto text-sinal-ok mb-1" />
             <p className="text-xs text-muted-foreground">Pago</p>
-            <p className="text-lg font-bold text-green-600">R$ {totalPago.toFixed(2)}</p>
+            <p className="text-lg font-semibold tabular-nums text-foreground">R$ {totalPago.toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <Clock className="w-5 h-5 mx-auto text-amber-500 mb-1" />
+            <Clock className="w-5 h-5 mx-auto text-sinal-espera mb-1" />
             <p className="text-xs text-muted-foreground">Pendente</p>
-            <p className="text-lg font-bold text-amber-600">R$ {totalPendente.toFixed(2)}</p>
+            <p className="text-lg font-semibold tabular-nums text-foreground">R$ {totalPendente.toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -236,7 +236,7 @@ export function OrthoFinanceiroTab({
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-7 text-xs gap-1 text-green-700 border-green-300 hover:bg-green-50"
+                        className="h-7 text-xs gap-1"
                         onClick={() => handlePayClick(titulo)}
                       >
                         <CreditCard className="h-3 w-3" />

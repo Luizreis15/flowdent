@@ -285,12 +285,12 @@ export default function Ortodontia() {
 
                   {/* Agendamento */}
                   {nextAppt ? (
-                    <Badge className="w-fit gap-1 bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100 text-[10px]">
+                    <Badge className="w-fit gap-1 border-transparent bg-sinal-ok-tenue text-sinal-ok text-[10px]">
                       <CheckCircle2 className="w-3 h-3" />
                       {format(parseISO(nextAppt), "dd/MM", { locale: ptBR })} — Ok
                     </Badge>
                   ) : (
-                    <Badge className="w-fit gap-1 bg-red-100 text-red-700 border-red-200 hover:bg-red-100 text-[10px]">
+                    <Badge className="w-fit gap-1 border-transparent bg-sinal-alerta-tenue text-sinal-alerta text-[10px]">
                       <AlertCircle className="w-3 h-3" />
                       Sem agendamento
                     </Badge>
