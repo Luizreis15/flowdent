@@ -214,19 +214,19 @@ const Prontuario = () => {
     }
 
     return (
-      <div className="space-y-2">
+      <div className="divide-y overflow-hidden rounded-lg border bg-card">
         {patientList.map((patient) => (
           <div
             key={patient.id}
-            className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer"
+            className="flex cursor-pointer items-center gap-3 px-4 py-2.5 transition-colors duration-150 hover:bg-muted/50"
             onClick={() => navigate(`/dashboard/prontuario/${patient.id}`)}
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold text-sm shrink-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acao-tenue text-[13px] font-medium text-acao">
               {patient.full_name.charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-foreground text-sm truncate">{patient.full_name}</p>
-              <p className="text-xs text-muted-foreground truncate">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[15px] font-medium text-foreground">{patient.full_name}</p>
+              <p className="truncate text-[13px] text-muted-foreground tabular-nums">
                 {patient.phone}
                 {patient.email && ` • ${patient.email}`}
               </p>
@@ -255,7 +255,7 @@ const Prontuario = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar paciente por nome, CPF ou telefone..."
+            placeholder="Buscar por nome, CPF ou telefone"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
             className="pl-10"

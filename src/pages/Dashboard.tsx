@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
 import TrialBanner from "@/components/TrialBanner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -41,14 +44,6 @@ const Dashboard = () => {
     );
   }
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Bom dia";
-    if (hour < 18) return "Boa tarde";
-    return "Boa noite";
-  };
-
-  const firstName = profile?.full_name?.split(" ")[0] || "Usuário";
 
   return (
     <>
@@ -59,18 +54,16 @@ const Dashboard = () => {
       )}
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-xl lg:text-2xl font-semibold text-foreground">
-            {isSuperAdmin
-              ? "Painel Super Admin"
-              : `${getGreeting()}, ${firstName}`}
-          </h1>
-          {!isSuperAdmin && (
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Confira o resumo do dia da sua clínica.
-            </p>
-          )}
-        </div>
+        <CabecalhoPagina
+          titulo={activeClinicId ? "Hoje" : "Painel Super Admin"}
+          subtitulo={
+            activeClinicId ? (
+              <span className="first-letter:uppercase">
+                {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
+              </span>
+            ) : undefined
+          }
+        />
 
         {activeClinicId && (
           <>
@@ -82,8 +75,8 @@ const Dashboard = () => {
               <ModuleCards />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
-                Alertas Operacionais
+              <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                Alertas operacionais
               </h2>
               <DashboardAlerts clinicId={activeClinicId} />
             </div>

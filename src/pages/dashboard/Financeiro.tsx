@@ -1,9 +1,11 @@
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, TrendingDown, Plus, Download, Search, Filter } from "lucide-react";
+import { Plus, Download, Search, Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
@@ -235,44 +237,21 @@ const Financeiro = () => {
   return (
     <div className="space-y-4 md:space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="bg-primary text-primary-foreground px-4 md:px-6 py-3 md:py-4 rounded-t-lg shadow-lg">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg md:text-2xl font-bold">Financeiro</h1>
-          </div>
+        <CabecalhoPagina titulo="Financeiro" className="mb-4" />
 
-          {/* Tabs - Scroll horizontal no mobile */}
-          <div className="mt-3 md:mt-4 -mx-4 md:mx-0 px-4 md:px-0 overflow-x-auto scrollbar-hide">
-            <TabsList className="bg-primary-foreground/10 border-none w-max md:w-auto">
-              <TabsTrigger value="fluxo" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                FLUXO
-              </TabsTrigger>
-              <TabsTrigger value="calendario" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                CALENDÁRIO
-              </TabsTrigger>
-              <TabsTrigger value="receber" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                RECEBER
-              </TabsTrigger>
-              <TabsTrigger value="pagar" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                PAGAR
-              </TabsTrigger>
-              <TabsTrigger value="recorrencias" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                RECORRÊNCIAS
-              </TabsTrigger>
-              {can("comissoes", "visualizar") && (
-                <TabsTrigger value="comissoes" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                  COMISSÕES
-                </TabsTrigger>
-              )}
-              {can("relatorios", "visualizar") && (
-                <TabsTrigger value="relatorios" className="text-primary-foreground data-[state=active]:bg-primary-foreground data-[state=active]:text-primary text-xs md:text-sm px-3 md:px-4">
-                  RELATÓRIOS
-                </TabsTrigger>
-              )}
-            </TabsList>
-          </div>
+        <div className="-mx-4 mb-4 overflow-x-auto px-4 scrollbar-hide md:mx-0 md:px-0">
+          <TabsList className="w-max md:w-auto">
+            <TabsTrigger value="fluxo">Fluxo</TabsTrigger>
+            <TabsTrigger value="calendario">Calendário</TabsTrigger>
+            <TabsTrigger value="receber">Receber</TabsTrigger>
+            <TabsTrigger value="pagar">Pagar</TabsTrigger>
+            <TabsTrigger value="recorrencias">Recorrências</TabsTrigger>
+            {can("comissoes", "visualizar") && <TabsTrigger value="comissoes">Comissões</TabsTrigger>}
+            {can("relatorios", "visualizar") && <TabsTrigger value="relatorios">Relatórios</TabsTrigger>}
+          </TabsList>
         </div>
 
-        <div className="bg-card rounded-b-lg shadow">
+        <div className="rounded-lg border bg-card">
           <TabsContent value="fluxo" className="m-0 p-4 md:p-6 space-y-4 md:space-y-6">
             {/* Filtros - Stack no mobile */}
             <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
@@ -301,14 +280,14 @@ const Financeiro = () => {
                   onClick={() => setShowFilters((v) => !v)}
                 >
                   <Filter className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">FILTRAR</span>
+                  <span className="hidden md:inline">Filtrar</span>
                 </Button>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="flex-1 md:flex-none">
                       <Download className="h-4 w-4 md:mr-2" />
-                      <span className="hidden md:inline">EXPORTAR</span>
+                      <span className="hidden md:inline">Exportar</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -323,11 +302,11 @@ const Financeiro = () => {
 
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 flex-1 md:flex-none"
+                  className="flex-1 md:flex-none"
                   onClick={() => setShowNovaTransacao(true)}
                 >
                   <Plus className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">ADICIONAR</span>
+                  <span className="hidden md:inline">Adicionar</span>
                 </Button>
               </div>
             </div>
@@ -388,65 +367,28 @@ const Financeiro = () => {
               </div>
             )}
 
-            {/* Cards de resumo - Scroll no mobile */}
-            <div className="flex lg:grid lg:grid-cols-3 gap-3 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-              <Card
-                className="border-l-4 border-l-[hsl(var(--success-green))] bg-gradient-to-br from-[hsl(145,63%,97%)] to-[hsl(145,63%,94%)] flex-shrink-0 w-[200px] lg:w-auto border-none shadow-md cursor-pointer"
-                onClick={() => setActiveTab("receber")}
-              >
-                <CardContent className="p-4 lg:pt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs lg:text-sm font-medium text-foreground/70">RECEITAS</span>
-                    <div className="p-1.5 rounded-lg bg-[hsl(var(--success-green))]/10">
-                      <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5 text-[hsl(var(--success-green))]" />
-                    </div>
-                  </div>
-                  <div className="text-xl lg:text-2xl font-bold text-[hsl(var(--success-green))]">
-                    {formatCurrency(receitas)}
-                  </div>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    A receber {formatCurrency(aReceber)}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card
-                className="border-l-4 border-l-[hsl(var(--error-red))] bg-gradient-to-br from-red-50 to-red-100/50 flex-shrink-0 w-[200px] lg:w-auto border-none shadow-md cursor-pointer"
-                onClick={() => setActiveTab("pagar")}
-              >
-                <CardContent className="p-4 lg:pt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs lg:text-sm font-medium text-foreground/70">DESPESAS</span>
-                    <div className="p-1.5 rounded-lg bg-[hsl(var(--error-red))]/10">
-                      <TrendingDown className="h-4 w-4 lg:h-5 lg:w-5 text-[hsl(var(--error-red))]" />
-                    </div>
-                  </div>
-                  <div className="text-xl lg:text-2xl font-bold text-[hsl(var(--error-red))]">
-                    {formatCurrency(despesas)}
-                  </div>
-                  <p className="text-xs text-foreground/60 mt-1">
-                    A pagar {formatCurrency(aPagar)}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-[hsl(var(--flowdent-blue))] bg-gradient-to-br from-[hsl(205,84%,97%)] to-[hsl(205,84%,94%)] flex-shrink-0 w-[200px] lg:w-auto border-none shadow-md">
-                <CardContent className="p-4 lg:pt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs lg:text-sm font-medium text-foreground/70">SALDO</span>
-                    <div className="p-1.5 rounded-lg bg-[hsl(var(--flowdent-blue))]/10">
-                      <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5 text-[hsl(var(--flowdent-blue))]" />
-                    </div>
-                  </div>
-                  <div className={`text-xl lg:text-2xl font-bold ${saldo >= 0 ? "text-[hsl(var(--flowdent-blue))]" : "text-[hsl(var(--error-red))]"}`}>
-                    {formatCurrency(saldo)}
-                  </div>
-                  <div className="mt-1 text-xs text-foreground/60">
-                    Previsto {formatCurrency(saldoPrevisto)}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <FaixaIndicadores
+              itens={[
+                {
+                  rotulo: "Receitas",
+                  ...separarMoeda(formatCurrency(receitas)),
+                  nota: `A receber ${formatCurrency(aReceber)}`,
+                  onClick: () => setActiveTab("receber"),
+                },
+                {
+                  rotulo: "Despesas",
+                  ...separarMoeda(formatCurrency(despesas)),
+                  nota: `A pagar ${formatCurrency(aPagar)}`,
+                  onClick: () => setActiveTab("pagar"),
+                },
+                {
+                  rotulo: "Saldo",
+                  ...separarMoeda(formatCurrency(saldo)),
+                  nota: `Previsto ${formatCurrency(saldoPrevisto)}`,
+                  tom: saldo < 0 ? "alerta" : "padrao",
+                },
+              ]}
+            />
 
             {/* Tabela de transações */}
             <div className="border rounded-lg overflow-hidden">
