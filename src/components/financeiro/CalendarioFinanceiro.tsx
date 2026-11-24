@@ -1,9 +1,11 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp, AlertTriangle, Bell, CreditCard, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, AlertTriangle, Bell, CreditCard, Calendar} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -53,7 +55,7 @@ export const CalendarioFinanceiro = ({ clinicId }: CalendarioFinanceiroProps) =>
       const { data: payables, error: payablesError } = await supabase
         .from("payable_titles")
         .select(`
-          id, description, amount, due_date, status, supplier_name,
+          id, description, amount, due_date, status,
           supplier:suppliers(razao_social, nome_fantasia)
         `)
         .eq("clinic_id", clinicId)
@@ -81,11 +83,11 @@ export const CalendarioFinanceiro = ({ clinicId }: CalendarioFinanceiroProps) =>
         ...(payables || []).map((p: any) => ({
           id: p.id,
           type: "pagar" as const,
-          description: p.description || p.supplier_name || "Conta a pagar",
+          description: p.description || p.supplier?.nome_fantasia || p.supplier?.razao_social || "Conta a pagar",
           amount: p.amount,
           dueDate: p.due_date,
           status: p.status,
-          supplier: p.supplier?.nome_fantasia || p.supplier?.razao_social || p.supplier_name,
+          supplier: p.supplier?.nome_fantasia || p.supplier?.razao_social,
         })),
         ...(receivables || []).map((r: any) => ({
           id: r.id,
@@ -266,45 +268,13 @@ export const CalendarioFinanceiro = ({ clinicId }: CalendarioFinanceiroProps) =>
       )}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-l-4 border-l-red-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">A Pagar no mês</p>
-                <p className="text-2xl font-bold text-red-600">{formatCurrency(totalPagar)}</p>
-              </div>
-              <TrendingDown className="h-8 w-8 text-red-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">A Receber no mês</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(totalReceber)}</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-green-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className={`border-l-4 ${vencidos > 0 ? "border-l-orange-500" : "border-l-gray-300"}`}>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Títulos Vencidos</p>
-                <p className={`text-2xl font-bold ${vencidos > 0 ? "text-orange-600" : "text-gray-500"}`}>
-                  {vencidos}
-                </p>
-              </div>
-              <AlertTriangle className={`h-8 w-8 ${vencidos > 0 ? "text-orange-400" : "text-gray-300"}`} />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        itens={[
+          { rotulo: "A pagar no mês", ...separarMoeda(formatCurrency(totalPagar)) },
+          { rotulo: "A receber no mês", ...separarMoeda(formatCurrency(totalReceber)) },
+          { rotulo: "Títulos vencidos", valor: vencidos, tom: vencidos > 0 ? "alerta" : "padrao" },
+        ]}
+      />
 
       {/* Calendar */}
       <Card>
@@ -315,7 +285,7 @@ export const CalendarioFinanceiro = ({ clinicId }: CalendarioFinanceiroProps) =>
               <Button variant="outline" size="icon" onClick={() => navigateMonth(-1)}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-semibold capitalize min-w-[180px] text-center">{monthName}</h2>
+              <h2 className="text-lg font-semibold first-letter:uppercase min-w-[180px] text-center">{monthName}</h2>
               <Button variant="outline" size="icon" onClick={() => navigateMonth(1)}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
