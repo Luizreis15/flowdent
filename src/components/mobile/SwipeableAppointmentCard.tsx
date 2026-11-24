@@ -32,18 +32,18 @@ const getStatusConfig = (status: string | null) => {
       return {
         variant: "default" as const,
         label: "Confirmado",
-        borderClass: "border-l-[hsl(var(--success-green))]",
-        bgClass: "bg-[hsl(var(--card-green))]",
-        avatarClass: "bg-[hsl(var(--success-green))]/20 text-[hsl(var(--success-green))]",
+        borderClass: "border-l-sinal-ok",
+        bgClass: "bg-sinal-ok-tenue",
+        avatarClass: "bg-sinal-ok/20 text-sinal-ok",
       };
     case "cancelled":
     case "cancelado":
       return {
         variant: "destructive" as const,
         label: "Cancelado",
-        borderClass: "border-l-[hsl(var(--error-red))]",
-        bgClass: "bg-[hsl(var(--card-amber))]",
-        avatarClass: "bg-[hsl(var(--error-red))]/20 text-[hsl(var(--error-red))]",
+        borderClass: "border-l-sinal-alerta",
+        bgClass: "bg-sinal-espera-tenue",
+        avatarClass: "bg-sinal-alerta/20 text-sinal-alerta",
       };
     case "completed":
     case "concluido":
@@ -59,33 +59,33 @@ const getStatusConfig = (status: string | null) => {
       return {
         variant: "outline" as const,
         label: "Agendado",
-        borderClass: "border-l-[hsl(var(--flowdent-blue))]",
-        bgClass: "bg-[hsl(var(--card-blue))]",
-        avatarClass: "bg-[hsl(var(--flowdent-blue))]/20 text-[hsl(var(--flowdent-blue))]",
+        borderClass: "border-l-primary",
+        bgClass: "bg-acao-tenue",
+        avatarClass: "bg-primary/20 text-primary",
       };
     case "no_show":
       return {
         variant: "destructive" as const,
         label: "Faltou",
-        borderClass: "border-l-[hsl(var(--error-red))]",
-        bgClass: "bg-[hsl(var(--card-amber))]",
-        avatarClass: "bg-[hsl(var(--error-red))]/20 text-[hsl(var(--error-red))]",
+        borderClass: "border-l-sinal-alerta",
+        bgClass: "bg-sinal-espera-tenue",
+        avatarClass: "bg-sinal-alerta/20 text-sinal-alerta",
       };
     case "waiting":
       return {
         variant: "outline" as const,
         label: "Aguardando",
-        borderClass: "border-l-[hsl(var(--warning-amber))]",
-        bgClass: "bg-[hsl(var(--card-amber))]",
-        avatarClass: "bg-[hsl(var(--warning-amber))]/20 text-[hsl(var(--warning-amber))]",
+        borderClass: "border-l-sinal-espera",
+        bgClass: "bg-sinal-espera-tenue",
+        avatarClass: "bg-sinal-espera/20 text-sinal-espera",
       };
     default:
       return {
         variant: "outline" as const,
         label: status || "Pendente",
-        borderClass: "border-l-[hsl(var(--warning-amber))]",
-        bgClass: "bg-[hsl(var(--card-amber))]",
-        avatarClass: "bg-[hsl(var(--warning-amber))]/20 text-[hsl(var(--warning-amber))]",
+        borderClass: "border-l-sinal-espera",
+        bgClass: "bg-sinal-espera-tenue",
+        avatarClass: "bg-sinal-espera/20 text-sinal-espera",
       };
   }
 };
@@ -144,7 +144,7 @@ const SwipeableAppointmentCard = memo(({
     <div ref={containerRef} className="relative overflow-hidden rounded-card min-h-[72px]">
       {/* Background actions */}
       <div className="absolute inset-0 flex">
-        <div className="flex-1 bg-gradient-to-r from-[hsl(var(--success-green))] to-emerald-500 flex items-center justify-start px-4">
+        <div className="flex-1 bg-gradient-to-r from-sinal-ok to-emerald-500 flex items-center justify-start px-4">
           <div className="flex items-center gap-2 text-white">
             <div className="p-2 rounded-full bg-white/20">
               <Check className="h-5 w-5" />
@@ -152,7 +152,7 @@ const SwipeableAppointmentCard = memo(({
             <span className="text-body font-medium">Confirmar</span>
           </div>
         </div>
-        <div className="flex-1 bg-gradient-to-l from-[hsl(var(--error-red))] to-red-500 flex items-center justify-end px-4">
+        <div className="flex-1 bg-gradient-to-l from-sinal-alerta to-red-500 flex items-center justify-end px-4">
           <div className="flex items-center gap-2 text-white">
             <span className="text-body font-medium">Cancelar</span>
             <div className="p-2 rounded-full bg-white/20">
@@ -208,7 +208,7 @@ const SwipeableAppointmentCard = memo(({
                 }}
                 className="p-2 rounded-full hover:bg-white/50 transition-colors"
               >
-                <MessageCircle className="h-4 w-4 text-[hsl(var(--flowdent-blue))]" />
+                <MessageCircle className="h-4 w-4 text-primary" />
               </button>
               <ChevronRight className="h-4 w-4 text-foreground/30" />
             </div>

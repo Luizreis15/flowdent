@@ -570,8 +570,8 @@ export const NovoOrcamentoModal = ({
               </div>
             </div>
 
-            <Alert className="bg-[hsl(var(--card-blue))] border-[hsl(var(--flowdent-blue)/0.3)]">
-              <Info className="h-4 w-4 text-[hsl(var(--flowdent-blue))]" />
+            <Alert className="bg-acao-tenue border-primary/30">
+              <Info className="h-4 w-4 text-primary" />
               <AlertDescription className="text-sm">
                 Ao <strong>aprovar</strong>, serão criados automaticamente: tratamento, títulos a receber e provisões de comissão.
               </AlertDescription>

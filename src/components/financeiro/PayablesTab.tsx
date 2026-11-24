@@ -227,18 +227,18 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
     const isOverdue = due < today && status !== "paid" && status !== "cancelled";
 
     if (status === "paid") {
-      return <Badge className="bg-[hsl(var(--success-green))]/10 text-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/10"><CheckCircle className="h-3 w-3 mr-1" />Pago</Badge>;
+      return <Badge className="bg-sinal-ok/10 text-sinal-ok hover:bg-sinal-ok/10"><CheckCircle className="h-3 w-3 mr-1" />Pago</Badge>;
     }
     if (status === "cancelled") {
       return <Badge variant="secondary"><XCircle className="h-3 w-3 mr-1" />Cancelado</Badge>;
     }
     if (isOverdue) {
-      return <Badge className="bg-[hsl(var(--error-red))]/10 text-[hsl(var(--error-red))] hover:bg-[hsl(var(--error-red))]/10"><AlertTriangle className="h-3 w-3 mr-1" />Vencido</Badge>;
+      return <Badge className="bg-sinal-alerta/10 text-sinal-alerta hover:bg-sinal-alerta/10"><AlertTriangle className="h-3 w-3 mr-1" />Vencido</Badge>;
     }
     if (status === "partial") {
       return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100"><Clock className="h-3 w-3 mr-1" />Parcial</Badge>;
     }
-    return <Badge className="bg-[hsl(var(--flowdent-blue))]/10 text-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flowdent-blue))]/10"><Clock className="h-3 w-3 mr-1" />Em aberto</Badge>;
+    return <Badge className="bg-primary/10 text-primary hover:bg-primary/10"><Clock className="h-3 w-3 mr-1" />Em aberto</Badge>;
   };
 
   const handlePayment = (title: PayableTitle) => {
@@ -337,12 +337,12 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-[hsl(var(--flowdent-blue))] flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "aVencer" ? "ring-2 ring-primary" : ""}`}
+          className={`cursor-pointer transition-all border-l-4 border-l-primary flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "aVencer" ? "ring-2 ring-primary" : ""}`}
           onClick={() => { setAgingFilter("aVencer"); setPage(0); }}
         >
           <CardContent className="p-3 lg:pt-4">
             <div className="text-xs font-medium text-muted-foreground">A Vencer</div>
-            <div className="text-lg lg:text-2xl font-bold text-[hsl(var(--flowdent-blue))]">{formatCurrency(aging.aVencer)}</div>
+            <div className="text-lg lg:text-2xl font-bold text-primary">{formatCurrency(aging.aVencer)}</div>
           </CardContent>
         </Card>
 
@@ -367,21 +367,21 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-[hsl(var(--error-red))] flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "vencido60mais" ? "ring-2 ring-primary" : ""}`}
+          className={`cursor-pointer transition-all border-l-4 border-l-sinal-alerta flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "vencido60mais" ? "ring-2 ring-primary" : ""}`}
           onClick={() => { setAgingFilter("vencido60mais"); setPage(0); }}
         >
           <CardContent className="p-3 lg:pt-4">
             <div className="text-xs font-medium text-muted-foreground">60+ dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-[hsl(var(--error-red))]">{formatCurrency(aging.vencido60mais)}</div>
+            <div className="text-lg lg:text-2xl font-bold text-sinal-alerta">{formatCurrency(aging.vencido60mais)}</div>
           </CardContent>
         </Card>
 
         <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-[hsl(var(--success-green))] flex-shrink-0 w-[130px] lg:w-auto`}
+          className={`cursor-pointer transition-all border-l-4 border-l-sinal-ok flex-shrink-0 w-[130px] lg:w-auto`}
         >
           <CardContent className="p-3 lg:pt-4">
             <div className="text-xs font-medium text-muted-foreground">Total Pago</div>
-            <div className="text-lg lg:text-2xl font-bold text-[hsl(var(--success-green))]">{formatCurrency(aging.totalPago)}</div>
+            <div className="text-lg lg:text-2xl font-bold text-sinal-ok">{formatCurrency(aging.totalPago)}</div>
           </CardContent>
         </Card>
       </div>
@@ -437,7 +437,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
             </SelectContent>
           </Select>
 
-          <Button onClick={() => setShowNovaDespesa(true)} className="bg-[hsl(var(--error-red))] hover:bg-[hsl(var(--error-red))]/90 whitespace-nowrap">
+          <Button onClick={() => setShowNovaDespesa(true)} className="bg-sinal-alerta hover:bg-sinal-alerta/90 whitespace-nowrap">
             <Plus className="h-4 w-4 mr-2" />
             Nova Despesa
           </Button>
@@ -499,7 +499,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
                         <span className="text-muted-foreground">Venc: </span>
                         {new Date(title.due_date).toLocaleDateString("pt-BR")}
                         {isOverdue && (
-                          <span className="text-xs text-[hsl(var(--error-red))] ml-1">({daysOverdue}d)</span>
+                          <span className="text-xs text-sinal-alerta ml-1">({daysOverdue}d)</span>
                         )}
                       </div>
                       <div className="text-right">
@@ -535,7 +535,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleCancel(title)}
-                            className="text-[hsl(var(--error-red))]"
+                            className="text-sinal-alerta"
                           >
                             <XCircle className="h-4 w-4" />
                           </Button>
@@ -605,7 +605,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
                         <div>
                           <div>{new Date(title.due_date).toLocaleDateString("pt-BR")}</div>
                           {isOverdue && (
-                            <div className="text-xs text-[hsl(var(--error-red))]">{daysOverdue} dias atrás</div>
+                            <div className="text-xs text-sinal-alerta">{daysOverdue} dias atrás</div>
                           )}
                         </div>
                       </TableCell>
@@ -620,7 +620,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handlePayment(title)}
-                                className="text-[hsl(var(--success-green))] hover:text-[hsl(var(--success-green))]"
+                                className="text-sinal-ok hover:text-sinal-ok"
                                 title="Baixar pagamento"
                               >
                                 <DollarSign className="h-4 w-4" />
@@ -629,7 +629,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleCancel(title)}
-                                className="text-[hsl(var(--error-red))] hover:text-[hsl(var(--error-red))]"
+                                className="text-sinal-alerta hover:text-sinal-alerta"
                                 title="Cancelar título"
                               >
                                 <XCircle className="h-4 w-4" />

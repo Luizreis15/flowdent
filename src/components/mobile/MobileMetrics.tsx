@@ -16,30 +16,30 @@ const getMetricConfig = (type: string) => {
   switch (type) {
     case "appointments":
       return {
-        bgClass: "bg-[hsl(var(--card-blue))]",
-        borderClass: "border-l-[hsl(var(--flowdent-blue))]",
-        textClass: "text-[hsl(var(--flowdent-blue))]",
+        bgClass: "bg-acao-tenue",
+        borderClass: "border-l-primary",
+        textClass: "text-primary",
         icon: Calendar,
       };
     case "revenue":
       return {
-        bgClass: "bg-[hsl(var(--card-green))]",
-        borderClass: "border-l-[hsl(var(--success-green))]",
-        textClass: "text-[hsl(var(--success-green))]",
+        bgClass: "bg-sinal-ok-tenue",
+        borderClass: "border-l-sinal-ok",
+        textClass: "text-sinal-ok",
         icon: DollarSign,
       };
     case "patients":
       return {
-        bgClass: "bg-[hsl(var(--card-turquoise))]",
-        borderClass: "border-l-[hsl(var(--flow-turquoise))]",
-        textClass: "text-[hsl(var(--flow-turquoise))]",
+        bgClass: "bg-acento-50",
+        borderClass: "border-l-acento-600",
+        textClass: "text-acento-600",
         icon: Users,
       };
     case "pending":
       return {
-        bgClass: "bg-[hsl(var(--card-amber))]",
-        borderClass: "border-l-[hsl(var(--warning-amber))]",
-        textClass: "text-[hsl(var(--warning-amber))]",
+        bgClass: "bg-sinal-espera-tenue",
+        borderClass: "border-l-sinal-espera",
+        textClass: "text-sinal-espera",
         icon: Clock,
       };
     default:

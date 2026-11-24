@@ -221,10 +221,10 @@ const Auth = () => {
       return (
         <>
           <div className="space-y-2">
-            <h1 className="text-[28px] font-bold text-[hsl(var(--flowdent-blue))]">
+            <h1 className="text-[28px] font-bold text-primary">
               Redefinir senha
             </h1>
-            <p className="text-base text-[hsl(var(--slate-gray))]">
+            <p className="text-base text-foreground">
               Digite sua nova senha
             </p>
           </div>
@@ -239,9 +239,9 @@ const Auth = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                className="h-12 rounded-xl border-gray-200 focus:border-[hsl(var(--flowdent-blue))] focus:ring-[hsl(var(--flowdent-blue))]/20"
+                className="h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
               />
-              <p className="text-xs text-[hsl(var(--slate-gray))]">
+              <p className="text-xs text-foreground">
                 {PASSWORD_HINT}
               </p>
             </div>
@@ -254,12 +254,12 @@ const Auth = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="h-12 rounded-xl border-gray-200 focus:border-[hsl(var(--flowdent-blue))] focus:ring-[hsl(var(--flowdent-blue))]/20"
+                className="h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full h-12 rounded-xl bg-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flowdent-blue))]/90 text-[15px] font-medium" 
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-[15px] font-medium" 
               disabled={loading}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -274,10 +274,10 @@ const Auth = () => {
       return (
         <>
           <div className="space-y-2">
-            <h1 className="text-[28px] font-bold text-[hsl(var(--flowdent-blue))]">
+            <h1 className="text-[28px] font-bold text-primary">
               Recuperar senha
             </h1>
-            <p className="text-base text-[hsl(var(--slate-gray))]">
+            <p className="text-base text-foreground">
               Digite seu email para receber o link de recuperação
             </p>
           </div>
@@ -292,12 +292,12 @@ const Auth = () => {
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
                 required
-                className="h-12 rounded-xl border-gray-200 focus:border-[hsl(var(--flowdent-blue))] focus:ring-[hsl(var(--flowdent-blue))]/20"
+                className="h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full h-12 rounded-xl bg-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flowdent-blue))]/90 text-[15px] font-medium" 
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-[15px] font-medium" 
               disabled={loading}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -305,11 +305,11 @@ const Auth = () => {
             </Button>
           </form>
 
-          <p className="text-sm text-center text-[hsl(var(--slate-gray))]">
+          <p className="text-sm text-center text-foreground">
             Lembrou a senha?{" "}
             <button
               onClick={() => { setIsForgotPassword(false); setResetEmail(""); }}
-              className="text-[hsl(var(--flowdent-blue))] font-semibold hover:underline"
+              className="text-primary font-semibold hover:underline"
             >
               Voltar ao login
             </button>
@@ -321,10 +321,10 @@ const Auth = () => {
     return (
       <>
         <div className="space-y-2">
-          <h1 className="text-[28px] font-bold text-[hsl(var(--flowdent-blue))]">
+          <h1 className="text-[28px] font-bold text-primary">
             Acessar sua conta
           </h1>
-          <p className="text-base text-[hsl(var(--slate-gray))]">
+          <p className="text-base text-foreground">
             Entre para continuar
           </p>
         </div>
@@ -339,7 +339,7 @@ const Auth = () => {
               value={loginEmail}
               onChange={(e) => setLoginEmail(e.target.value)}
               required
-              className="h-12 rounded-xl border-gray-200 focus:border-[hsl(var(--flowdent-blue))] focus:ring-[hsl(var(--flowdent-blue))]/20"
+              className="h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
             />
           </div>
           <div className="space-y-1.5">
@@ -348,7 +348,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsForgotPassword(true)}
-                className="text-sm text-[hsl(var(--flowdent-blue))] hover:underline"
+                className="text-sm text-primary hover:underline"
               >
                 Esqueceu a senha?
               </button>
@@ -360,12 +360,12 @@ const Auth = () => {
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
               required
-              className="h-12 rounded-xl border-gray-200 focus:border-[hsl(var(--flowdent-blue))] focus:ring-[hsl(var(--flowdent-blue))]/20"
+              className="h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
             />
           </div>
           <Button 
             type="submit" 
-            className="w-full h-12 rounded-xl bg-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flowdent-blue))]/90 text-[15px] font-medium" 
+            className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-[15px] font-medium" 
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -373,11 +373,11 @@ const Auth = () => {
           </Button>
         </form>
 
-        <p className="text-sm text-center text-[hsl(var(--slate-gray))]">
+        <p className="text-sm text-center text-foreground">
           Não tem uma conta?{" "}
           <Link
             to="/cadastro"
-            className="text-[hsl(var(--flowdent-blue))] font-semibold hover:underline"
+            className="text-primary font-semibold hover:underline"
           >
             Criar conta
           </Link>
@@ -389,7 +389,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex">
       {/* Coluna Institucional — Esquerda */}
-      <div className="hidden md:flex w-[60%] lg:w-[60%] xl:w-[60%] relative bg-gradient-to-br from-[hsl(var(--flowdent-blue))] to-[hsl(var(--flow-turquoise))]">
+      <div className="hidden md:flex w-[60%] lg:w-[60%] xl:w-[60%] relative bg-gradient-to-br from-primary to-acento-600">
         {/* Overlay escuro */}
         <div className="absolute inset-0 bg-black/[0.15]" />
 
@@ -439,14 +439,14 @@ const Auth = () => {
       </div>
 
       {/* Coluna Login — Direita */}
-      <div className="w-full md:w-[40%] flex flex-col bg-[#F5F7FA] relative">
+      <div className="w-full md:w-[40%] flex flex-col bg-background relative">
         {/* Versão */}
         <div className="absolute top-4 right-5 text-xs text-gray-400 font-mono">
           Flowdent v3.2
         </div>
 
         {/* Mobile header */}
-        <div className="md:hidden bg-gradient-to-r from-[hsl(var(--flowdent-blue))] to-[hsl(var(--flow-turquoise))] p-5">
+        <div className="md:hidden bg-gradient-to-r from-primary to-acento-600 p-5">
           <Link to="/">
             <Logo variante="mono" className="h-7 text-bone-50" />
           </Link>

@@ -192,7 +192,7 @@ const MobileAgenda = ({ clinicId }: MobileAgendaProps) => {
   return (
     <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
       {/* Header with filters */}
-      <div className="bg-gradient-to-br from-[hsl(var(--flowdent-blue))] via-[hsl(var(--flow-turquoise))] to-[hsl(var(--health-mint))] text-white px-4 py-3">
+      <div className="bg-gradient-to-br from-primary via-acento-600 to-acento-400 text-white px-4 py-3">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-lg font-bold">Agenda</h1>
           <Button

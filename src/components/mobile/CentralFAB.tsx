@@ -36,8 +36,8 @@ const CentralFAB = () => {
       icon: UserPlus,
       label: "Novo Paciente",
       description: "Cadastrar um novo paciente",
-      color: "text-[hsl(var(--success-green))]",
-      bgColor: "bg-[hsl(var(--success-green))]/10",
+      color: "text-sinal-ok",
+      bgColor: "bg-sinal-ok/10",
       onClick: () => { navigate("/dashboard/prontuario"); setOpen(false); },
     },
     {
@@ -52,8 +52,8 @@ const CentralFAB = () => {
       icon: ClipboardList,
       label: "Novo Orçamento",
       description: "Criar orçamento para paciente",
-      color: "text-[hsl(var(--warning-amber))]",
-      bgColor: "bg-[hsl(var(--warning-amber))]/10",
+      color: "text-sinal-espera",
+      bgColor: "bg-sinal-espera/10",
       onClick: () => { navigate("/dashboard/prontuario"); setOpen(false); },
     },
   ];

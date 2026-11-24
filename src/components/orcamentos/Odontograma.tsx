@@ -23,8 +23,8 @@ const ToothIcon = ({ selected, onClick, status }: { selected: boolean; onClick: 
   const getStatusColor = () => {
     if (selected) return "fill-primary stroke-primary";
     switch (status) {
-      case "completed": return "fill-[hsl(var(--success-green))] stroke-[hsl(var(--success-green))]";
-      case "in_progress": return "fill-[hsl(var(--warning-amber))] stroke-[hsl(var(--warning-amber))]";
+      case "completed": return "fill-sinal-ok stroke-sinal-ok";
+      case "in_progress": return "fill-sinal-espera stroke-sinal-espera";
       case "pending": return "fill-muted-foreground/40 stroke-muted-foreground/50";
       default: return "fill-background stroke-muted-foreground";
     }

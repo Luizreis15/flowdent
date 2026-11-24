@@ -26,56 +26,56 @@ const modules: Module[] = [
     title: "Agenda",
     description: "Agende consultas, remarque e crie alertas de retorno.",
     icon: Calendar,
-    iconBg: "bg-[hsl(var(--flowdent-blue))]",
+    iconBg: "bg-primary",
     route: "/dashboard/agenda"
   },
   {
     title: "Pacientes",
     description: "Visualize o prontuário dos pacientes e detalhes de tratamento.",
     icon: Users,
-    iconBg: "bg-[hsl(var(--flowdent-blue))]",
+    iconBg: "bg-primary",
     route: "/dashboard/prontuario"
   },
   {
     title: "Financeiro",
     description: "Faça a gestão financeira, acompanhe entradas e saídas.",
     icon: DollarSign,
-    iconBg: "bg-[hsl(var(--flow-turquoise))]",
+    iconBg: "bg-acento-600",
     route: "/dashboard/financeiro"
   },
   {
     title: "Estoque",
     description: "Controle seus produtos e movimentações de estoque.",
     icon: Package,
-    iconBg: "bg-[hsl(var(--flow-turquoise))]",
+    iconBg: "bg-acento-600",
     route: "/dashboard/estoque"
   },
   {
     title: "Relatórios",
     description: "Acompanhe as métricas gerais da sua clínica.",
     icon: BarChart3,
-    iconBg: "bg-[hsl(var(--health-mint))]",
+    iconBg: "bg-acento-400",
     route: "/dashboard/financeiro"
   },
   {
     title: "Marketing",
     description: "Gerencie campanhas e comunicação com pacientes.",
     icon: MessageSquare,
-    iconBg: "bg-[hsl(var(--health-mint))]",
+    iconBg: "bg-acento-400",
     route: "/dashboard/crm"
   },
   {
     title: "Próteses",
     description: "Controle pedidos e acompanhe entregas de laboratórios.",
     icon: FileText,
-    iconBg: "bg-[hsl(var(--warm-sand))]",
+    iconBg: "bg-bone-300",
     route: "/dashboard/proteses"
   },
   {
     title: "Ortodontia",
     description: "Acompanhe casos ortodônticos, alinhadores e manutenções.",
     icon: SmilePlus,
-    iconBg: "bg-[hsl(var(--flowdent-blue))]",
+    iconBg: "bg-primary",
     route: "/dashboard/ortodontia"
   },
   {

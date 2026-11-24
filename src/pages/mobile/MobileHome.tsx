@@ -90,22 +90,22 @@ const MobileHome = ({ user, clinicId }: MobileHomeProps) => {
       icon: Calendar,
       value: summaryData?.total ?? "–",
       label: "Consultas",
-      colorClass: "text-[hsl(var(--flowdent-blue))]",
-      bgClass: "bg-[hsl(var(--card-blue))]",
+      colorClass: "text-primary",
+      bgClass: "bg-acao-tenue",
     },
     {
       icon: CheckCircle2,
       value: summaryData?.confirmed ?? "–",
       label: "Confirmados",
-      colorClass: "text-[hsl(var(--success-green))]",
-      bgClass: "bg-[hsl(var(--card-green))]",
+      colorClass: "text-sinal-ok",
+      bgClass: "bg-sinal-ok-tenue",
     },
     {
       icon: Clock,
       value: summaryData?.pending ?? "–",
       label: "Pendentes",
-      colorClass: "text-[hsl(var(--warning-amber))]",
-      bgClass: "bg-[hsl(var(--card-amber))]",
+      colorClass: "text-sinal-espera",
+      bgClass: "bg-sinal-espera-tenue",
     },
   ];
 
@@ -118,13 +118,13 @@ const MobileHome = ({ user, clinicId }: MobileHomeProps) => {
     >
       {/* Pull-to-refresh indicator */}
       {isRefreshing && (
-        <div className="flex justify-center py-2 bg-[hsl(var(--flowdent-blue))]">
+        <div className="flex justify-center py-2 bg-primary">
           <RefreshCw className="h-5 w-5 animate-spin text-white" />
         </div>
       )}
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-[hsl(var(--flowdent-blue))] via-[hsl(var(--flow-turquoise))] to-[hsl(var(--health-mint))] text-white">
+      <div className="bg-gradient-to-br from-primary via-acento-600 to-acento-400 text-white">
         <div className="px-4 pt-12 pb-10">
           <div className="flex items-center justify-between mb-1">
             <div>
@@ -146,7 +146,7 @@ const MobileHome = ({ user, clinicId }: MobileHomeProps) => {
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/15 rounded-full h-9 w-9 relative">
                 <Bell className="h-4.5 w-4.5" />
                 {summaryData && summaryData.pending > 0 && (
-                  <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-[hsl(var(--error-red))]" />
+                  <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-sinal-alerta" />
                 )}
               </Button>
             </div>

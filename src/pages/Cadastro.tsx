@@ -235,10 +235,10 @@ const Cadastro = () => {
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-[hsl(var(--flowdent-blue))] mb-2">
+              <h1 className="text-2xl font-bold text-primary mb-2">
                 Crie sua conta
               </h1>
-              <p className="text-[hsl(var(--slate-gray))] mb-6">
+              <p className="text-foreground mb-6">
                 {signupStep === 1 
                   ? "Teste de graça por 7 dias. Não é necessário informar um cartão de crédito para começar, pague somente se gostar."
                   : "Quase lá! Precisamos de mais algumas informações para personalizar sua experiência."
@@ -252,7 +252,7 @@ const Cadastro = () => {
                 type="button"
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                   signupStep === 1
-                    ? "bg-[hsl(var(--flowdent-blue)/0.1)] text-[hsl(var(--flowdent-blue))]"
+                    ? "bg-primary/10 text-primary"
                     : "bg-gray-100 text-gray-400"
                 }`}
                 onClick={() => setSignupStep(1)}
@@ -263,7 +263,7 @@ const Cadastro = () => {
                 type="button"
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                   signupStep === 2
-                    ? "bg-[hsl(var(--flowdent-blue)/0.1)] text-[hsl(var(--flowdent-blue))]"
+                    ? "bg-primary/10 text-primary"
                     : "bg-gray-100 text-gray-400"
                 }`}
                 disabled={signupStep === 1}
@@ -314,17 +314,17 @@ const Cadastro = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flow-turquoise))]"
+                  className="w-full h-12 bg-primary hover:bg-acento-600"
                 >
                   Continuar
                 </Button>
 
                 <div className="text-center">
-                  <p className="text-sm text-[hsl(var(--slate-gray))]">
+                  <p className="text-sm text-foreground">
                     Já tem uma conta?{" "}
                     <Link
                       to="/auth"
-                      className="text-[hsl(var(--flowdent-blue))] font-semibold hover:underline"
+                      className="text-primary font-semibold hover:underline"
                     >
                       Entrar
                     </Link>
@@ -389,20 +389,20 @@ const Cadastro = () => {
                   </Select>
                 </div>
 
-                <p className="text-xs text-center text-[hsl(var(--slate-gray))]">
+                <p className="text-xs text-center text-foreground">
                   Ao clicar em "Iniciar teste" você está concordando com nossos{" "}
-                  <Link to="/termos" target="_blank" className="text-[hsl(var(--flowdent-blue))] hover:underline">
+                  <Link to="/termos" target="_blank" className="text-primary hover:underline">
                     termos de uso
                   </Link>{" "}
                   e{" "}
-                  <Link to="/privacidade" target="_blank" className="text-[hsl(var(--flowdent-blue))] hover:underline">
+                  <Link to="/privacidade" target="_blank" className="text-primary hover:underline">
                     política de privacidade
                   </Link>.
                 </p>
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flow-turquoise))]" 
+                  className="w-full h-12 bg-primary hover:bg-acento-600" 
                   disabled={loading}
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -424,7 +424,7 @@ const Cadastro = () => {
       </div>
 
       {/* Right Side - Testimonials */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[hsl(var(--flowdent-blue))] to-[hsl(var(--flow-turquoise))] relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-acento-600 relative overflow-hidden">
         <TestimonialCarousel />
       </div>
     </div>

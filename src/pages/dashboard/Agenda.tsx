@@ -689,7 +689,7 @@ const Agenda = () => {
               <span className="text-muted-foreground">Taxa de ocupação do dia</span>
               <span className={cn(
                 "font-semibold",
-                occupancyRate >= 70 ? "text-[hsl(var(--success-green))]" : 
+                occupancyRate >= 70 ? "text-sinal-ok" : 
                 occupancyRate >= 40 ? "text-yellow-500" : "text-destructive"
               )}>
                 {occupancyRate}%
@@ -699,7 +699,7 @@ const Agenda = () => {
               <div 
                 className={cn(
                   "h-full transition-all duration-500 rounded-full",
-                  occupancyRate >= 70 ? "bg-[hsl(var(--success-green))]" : 
+                  occupancyRate >= 70 ? "bg-sinal-ok" : 
                   occupancyRate >= 40 ? "bg-yellow-500" : "bg-destructive"
                 )}
                 style={{ width: `${occupancyRate}%` }}
@@ -733,7 +733,7 @@ const Agenda = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm">
-                <span className="w-3 h-3 rounded bg-[hsl(var(--card-green))] border border-[hsl(var(--success-green))]" />
+                <span className="w-3 h-3 rounded bg-sinal-ok-tenue border border-sinal-ok" />
                 <span className="text-muted-foreground">{availableSlots} disponíveis</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -848,17 +848,17 @@ const Agenda = () => {
                   onClick={() => handleSlotClick(selectedDate, time)}
                   className={cn(
                     "w-full flex items-center gap-4 p-4 rounded-lg border-l-4 transition-all",
-                    "bg-[hsl(var(--card-green))] border-l-[hsl(var(--success-green))]",
+                    "bg-sinal-ok-tenue border-l-sinal-ok",
                     "hover:shadow-md hover:scale-[1.01] cursor-pointer",
                     "group"
                   )}
                 >
                   <div className="flex items-center justify-center w-16 shrink-0">
-                    <span className="text-lg font-bold text-[hsl(var(--success-green))]">{time}</span>
+                    <span className="text-lg font-bold text-sinal-ok">{time}</span>
                   </div>
                   <div className="flex-1 flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-[hsl(var(--success-green))] group-hover:scale-110 transition-transform" />
-                    <span className="font-medium text-[hsl(var(--success-green))]">
+                    <Plus className="h-4 w-4 text-sinal-ok group-hover:scale-110 transition-transform" />
+                    <span className="font-medium text-sinal-ok">
                       Horário Disponível
                     </span>
                     <span className="text-sm text-muted-foreground hidden sm:inline">
@@ -1006,7 +1006,7 @@ const Agenda = () => {
                               ? "cursor-pointer hover:shadow-md" 
                               : slotPassed
                                 ? "bg-muted/30 cursor-not-allowed"
-                                : "bg-[hsl(var(--card-green))] border-[hsl(var(--success-green))]/30 hover:border-[hsl(var(--success-green))] cursor-pointer group"
+                                : "bg-sinal-ok-tenue border-sinal-ok/30 hover:border-sinal-ok cursor-pointer group"
                           )}
                           style={apt ? { 
                             borderLeftColor: dentistColor, 
@@ -1037,7 +1037,7 @@ const Agenda = () => {
                             </div>
                           ) : !slotPassed && (
                             <div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Plus className="h-4 w-4 text-[hsl(var(--success-green))]" />
+                              <Plus className="h-4 w-4 text-sinal-ok" />
                             </div>
                           )}
                         </div>
@@ -1052,7 +1052,7 @@ const Agenda = () => {
           {/* Legenda */}
           <div className="flex items-center gap-4 mt-4 pt-3 border-t flex-wrap text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded border-2 border-[hsl(var(--success-green))] bg-[hsl(var(--card-green))]"></div>
+              <div className="w-3 h-3 rounded border-2 border-sinal-ok bg-sinal-ok-tenue"></div>
               <span className="text-muted-foreground">Disponível</span>
             </div>
             <div className="flex items-center gap-2">
@@ -1446,7 +1446,7 @@ const Agenda = () => {
                       type="date"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value, time: "" })}
-                      className={formData.date ? "border-[hsl(var(--success-green))] bg-[hsl(var(--card-green))]" : ""}
+                      className={formData.date ? "border-sinal-ok bg-sinal-ok-tenue" : ""}
                     />
                   </div>
 
@@ -1506,7 +1506,7 @@ const Agenda = () => {
                           onValueChange={(value) => setFormData({ ...formData, time: value })}
                           disabled={!formData.date || !formData.dentistId}
                         >
-                          <SelectTrigger className={formData.time ? "border-[hsl(var(--success-green))] bg-[hsl(var(--card-green))]" : ""}>
+                          <SelectTrigger className={formData.time ? "border-sinal-ok bg-sinal-ok-tenue" : ""}>
                             <SelectValue placeholder={!formData.dentistId ? "Selecione dentista" : !formData.date ? "Selecione data" : "Selecione horário"} />
                           </SelectTrigger>
                           <SelectContent>
@@ -1661,7 +1661,7 @@ const Agenda = () => {
                           {/* Badge showing slots info */}
                           {isCurrentMonth && occupiedCount === 0 && (
                             <div className="absolute bottom-1 right-1">
-                              <Badge variant="outline" className="text-[10px] px-1 py-0 bg-[hsl(var(--card-green))] text-[hsl(var(--success-green))] border-[hsl(var(--success-green))]/30">
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 bg-sinal-ok-tenue text-sinal-ok border-sinal-ok/30">
                                 Livre
                               </Badge>
                             </div>
