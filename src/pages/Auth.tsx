@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Calendar, DollarSign, ClipboardList, Shield, Clock } from "lucide-react";
 import { z } from "zod";
-import logoFlowdent from '@/assets/logo-flowdent.png';
+import { Logo } from "@/components/brand/Logo";
 import { PASSWORD_HINT, passwordSchema } from "@/lib/password";
 
 const signinSchema = z.object({
@@ -397,11 +397,7 @@ const Auth = () => {
           {/* Logo + Headline */}
           <div>
             <Link to="/">
-              <img 
-                src={logoFlowdent} 
-                alt="Flowdent" 
-                className="h-14 xl:h-16 w-auto brightness-0 invert"
-              />
+              <Logo variante="mono" className="h-10 xl:h-12 text-bone-50" />
             </Link>
           </div>
 
@@ -452,7 +448,7 @@ const Auth = () => {
         {/* Mobile header */}
         <div className="md:hidden bg-gradient-to-r from-[hsl(var(--flowdent-blue))] to-[hsl(var(--flow-turquoise))] p-5">
           <Link to="/">
-            <img src={logoFlowdent} alt="Flowdent" className="h-10 w-auto brightness-0 invert" />
+            <Logo variante="mono" className="h-7 text-bone-50" />
           </Link>
           <p className="text-white/70 text-sm mt-2">Gestão Odontológica Inteligente</p>
         </div>

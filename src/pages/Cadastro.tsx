@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import TestimonialCarousel from "@/components/auth/TestimonialCarousel";
-import logoFlowdent from '@/assets/logo-flowdent.png';
+import { Logo } from "@/components/brand/Logo";
 import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, passwordSchema } from "@/lib/password";
 
 const signupSchema = z.object({
@@ -227,7 +227,7 @@ const Cadastro = () => {
         {/* Header */}
         <div className="p-6 border-b">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoFlowdent} alt="Flowdent" className="h-14 lg:h-16 w-auto" />
+            <Logo className="h-9 lg:h-10" />
           </Link>
         </div>
 

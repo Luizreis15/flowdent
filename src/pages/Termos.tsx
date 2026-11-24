@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import logoFlowdent from "@/assets/logo-flowdent.png";
+import { Logo } from "@/components/brand/Logo";
 
 export default function Termos() {
   return (
@@ -9,7 +9,7 @@ export default function Termos() {
       <header className="border-b bg-white sticky top-0 z-30">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoFlowdent} alt="Flowdent" className="h-10 w-auto" />
+            <Logo className="h-7" />
           </Link>
           <div className="h-6 w-px bg-border" />
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
