@@ -251,7 +251,7 @@ export const NovoPlanoProcedimentosModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novo Plano Personalizado</DialogTitle>
+          <DialogTitle>Novo plano personalizado</DialogTitle>
           <DialogDescription>
             Crie um plano baseado na tabela de procedimentos base
           </DialogDescription>
@@ -259,7 +259,7 @@ export const NovoPlanoProcedimentosModal = ({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="nome">Nome do Plano *</Label>
+            <Label htmlFor="nome">Nome do plano *</Label>
             <Input
               id="nome"
               placeholder="Ex: Plano Particular, Convênio XYZ"
@@ -270,7 +270,7 @@ export const NovoPlanoProcedimentosModal = ({
           </div>
 
           <div className="space-y-3">
-            <Label>Origem dos Procedimentos</Label>
+            <Label>Origem dos procedimentos</Label>
             <RadioGroup value={tipoImportacao} onValueChange={(v: any) => setTipoImportacao(v)}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="base" id="base" />
@@ -289,7 +289,7 @@ export const NovoPlanoProcedimentosModal = ({
 
           {tipoImportacao === "base" ? (
             <div className="space-y-2">
-              <Label htmlFor="ajuste">Ajuste Percentual (%)</Label>
+              <Label htmlFor="ajuste">Ajuste percentual (%)</Label>
               <div className="relative">
                 <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -309,7 +309,7 @@ export const NovoPlanoProcedimentosModal = ({
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="file">Arquivo de Procedimentos *</Label>
+              <Label htmlFor="file">Arquivo de procedimentos *</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="file"

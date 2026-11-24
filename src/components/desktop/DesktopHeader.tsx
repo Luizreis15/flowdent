@@ -40,10 +40,10 @@ const routeTitles: Record<string, { title: string; parent?: string }> = {
   "/dashboard/movimentacoes": { title: "Movimentações", parent: "Estoque" },
   "/dashboard/crm": { title: "CRM" },
   "/dashboard/crm/atendimento": { title: "Atendimento", parent: "CRM" },
-  "/dashboard/portal-paciente": { title: "Portal do Paciente" },
+  "/dashboard/portal-paciente": { title: "Portal do paciente" },
   "/dashboard/ia-assistente": { title: "IA Assistente" },
   "/dashboard/configuracoes": { title: "Configurações" },
-  "/dashboard/perfil": { title: "Meu Perfil" },
+  "/dashboard/perfil": { title: "Meu perfil" },
   "/dashboard/assinatura": { title: "Assinatura" },
   "/dashboard/relatorios": { title: "Relatórios" },
 };
@@ -131,7 +131,7 @@ const DesktopHeader = ({ user, clinicName }: DesktopHeaderProps) => {
           <DropdownMenuContent align="end" className="w-52">
             <DropdownMenuItem onClick={() => navigate("/dashboard/perfil")} className="cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
-              Meu Perfil
+              Meu perfil
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/dashboard/assinatura")} className="cursor-pointer">
               <CreditCard className="mr-2 h-4 w-4" />

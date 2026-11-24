@@ -53,7 +53,6 @@ const CRMAtendimentoWrapper = lazy(() => import("@/pages/dashboard/CRMAtendiment
 const PortalPacienteWrapper = lazy(() => import("@/pages/dashboard/PortalPacienteWrapper"));
 const PortalAuth = lazy(() => import("@/pages/portal/PortalAuth"));
 const PortalDashboard = lazy(() => import("@/pages/portal/PortalDashboard"));
-const IAAssistenteWrapper = lazy(() => import("@/pages/dashboard/IAAssistenteWrapper"));
 const ProtesesWrapper = lazy(() => import("@/pages/dashboard/ProtesesWrapper"));
 const OrtodontiaWrapper = lazy(() => import("@/pages/dashboard/OrtodontiaWrapper"));
 const EstoqueWrapper = lazy(() => import("@/pages/dashboard/EstoqueWrapper"));
@@ -138,7 +137,8 @@ function AppRoutes() {
           <Route path="crm" element={<RequirePermission permission="crm.visualizar"><CRMWrapper /></RequirePermission>} />
           <Route path="crm/atendimento" element={<CRMAtendimentoWrapper />} />
           <Route path="portal-paciente" element={<RequirePermission permission="portal_paciente.visualizar"><PortalPacienteWrapper /></RequirePermission>} />
-          <Route path="ia-assistente" element={<RequirePermission permission="ia_assistente.visualizar"><IAAssistenteWrapper /></RequirePermission>} />
+          {/* IA Assistente fora do ar até existir de verdade: a tela mostrava dados inventados */}
+          <Route path="ia-assistente" element={<Navigate to="/dashboard" replace />} />
           <Route path="proteses" element={<RequirePermission permission="proteses.visualizar"><ProtesesWrapper /></RequirePermission>} />
           <Route path="ortodontia" element={<RequirePermission permission="ortodontia.visualizar"><OrtodontiaWrapper /></RequirePermission>} />
           <Route path="estoque" element={<RequirePermission permission="estoque.visualizar"><EstoqueWrapper /></RequirePermission>} />

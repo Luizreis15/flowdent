@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { NovoLocalEstoqueModal } from "./NovoLocalEstoqueModal";
 import { LocaisEstoqueTable } from "./LocaisEstoqueTable";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface LocaisEstoqueTabProps {
   clinicaId: string;
@@ -35,17 +36,17 @@ export function LocaisEstoqueTab({ clinicaId }: LocaisEstoqueTabProps) {
   });
 
   if (isLoading) {
-    return <div className="text-center py-12 text-muted-foreground">Carregando...</div>;
+    return <EsqueletoSecao />;
   }
 
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Locais de Estoque</CardTitle>
+          <CardTitle>Locais de estoque</CardTitle>
           <Button onClick={() => setShowModal(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Novo Local
+            Novo local
           </Button>
         </CardHeader>
         <CardContent>

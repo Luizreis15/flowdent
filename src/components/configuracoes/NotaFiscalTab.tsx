@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface NotaFiscalTabProps {
   clinicaId: string;
@@ -81,9 +82,7 @@ export function NotaFiscalTab({ clinicaId }: NotaFiscalTabProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <EsqueletoSecao />
     );
   }
 
@@ -91,7 +90,7 @@ export function NotaFiscalTab({ clinicaId }: NotaFiscalTabProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Dados Fiscais</CardTitle>
+          <CardTitle>Dados fiscais</CardTitle>
           <CardDescription>
             Configurações para emissão de notas fiscais
           </CardDescription>
@@ -99,7 +98,7 @@ export function NotaFiscalTab({ clinicaId }: NotaFiscalTabProps) {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="regime">Regime Tributário</Label>
+              <Label htmlFor="regime">Regime tributário</Label>
               <Input
                 id="regime"
                 value={config?.regime_tributario || ""}
@@ -120,7 +119,7 @@ export function NotaFiscalTab({ clinicaId }: NotaFiscalTabProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="inscricao_municipal">Inscrição Municipal</Label>
+              <Label htmlFor="inscricao_municipal">Inscrição municipal</Label>
               <Input
                 id="inscricao_municipal"
                 value={config?.inscricao_municipal || ""}
@@ -128,7 +127,7 @@ export function NotaFiscalTab({ clinicaId }: NotaFiscalTabProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="inscricao_estadual">Inscrição Estadual</Label>
+              <Label htmlFor="inscricao_estadual">Inscrição estadual</Label>
               <Input
                 id="inscricao_estadual"
                 value={config?.inscricao_estadual || ""}
@@ -152,7 +151,7 @@ export function NotaFiscalTab({ clinicaId }: NotaFiscalTabProps) {
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={saving}>
           {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Salvar Configurações
+          Salvar configurações
         </Button>
       </div>
     </div>

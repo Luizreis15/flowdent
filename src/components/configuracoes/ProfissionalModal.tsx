@@ -136,7 +136,7 @@ export const ProfissionalModal = ({ open, onClose, profissional, clinicaId }: Pr
 
         <Tabs defaultValue="dados" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="dados">Dados Cadastrais</TabsTrigger>
+            <TabsTrigger value="dados">Dados cadastrais</TabsTrigger>
             <TabsTrigger value="remuneracao" disabled={!profissional}>Remuneração</TabsTrigger>
             <TabsTrigger value="agenda" disabled={!profissional}>Agenda</TabsTrigger>
           </TabsList>
@@ -236,7 +236,7 @@ export const ProfissionalModal = ({ open, onClose, profissional, clinicaId }: Pr
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="cor">Cor na Agenda</Label>
+                <Label htmlFor="cor">Cor na agenda</Label>
                 <div className="flex items-center gap-3">
                   <input
                     id="cor"
@@ -251,7 +251,8 @@ export const ProfissionalModal = ({ open, onClose, profissional, clinicaId }: Pr
                         key={color}
                         type="button"
                         onClick={() => setFormData({ ...formData, cor: color })}
-                        className={`w-6 h-6 rounded-full border-2 transition-all ${formData.cor === color ? 'border-foreground scale-110' : 'border-transparent'}`}
+                        className={`h-6 w-6 rounded-full transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${formData.cor === color ? 'ring-2 ring-foreground ring-offset-2' : ''}`}
+                        aria-label={`Cor ${color}`}
                         style={{ backgroundColor: color }}
                       />
                     ))}

@@ -370,7 +370,7 @@ export const AgendaProfissionalModal = ({
                   {config.ativo && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label>Hora Início</Label>
+                        <Label>Hora início</Label>
                         <Input
                           type="time"
                           value={config.hora_inicio}
@@ -381,7 +381,7 @@ export const AgendaProfissionalModal = ({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Hora Fim</Label>
+                        <Label>Hora fim</Label>
                         <Input
                           type="time"
                           value={config.hora_fim}
@@ -392,7 +392,7 @@ export const AgendaProfissionalModal = ({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Duração Consulta (min)</Label>
+                        <Label>Duração consulta (min)</Label>
                         <Input
                           type="number"
                           step="5"
@@ -409,7 +409,7 @@ export const AgendaProfissionalModal = ({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Almoço Início</Label>
+                        <Label>Almoço início</Label>
                         <Input
                           type="time"
                           value={config.almoco_inicio || ""}
@@ -424,7 +424,7 @@ export const AgendaProfissionalModal = ({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Almoço Fim</Label>
+                        <Label>Almoço fim</Label>
                         <Input
                           type="time"
                           value={config.almoco_fim || ""}

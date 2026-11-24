@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface PreferenciasTabProps {
   userId: string;
@@ -78,14 +79,14 @@ const PreferenciasTab = ({ userId }: PreferenciasTabProps) => {
   };
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <EsqueletoSecao linhas={4} />;
   }
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Preferências Regionais</CardTitle>
+          <CardTitle>Preferências regionais</CardTitle>
           <CardDescription>Configure formatos de data, hora e moeda</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -108,7 +109,7 @@ const PreferenciasTab = ({ userId }: PreferenciasTabProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label>Formato de Data</Label>
+              <Label>Formato de data</Label>
               <Select
                 value={preferences.formato_data}
                 onValueChange={(value) => setPreferences({ ...preferences, formato_data: value })}
@@ -125,7 +126,7 @@ const PreferenciasTab = ({ userId }: PreferenciasTabProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label>Formato de Hora</Label>
+              <Label>Formato de hora</Label>
               <Select
                 value={preferences.formato_hora}
                 onValueChange={(value) => setPreferences({ ...preferences, formato_hora: value })}
@@ -162,7 +163,7 @@ const PreferenciasTab = ({ userId }: PreferenciasTabProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Preferências Visuais</CardTitle>
+          <CardTitle>Preferências visuais</CardTitle>
           <CardDescription>Personalize a aparência do sistema</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -185,7 +186,7 @@ const PreferenciasTab = ({ userId }: PreferenciasTabProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label>Densidade de Tabelas</Label>
+              <Label>Densidade de tabelas</Label>
               <Select
                 value={preferences.densidade_tabela}
                 onValueChange={(value) => setPreferences({ ...preferences, densidade_tabela: value })}

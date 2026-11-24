@@ -13,6 +13,7 @@ import { Plus, Search, Pencil, Trash2, Building2, FileSpreadsheet } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { UploadPlanilhaLabModal } from "./UploadPlanilhaLabModal";
+import { SeloAtivo } from "@/components/sistema/Selo";
 
 interface FornecedoresTabProps {
   clinicaId: string;
@@ -210,7 +211,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
           </div>
           <Button onClick={() => handleOpenModal()}>
             <Plus className="h-4 w-4 mr-2" />
-            Novo Fornecedor
+            Novo fornecedor
           </Button>
         </div>
       </CardHeader>
@@ -267,11 +268,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
                   <TableCell>{supplier.cnpj || "—"}</TableCell>
                   <TableCell>{supplier.contato_nome || "—"}</TableCell>
                   <TableCell>
-                    {supplier.ativo ? (
-                      <Badge className="bg-green-100 text-green-800">Ativo</Badge>
-                    ) : (
-                      <Badge variant="secondary">Inativo</Badge>
-                    )}
+                    <SeloAtivo ativo={supplier.ativo} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
@@ -279,17 +276,17 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          title="Importar Planilha de Preços"
+                          title="Importar planilha de preços"
                           onClick={() => handleOpenUpload(supplier)}
                         >
-                          <FileSpreadsheet className="h-4 w-4 text-green-600" />
+                          <FileSpreadsheet className="h-4 w-4" />
                         </Button>
                       )}
                       <Button variant="ghost" size="icon" onClick={() => handleOpenModal(supplier)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleDelete(supplier.id)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <Trash2 className="h-4 w-4 text-sinal-alerta" />
                       </Button>
                     </div>
                   </TableCell>
@@ -308,23 +305,23 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="razao_social">Razão Social *</Label>
+                <Label htmlFor="razao_social">Razão social *</Label>
                 <Input
                   id="razao_social"
                   value={formData.razao_social}
                   onChange={(e) => setFormData({ ...formData, razao_social: e.target.value })}
-                  placeholder="Razão Social do fornecedor"
+                  placeholder="Razão social do fornecedor"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="nome_fantasia">Nome Fantasia</Label>
+                  <Label htmlFor="nome_fantasia">Nome fantasia</Label>
                   <Input
                     id="nome_fantasia"
                     value={formData.nome_fantasia}
                     onChange={(e) => setFormData({ ...formData, nome_fantasia: e.target.value })}
-                    placeholder="Nome Fantasia"
+                    placeholder="Nome fantasia"
                   />
                 </div>
                 <div>
@@ -340,7 +337,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="contato_nome">Nome do Contato</Label>
+                  <Label htmlFor="contato_nome">Nome do contato</Label>
                   <Input
                     id="contato_nome"
                     value={formData.contato_nome}
@@ -382,7 +379,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
               </div>
 
               <div>
-                <Label htmlFor="condicoes">Condições de Pagamento</Label>
+                <Label htmlFor="condicoes">Condições de pagamento</Label>
                 <Textarea
                   id="condicoes"
                   value={formData.condicoes_pagamento}
@@ -393,7 +390,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
               </div>
 
               <div>
-                <Label htmlFor="tipo">Tipo de Fornecedor</Label>
+                <Label htmlFor="tipo">Tipo de fornecedor</Label>
                 <Select 
                   value={formData.tipo}
                   onValueChange={(value) => setFormData({ ...formData, tipo: value })}
@@ -403,8 +400,8 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="geral">Geral</SelectItem>
-                    <SelectItem value="laboratorio_protetico">Laboratório Protético</SelectItem>
-                    <SelectItem value="material_consumo">Material de Consumo</SelectItem>
+                    <SelectItem value="laboratorio_protetico">Laboratório protético</SelectItem>
+                    <SelectItem value="material_consumo">Material de consumo</SelectItem>
                     <SelectItem value="equipamentos">Equipamentos</SelectItem>
                   </SelectContent>
                 </Select>

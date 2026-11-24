@@ -195,7 +195,7 @@ export const NovaRegraComissaoModal = ({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="nome">Nome da Regra *</Label>
+            <Label htmlFor="nome">Nome da regra *</Label>
             <Input
               id="nome"
               value={nome}
@@ -242,14 +242,14 @@ export const NovaRegraComissaoModal = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Tipo de Cálculo</Label>
+              <Label>Tipo de cálculo</Label>
               <Select value={tipoCalculo} onValueChange={setTipoCalculo}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="percentual">Percentual</SelectItem>
-                  <SelectItem value="fixo">Valor Fixo</SelectItem>
+                  <SelectItem value="fixo">Valor fixo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -268,7 +268,7 @@ export const NovaRegraComissaoModal = ({
               </div>
             ) : (
               <div className="space-y-2">
-                <Label>Valor Fixo (R$)</Label>
+                <Label>Valor fixo (R$)</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -282,15 +282,15 @@ export const NovaRegraComissaoModal = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Base de Cálculo</Label>
+              <Label>Base de cálculo</Label>
               <Select value={baseCalculo} onValueChange={setBaseCalculo}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bruto">Valor Bruto</SelectItem>
-                  <SelectItem value="liquido">Valor Líquido (após taxas)</SelectItem>
-                  <SelectItem value="recebido">Valor Recebido</SelectItem>
+                  <SelectItem value="bruto">Valor bruto</SelectItem>
+                  <SelectItem value="liquido">Valor líquido (após taxas)</SelectItem>
+                  <SelectItem value="recebido">Valor recebido</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -302,9 +302,9 @@ export const NovaRegraComissaoModal = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="aprovacao">Aprovação do Orçamento</SelectItem>
-                  <SelectItem value="conclusao">Conclusão do Procedimento</SelectItem>
-                  <SelectItem value="recebimento">Recebimento do Pagamento</SelectItem>
+                  <SelectItem value="aprovacao">Aprovação do orçamento</SelectItem>
+                  <SelectItem value="conclusao">Conclusão do procedimento</SelectItem>
+                  <SelectItem value="recebimento">Recebimento do pagamento</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -312,7 +312,7 @@ export const NovaRegraComissaoModal = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Mínimo Garantido (R$)</Label>
+              <Label>Mínimo garantido (R$)</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -324,7 +324,7 @@ export const NovaRegraComissaoModal = ({
             </div>
 
             <div className="space-y-2">
-              <Label>Teto Máximo (R$)</Label>
+              <Label>Teto máximo (R$)</Label>
               <Input
                 type="number"
                 step="0.01"

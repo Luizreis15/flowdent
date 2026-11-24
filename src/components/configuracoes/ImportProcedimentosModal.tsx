@@ -201,7 +201,7 @@ export const ImportProcedimentosModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Importar Tabela de Procedimentos</DialogTitle>
+          <DialogTitle>Importar tabela de procedimentos</DialogTitle>
           <DialogDescription>
             Envie um arquivo CSV ou XLSX com os procedimentos
           </DialogDescription>

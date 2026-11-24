@@ -25,32 +25,31 @@ interface PermissoesPerfilModalProps {
 }
 
 const MODULE_LABELS: Record<string, string> = {
-  agenda: "📅 Agenda",
-  prontuario: "📋 Prontuário",
-  odontograma: "🦷 Odontograma",
-  orcamentos: "💼 Orçamentos",
-  pacientes: "👥 Pacientes",
-  financeiro: "💰 Financeiro",
-  comissoes: "📊 Comissões",
-  relatorios: "📈 Relatórios",
-  configuracoes: "⚙️ Configurações",
-  crm: "💬 CRM",
-  usuarios: "👤 Usuários",
-  estoque: "📦 Estoque",
-  ortodontia: "😁 Ortodontia",
-  proteses: "🔧 Próteses",
-  portal_paciente: "🌐 Portal Paciente",
-  ia_assistente: "✨ IA Assistente",
+  agenda: "Agenda",
+  prontuario: "Prontuário",
+  odontograma: "Odontograma",
+  orcamentos: "Orçamentos",
+  pacientes: "Pacientes",
+  financeiro: "Financeiro",
+  comissoes: "Comissões",
+  relatorios: "Relatórios",
+  configuracoes: "Configurações",
+  crm: "CRM",
+  usuarios: "Usuários",
+  estoque: "Estoque",
+  ortodontia: "Ortodontia",
+  proteses: "Próteses",
+  portal_paciente: "Portal Paciente",
 };
 
 const ACTION_LABELS: Record<string, string> = {
   visualizar: "Visualizar",
   criar: "Criar",
   editar: "Editar",
-  finalizar_atendimento: "Finalizar Atendimento",
+  finalizar_atendimento: "Finalizar atendimento",
   cadastrar: "Cadastrar",
   estorno: "Estornos",
-  reabrir_pagamento: "Reabrir Pagamentos",
+  reabrir_pagamento: "Reabrir pagamentos",
   gerenciar: "Gerenciar",
 };
 
@@ -58,6 +57,8 @@ const ACTION_LABELS: Record<string, string> = {
 function groupByRecurso(permissions: Permission[]) {
   const groups: Record<string, Permission[]> = {};
   for (const p of permissions) {
+    // IA Assistente saiu do menu (fase D2): a permissão some da tela até a função existir
+    if (p.recurso === "ia_assistente") continue;
     if (!groups[p.recurso]) groups[p.recurso] = [];
     groups[p.recurso].push(p);
   }
@@ -181,7 +182,7 @@ export const PermissoesPerfilModal = ({
           </Button>
           <Button onClick={handleSave} disabled={saving || loading}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Salvar Permissões
+            Salvar permissões
           </Button>
         </div>
       </DialogContent>

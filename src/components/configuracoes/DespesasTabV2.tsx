@@ -35,6 +35,7 @@ import {
   Cog,
   Loader2
 } from "lucide-react";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface DespesasTabV2Props {
   clinicaId: string;
@@ -755,9 +756,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <EsqueletoSecao />
     );
   }
 
@@ -769,7 +768,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <FolderTree className="h-5 w-5" />
-                Catálogo de Despesas
+                Catálogo de despesas
               </CardTitle>
               <CardDescription>
                 Estrutura hierárquica: Tipo Macro → Grupo → Item de Despesa
@@ -779,12 +778,12 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
               {(macroTypes.length === 0 || groups.length === 0 || items.length === 0) && (
                 <Button onClick={importCatalogoPadrao} disabled={saving} variant="outline">
                   {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  {macroTypes.length === 0 ? "Importar Catálogo Padrão" : "Completar Catálogo"}
+                  {macroTypes.length === 0 ? "Importar catálogo padrão" : "Completar catálogo"}
                 </Button>
               )}
               <Button onClick={() => handleOpenMacroModal()}>
                 <Plus className="h-4 w-4 mr-2" />
-                Novo Tipo
+                Novo tipo
               </Button>
             </div>
           </div>
@@ -812,7 +811,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
             <div className="text-center py-12 text-muted-foreground">
               <FolderTree className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Nenhum tipo de despesa cadastrado.</p>
-              <p className="text-sm">Clique em "Importar Catálogo Padrão" para começar.</p>
+              <p className="text-sm">Clique em "Importar catálogo padrão" para começar.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -1123,7 +1122,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
               <Label>É investimento (Capex)?</Label>
             </div>
             <div>
-              <Label>Centro de Custo</Label>
+              <Label>Centro de custo</Label>
               <Select
                 value={itemForm.centro_custo}
                 onValueChange={(v) => setItemForm({ ...itemForm, centro_custo: v })}
@@ -1139,7 +1138,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
               </Select>
             </div>
             <div>
-              <Label>Fornecedor Padrão</Label>
+              <Label>Fornecedor padrão</Label>
               <Select
                 value={itemForm.fornecedor_padrao_id}
                 onValueChange={(v) => setItemForm({ ...itemForm, fornecedor_padrao_id: v })}
@@ -1157,7 +1156,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
               </Select>
             </div>
             <div>
-              <Label>Forma de Pagamento Padrão</Label>
+              <Label>Forma de pagamento padrão</Label>
               <Select
                 value={itemForm.forma_pagamento_padrao}
                 onValueChange={(v) => setItemForm({ ...itemForm, forma_pagamento_padrao: v })}
@@ -1198,7 +1197,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
                   </Select>
                 </div>
                 <div>
-                  <Label>Dia de Vencimento</Label>
+                  <Label>Dia de vencimento</Label>
                   <Input
                     type="number"
                     min="1"
@@ -1211,7 +1210,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
               </>
             )}
             <div>
-              <Label>Valor Padrão (R$)</Label>
+              <Label>Valor padrão (R$)</Label>
               <Input
                 value={itemForm.valor_padrao}
                 onChange={(e) => setItemForm({ ...itemForm, valor_padrao: e.target.value })}
@@ -1219,7 +1218,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
               />
             </div>
             <div className="md:col-span-2">
-              <Label>Observações / Alertas</Label>
+              <Label>Observações / alertas</Label>
               <Textarea
                 value={itemForm.observacoes}
                 onChange={(e) => setItemForm({ ...itemForm, observacoes: e.target.value })}

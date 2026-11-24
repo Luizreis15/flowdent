@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Shield, Key, Smartphone } from "lucide-react";
 import { PASSWORD_HINT, passwordSchema } from "@/lib/password";
 
 interface SegurancaTabProps {
@@ -21,6 +20,11 @@ const SegurancaTab = ({ userId }: SegurancaTabProps) => {
   const [changing, setChanging] = useState(false);
 
   const handlePasswordChange = async () => {
+    if (!passwordData.currentPassword) {
+      toast.error("Informe a senha atual");
+      return;
+    }
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error("As senhas não coincidem");
       return;
@@ -34,6 +38,19 @@ const SegurancaTab = ({ userId }: SegurancaTabProps) => {
 
     try {
       setChanging(true);
+
+      // Confere a senha atual antes de trocar: antes o campo era pedido e ignorado,
+      // e qualquer pessoa com a sessão aberta trocava a senha.
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) throw new Error("Usuário sem e-mail na sessão");
+      const { error: senhaAtualErro } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: passwordData.currentPassword,
+      });
+      if (senhaAtualErro) {
+        toast.error("Senha atual incorreta");
+        return;
+      }
 
       const { error } = await supabase.auth.updateUser({
         password: passwordData.newPassword,
@@ -59,15 +76,12 @@ const SegurancaTab = ({ userId }: SegurancaTabProps) => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
-            Alterar Senha
-          </CardTitle>
+          <CardTitle className="text-[15px]">Alterar senha</CardTitle>
           <CardDescription>
             Mantenha sua conta segura com uma senha forte
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="max-w-md space-y-4">
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Senha atual *</Label>
             <Input
@@ -113,46 +127,6 @@ const SegurancaTab = ({ userId }: SegurancaTabProps) => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5" />
-            Autenticação em Duas Etapas (2FA)
-          </CardTitle>
-          <CardDescription>
-            Adicione uma camada extra de segurança à sua conta
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="font-medium">Status 2FA</p>
-              <p className="text-sm text-muted-foreground">Desativado</p>
-            </div>
-            <Button variant="outline">Ativar 2FA</Button>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Funcionalidade em desenvolvimento. Em breve você poderá proteger sua conta com autenticação de dois fatores.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Sessões Ativas
-          </CardTitle>
-          <CardDescription>
-            Dispositivos e locais onde sua conta está conectada
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Funcionalidade em desenvolvimento. Em breve você poderá visualizar e gerenciar todas as sessões ativas.
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 };

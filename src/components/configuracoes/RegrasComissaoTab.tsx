@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { SeloAtivo } from "@/components/sistema/Selo";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit2, Trash2, Users, FileText, Percent, DollarSign } from "lucide-react";
+import { Plus, Edit2, Trash2, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NovaRegraComissaoModal } from "./NovaRegraComissaoModal";
@@ -18,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { formatCurrency } from "@/lib/utils";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
 
 interface CommissionRule {
   id: string;
@@ -135,75 +138,44 @@ export const RegrasComissaoTab = ({ clinicId }: RegrasComissaoTabProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Regras de Comissão</h3>
+          <h3 className="text-section text-foreground">Regras de comissão</h3>
           <p className="text-sm text-muted-foreground">
             Configure regras de comissionamento por profissional e/ou procedimento
           </p>
         </div>
         <Button onClick={() => { setEditingRule(null); setShowModal(true); }}>
           <Plus className="h-4 w-4 mr-2" />
-          Nova Regra
+          Nova regra
         </Button>
       </div>
 
-      {/* Cards resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{regras.filter(r => r.ativo).length}</p>
-                <p className="text-sm text-muted-foreground">Regras ativas</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Percent className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{regras.filter(r => r.tipo_calculo === "percentual").length}</p>
-                <p className="text-sm text-muted-foreground">Por percentual</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{regras.filter(r => r.tipo_calculo === "fixo").length}</p>
-                <p className="text-sm text-muted-foreground">Valor fixo</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        compacto
+        itens={[
+          { rotulo: "Regras ativas", valor: regras.filter((r) => r.ativo).length },
+          { rotulo: "Por percentual", valor: regras.filter((r) => r.tipo_calculo === "percentual").length },
+          { rotulo: "Valor fixo", valor: regras.filter((r) => r.tipo_calculo === "fixo").length },
+        ]}
+      />
 
       {/* Tabela de regras */}
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-8 text-center text-muted-foreground">Carregando...</div>
-          ) : regras.length === 0 ? (
-            <div className="p-8 text-center">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="font-medium">Nenhuma regra cadastrada</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Crie regras para automatizar o cálculo de comissões
-              </p>
+            <div className="space-y-2 p-5">
+              {[0, 1, 2].map((i) => <Skeleton key={i} className="h-10" />)}
             </div>
+          ) : regras.length === 0 ? (
+            <EstadoVazio
+              icone={FileText}
+              titulo="Nenhuma regra cadastrada"
+              descricao="Crie regras para automatizar o cálculo de comissões por profissional ou procedimento."
+              acao={
+                <Button size="sm" onClick={() => { setEditingRule(null); setShowModal(true); }}>
+                  Nova regra
+                </Button>
+              }
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -221,7 +193,7 @@ export const RegrasComissaoTab = ({ clinicId }: RegrasComissaoTabProps) => {
               </TableHeader>
               <TableBody>
                 {regras.map((regra) => (
-                  <TableRow key={regra.id} className={!regra.ativo ? "opacity-50" : ""}>
+                  <TableRow key={regra.id} className={!regra.ativo ? "text-muted-foreground" : ""}>
                     <TableCell className="font-medium">{regra.nome}</TableCell>
                     <TableCell>
                       {regra.profissional?.nome || (
@@ -235,13 +207,9 @@ export const RegrasComissaoTab = ({ clinicId }: RegrasComissaoTabProps) => {
                     </TableCell>
                     <TableCell>
                       {regra.tipo_calculo === "percentual" ? (
-                        <Badge variant="outline" className="bg-blue-50">
-                          {regra.percentual}%
-                        </Badge>
+                        <span className="text-sm font-medium tabular-nums">{regra.percentual}%</span>
                       ) : (
-                        <Badge variant="outline" className="bg-green-50">
-                          {formatCurrency(regra.valor_fixo)}
-                        </Badge>
+                        <span className="text-sm font-medium tabular-nums">{formatCurrency(regra.valor_fixo)}</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -264,13 +232,14 @@ export const RegrasComissaoTab = ({ clinicId }: RegrasComissaoTabProps) => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={regra.ativo ? "default" : "secondary"}
-                        className="cursor-pointer"
+                      <button
+                        type="button"
                         onClick={() => toggleAtivo(regra)}
+                        title={regra.ativo ? "Desativar regra" : "Ativar regra"}
+                        className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
-                        {regra.ativo ? "Ativo" : "Inativo"}
-                      </Badge>
+                        <SeloAtivo ativo={regra.ativo} />
+                      </button>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
@@ -286,7 +255,7 @@ export const RegrasComissaoTab = ({ clinicId }: RegrasComissaoTabProps) => {
                           size="icon"
                           onClick={() => setDeleteId(regra.id)}
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="h-4 w-4 text-sinal-alerta" />
                         </Button>
                       </div>
                     </TableCell>
@@ -322,7 +291,7 @@ export const RegrasComissaoTab = ({ clinicId }: RegrasComissaoTabProps) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>

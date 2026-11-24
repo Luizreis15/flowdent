@@ -75,7 +75,7 @@ export default function EditarProcedimentoModal({ open, onOpenChange, item, onSu
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Editar Valor do Procedimento</DialogTitle>
+          <DialogTitle>Editar valor do procedimento</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -95,12 +95,12 @@ export default function EditarProcedimentoModal({ open, onOpenChange, item, onSu
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs">Valor Base (Tabela)</Label>
+            <Label className="text-muted-foreground text-xs">Valor base (tabela)</Label>
             <p className="text-sm">{formatCurrency(item.procedimento.valor)}</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="valor">Valor no Plano (R$)</Label>
+            <Label htmlFor="valor">Valor no plano (R$)</Label>
             <Input
               id="valor"
               type="number"

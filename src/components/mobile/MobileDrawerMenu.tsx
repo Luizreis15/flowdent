@@ -5,7 +5,6 @@ import {
   DollarSign,
   MessageSquare,
   Users,
-  Sparkles,
   LayoutDashboard,
   Settings,
   FlaskConical,
@@ -52,8 +51,7 @@ const menuCategories = [
   {
     title: "FERRAMENTAS",
     items: [
-      { name: "Portal Paciente", href: "/dashboard/portal-paciente", icon: Users },
-      { name: "IA Assistente", href: "/dashboard/ia-assistente", icon: Sparkles },
+      { name: "Portal do paciente", href: "/dashboard/portal-paciente", icon: Users },
     ],
   },
   {

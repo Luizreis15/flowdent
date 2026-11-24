@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface EmailNotificacoesTabProps {
   userId: string;
@@ -94,14 +95,14 @@ const EmailNotificacoesTab = ({ userId }: EmailNotificacoesTabProps) => {
   };
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <EsqueletoSecao linhas={5} />;
   }
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Notificações Financeiras</CardTitle>
+          <CardTitle>Notificações financeiras</CardTitle>
           <CardDescription>Configurações relacionadas a pagamentos e repasses</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -146,7 +147,7 @@ const EmailNotificacoesTab = ({ userId }: EmailNotificacoesTabProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Notificações da Agenda</CardTitle>
+          <CardTitle>Notificações da agenda</CardTitle>
           <CardDescription>Atualizações sobre agendamentos</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -191,7 +192,7 @@ const EmailNotificacoesTab = ({ userId }: EmailNotificacoesTabProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Notificações de Pacientes</CardTitle>
+          <CardTitle>Notificações de pacientes</CardTitle>
           <CardDescription>Atualizações sobre documentos e consentimentos</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -224,7 +225,7 @@ const EmailNotificacoesTab = ({ userId }: EmailNotificacoesTabProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Notificações Operacionais</CardTitle>
+          <CardTitle>Notificações operacionais</CardTitle>
           <CardDescription>Alertas sobre estoque, próteses e integrações</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -269,7 +270,7 @@ const EmailNotificacoesTab = ({ userId }: EmailNotificacoesTabProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Canais de Notificação</CardTitle>
+          <CardTitle>Canais de notificação</CardTitle>
           <CardDescription>Escolha como deseja receber notificações</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
