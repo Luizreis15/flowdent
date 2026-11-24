@@ -479,7 +479,7 @@ export const AprovarOrcamentoModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Aprovar Orçamento</DialogTitle>
+          <DialogTitle>Aprovar orçamento</DialogTitle>
         </DialogHeader>
 
         {/* Stepper */}
@@ -930,7 +930,6 @@ export const AprovarOrcamentoModal = ({
               <Button
                 onClick={handleApprove}
                 disabled={loading}
-                className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green)/0.9)]"
               >
                 {loading ? (
                   <>

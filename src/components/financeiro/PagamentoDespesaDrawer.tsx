@@ -244,7 +244,7 @@ export const PagamentoDespesaDrawer = ({
               <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
                 Cancelar
               </Button>
-              <Button onClick={handleSubmit} disabled={loading} className="flex-1 bg-green-600 hover:bg-green-700">
+              <Button onClick={handleSubmit} disabled={loading} className="flex-1">
                 {loading ? "Processando..." : "Confirmar Pagamento"}
               </Button>
             </div>

@@ -146,7 +146,7 @@ export function DetalhesCasoModal({ open, onOpenChange, casoId, onRefresh }: Det
           <DialogHeader>
             <div className="flex items-start justify-between gap-4 pr-10">
               <div>
-                <DialogTitle className="text-xl">{caso.patient?.full_name}</DialogTitle>
+                <DialogTitle>{caso.patient?.full_name}</DialogTitle>
                 <p className="text-sm text-muted-foreground mt-1">
                   {TIPO_MAP[caso.tipo_tratamento] || caso.tipo_tratamento}
                 </p>

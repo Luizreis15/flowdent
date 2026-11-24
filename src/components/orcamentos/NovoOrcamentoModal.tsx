@@ -296,7 +296,7 @@ export const NovoOrcamentoModal = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto w-[calc(100vw-2rem)] sm:w-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl">NOVO ORÇAMENTO</DialogTitle>
+          <DialogTitle>Novo orçamento</DialogTitle>
         </DialogHeader>
 
         {step === "adicionar" && (
@@ -354,14 +354,14 @@ export const NovoOrcamentoModal = ({
 
             <div className="flex justify-between pt-4 gap-3">
               <Button variant="outline" onClick={handleClose} className="h-12 sm:h-10 flex-1 sm:flex-none">
-                FECHAR
+                Fechar
               </Button>
               <Button
                 onClick={() => setStep("listar")}
                 disabled={tratamentos.length === 0}
                 className="h-12 sm:h-10 flex-1 sm:flex-none"
               >
-                CONTINUAR
+                Continuar
               </Button>
             </div>
           </>
@@ -444,10 +444,10 @@ export const NovoOrcamentoModal = ({
 
             <div className="flex justify-between pt-4 gap-3">
               <Button variant="outline" onClick={() => setStep("adicionar")} className="h-12 sm:h-10 flex-1 sm:flex-none">
-                VOLTAR
+                Voltar
               </Button>
               <Button onClick={() => setStep("pagamento")} className="h-12 sm:h-10 flex-1 sm:flex-none">
-                CONFIGURAR PAGAMENTO
+                Configurar pagamento
               </Button>
             </div>
           </>
@@ -579,16 +579,16 @@ export const NovoOrcamentoModal = ({
 
             <div className="flex flex-col sm:flex-row justify-between pt-4 gap-3">
               <Button variant="outline" onClick={() => setStep("listar")} className="h-12 sm:h-10">
-                VOLTAR
+                Voltar
               </Button>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => handleSalvar(false)} disabled={loading} className="h-12 sm:h-10 flex-1 sm:flex-none">
-                  RASCUNHO
+                  Rascunho
                 </Button>
                 <Button
                   onClick={() => handleSalvar(true)}
                   disabled={loading}
-                  className="h-12 sm:h-10 flex-1 sm:flex-none bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green)/0.9)]"
+                  className="h-12 sm:h-10 flex-1 sm:flex-none"
                 >
                   {loading ? "PROCESSANDO..." : "APROVAR"}
                 </Button>

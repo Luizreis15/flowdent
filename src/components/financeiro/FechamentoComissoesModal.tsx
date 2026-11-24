@@ -304,7 +304,7 @@ export const FechamentoComissoesModal = ({
             </Button>
           )}
           {provisao && provisao.status === "aprovado" && (
-            <Button onClick={handlePagar} disabled={saving} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={handlePagar} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Registrar Pagamento"}
             </Button>
           )}

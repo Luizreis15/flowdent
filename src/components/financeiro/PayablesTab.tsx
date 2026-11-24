@@ -448,7 +448,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
       {batchMode && selectedIds.size > 0 && (
         <div className="flex items-center gap-3 bg-muted p-3 rounded-lg">
           <span className="text-sm font-medium">{selectedIds.size} selecionado(s)</span>
-          <Button size="sm" onClick={handleBatchPayment} className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90">
+          <Button size="sm" onClick={handleBatchPayment}>
             <DollarSign className="h-4 w-4 mr-1" />
             Baixar Selecionados
           </Button>
@@ -526,7 +526,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
                           <Button
                             size="sm"
                             onClick={() => handlePayment(title)}
-                            className="flex-1 bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90"
+                            className="flex-1"
                           >
                             <DollarSign className="h-4 w-4 mr-1" />
                             Baixar

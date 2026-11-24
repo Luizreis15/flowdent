@@ -488,7 +488,7 @@ const Prontuario = () => {
                     onClick={() => setIsSheetOpen(false)} 
                     disabled={saving}
                   >
-                    FECHAR
+                    Fechar
                   </Button>
                   <Button type="submit" disabled={saving}>
                     {saving ? "SALVANDO..." : "SALVAR"}
