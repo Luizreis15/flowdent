@@ -55,7 +55,7 @@ const PortalDashboard = () => {
     await supabase.auth.signOut();
     toast({
       title: "Logout realizado",
-      description: "Até breve!",
+      description: "Até breve",
     });
     navigate("/portal/auth");
   };

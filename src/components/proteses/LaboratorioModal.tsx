@@ -59,7 +59,7 @@ export function LaboratorioModal({
       if (error) throw error;
 
       toast({
-        title: "Laboratório cadastrado!",
+        title: "Laboratório cadastrado",
         description: "O laboratório foi adicionado com sucesso",
       });
 

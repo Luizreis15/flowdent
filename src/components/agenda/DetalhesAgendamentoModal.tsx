@@ -148,7 +148,7 @@ export const DetalhesAgendamentoModal = ({
       
       if (error) throw error;
       
-      toast.success("Agendamento reagendado com sucesso!");
+      toast.success("Agendamento reagendado com sucesso");
       await onUpdate();
       onOpenChange(false);
     } catch (error: any) {
@@ -180,7 +180,7 @@ export const DetalhesAgendamentoModal = ({
       
       if (error) throw error;
       
-      toast.success("Agendamento atualizado com sucesso!");
+      toast.success("Agendamento atualizado com sucesso");
       setIsEditing(false);
       await onUpdate();
       onOpenChange(false);
@@ -201,7 +201,7 @@ export const DetalhesAgendamentoModal = ({
       
       if (error) throw error;
       
-      toast.success("Agendamento excluído com sucesso!");
+      toast.success("Agendamento excluído com sucesso");
       await onUpdate();
       onOpenChange(false);
     } catch (error: any) {

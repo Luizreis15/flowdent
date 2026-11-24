@@ -123,7 +123,7 @@ export function CRMContatos({ clinicId }: CRMContatosProps) {
         });
 
       if (error) throw error;
-      toast.success("Contato adicionado!");
+      toast.success("Contato adicionado");
       setNewName("");
       setNewPhone("");
       setAddModalOpen(false);

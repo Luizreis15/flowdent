@@ -454,7 +454,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
         }
       }
 
-      toast({ title: "Catálogo padrão importado com sucesso!" });
+      toast({ title: "Catálogo padrão importado com sucesso" });
       loadData();
     } catch (error) {
       console.error("Erro ao importar catálogo:", error);
@@ -499,7 +499,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
           })
           .eq("id", editingMacro.id);
         if (error) throw error;
-        toast({ title: "Tipo atualizado!" });
+        toast({ title: "Tipo atualizado" });
       } else {
         const maxOrdem = Math.max(0, ...macroTypes.map((m) => m.ordem));
         const { error } = await supabase.from("expense_macro_types").insert({
@@ -511,7 +511,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
           ordem: maxOrdem + 1,
         });
         if (error) throw error;
-        toast({ title: "Tipo criado!" });
+        toast({ title: "Tipo criado" });
       }
       setMacroModalOpen(false);
       loadData();
@@ -528,7 +528,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
     try {
       const { error } = await supabase.from("expense_macro_types").delete().eq("id", id);
       if (error) throw error;
-      toast({ title: "Tipo excluído!" });
+      toast({ title: "Tipo excluído" });
       loadData();
     } catch (error) {
       console.error("Erro ao excluir:", error);
@@ -575,7 +575,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
           .update({ nome: groupForm.nome, descricao: groupForm.descricao || null })
           .eq("id", editingGroup.id);
         if (error) throw error;
-        toast({ title: "Grupo atualizado!" });
+        toast({ title: "Grupo atualizado" });
       } else {
         const groupsOfMacro = groups.filter((g) => g.macro_type_id === selectedMacroId);
         const maxOrdem = Math.max(0, ...groupsOfMacro.map((g) => g.ordem));
@@ -587,7 +587,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
           ordem: maxOrdem + 1,
         });
         if (error) throw error;
-        toast({ title: "Grupo criado!" });
+        toast({ title: "Grupo criado" });
       }
       setGroupModalOpen(false);
       loadData();
@@ -604,7 +604,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
     try {
       const { error } = await supabase.from("expense_groups").delete().eq("id", id);
       if (error) throw error;
-      toast({ title: "Grupo excluído!" });
+      toast({ title: "Grupo excluído" });
       loadData();
     } catch (error) {
       console.error("Erro ao excluir:", error);
@@ -673,7 +673,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
       if (editingItem) {
         const { error } = await supabase.from("expense_items").update(payload).eq("id", editingItem.id);
         if (error) throw error;
-        toast({ title: "Item atualizado!" });
+        toast({ title: "Item atualizado" });
       } else {
         const { error } = await supabase.from("expense_items").insert({
           ...payload,
@@ -681,7 +681,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
           group_id: selectedGroupId,
         });
         if (error) throw error;
-        toast({ title: "Item criado!" });
+        toast({ title: "Item criado" });
       }
       setItemModalOpen(false);
       loadData();
@@ -698,7 +698,7 @@ export const DespesasTabV2 = ({ clinicaId }: DespesasTabV2Props) => {
     try {
       const { error } = await supabase.from("expense_items").delete().eq("id", id);
       if (error) throw error;
-      toast({ title: "Item excluído!" });
+      toast({ title: "Item excluído" });
       loadData();
     } catch (error) {
       console.error("Erro ao excluir:", error);

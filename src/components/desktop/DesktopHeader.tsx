@@ -140,7 +140,7 @@ const DesktopHeader = ({ user, clinicName }: DesktopHeaderProps) => {
             <DropdownMenuItem
               onClick={async () => {
                 await supabase.auth.signOut();
-                toast.success("Logout realizado com sucesso!");
+                toast.success("Logout realizado com sucesso");
                 navigate("/auth");
               }}
               className="cursor-pointer text-destructive focus:text-destructive"

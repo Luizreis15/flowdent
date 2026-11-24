@@ -96,7 +96,7 @@ export function OrthoImagesTab({ casoId, patientId }: OrthoImagesTabProps) {
 
       if (dbError) throw dbError;
 
-      toast.success("Imagem enviada com sucesso!");
+      toast.success("Imagem enviada com sucesso");
       setUploadOpen(false);
       setFile(null);
       setDescricao("");

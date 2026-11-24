@@ -87,7 +87,7 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
       console.log('Webhook status registration:', statusRes.status);
 
       if (receivedRes.ok) {
-        toast.success("Webhook registrado na Z-API com sucesso!");
+        toast.success("Webhook registrado na Z-API com sucesso");
       } else {
         const err = await receivedRes.text();
         console.error('Webhook registration error:', err);
@@ -149,7 +149,7 @@ export function ConfigurarWhatsAppModal({ open, onOpenChange, onSuccess }: Confi
         await registerWebhook(instanceId.trim(), instanceToken.trim(), clientToken.trim(), verifyToken);
       }
 
-      toast.success(isActive ? "WhatsApp configurado e ativado!" : "Configuração salva (inativa)");
+      toast.success(isActive ? "WhatsApp configurado e ativado" : "Configuração salva (inativa)");
       onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {

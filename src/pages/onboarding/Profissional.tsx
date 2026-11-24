@@ -171,7 +171,7 @@ const Profissional = () => {
 
       await (supabase as any).from("clinicas").update({ onboarding_status: "completed" }).eq("id", profile.clinic_id);
 
-      toast({ title: "Cadastro concluído!", description: "Bem-vindo ao Flowdent!" });
+      toast({ title: "Cadastro concluído", description: "Bem-vindo ao Flowdent" });
       navigate("/dashboard");
     } catch (error: any) {
       toast({ variant: "destructive", title: "Erro ao cadastrar profissional", description: error.message });

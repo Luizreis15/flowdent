@@ -86,7 +86,7 @@ const AdminMarketing = () => {
 
       if (error) throw error;
 
-      toast.success("Campanha criada!");
+      toast.success("Campanha criada");
       setShowModal(false);
       setFormData({ name: "", subject: "", html_content: "", target_type: "all_clinics" });
       loadCampaigns();
@@ -312,7 +312,7 @@ const AdminMarketing = () => {
               <Input
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                placeholder="Ex: Novidades do Flowdent para você!"
+                placeholder="Ex: Novidades do Flowdent para você"
                 className="bg-slate-700 border-slate-600 text-white"
               />
             </div>

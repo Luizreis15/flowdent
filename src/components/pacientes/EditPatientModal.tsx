@@ -131,7 +131,7 @@ export function EditPatientModal({ open, onOpenChange, patient, onSuccess }: Edi
 
       if (error) throw error;
 
-      toast.success("Paciente atualizado com sucesso!");
+      toast.success("Paciente atualizado com sucesso");
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {

@@ -163,7 +163,7 @@ export default function DetalhesClinicaModal({
         .eq("id", clinic.id);
 
       if (error) throw error;
-      toast.success("Clínica atualizada com sucesso!");
+      toast.success("Clínica atualizada com sucesso");
       onUpdate?.();
       onOpenChange(false);
     } catch (error) {

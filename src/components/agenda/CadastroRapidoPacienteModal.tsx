@@ -67,7 +67,7 @@ export const CadastroRapidoPacienteModal = ({
 
       if (error) throw error;
 
-      toast.success("Paciente cadastrado com sucesso!");
+      toast.success("Paciente cadastrado com sucesso");
       setFormData({ full_name: "", phone: "", email: "", cpf: "", birth_date: "" });
       onOpenChange(false);
       onPatientCreated(newPatient.id);

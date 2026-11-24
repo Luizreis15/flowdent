@@ -146,7 +146,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
           .eq("id", editingSupplier.id);
 
         if (error) throw error;
-        toast.success("Fornecedor atualizado!");
+        toast.success("Fornecedor atualizado");
       } else {
         const { error } = await supabase.from("suppliers").insert({
           clinica_id: clinicaId,
@@ -163,7 +163,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
         });
 
         if (error) throw error;
-        toast.success("Fornecedor criado!");
+        toast.success("Fornecedor criado");
       }
 
       setShowModal(false);
@@ -180,7 +180,7 @@ export const FornecedoresTab = ({ clinicaId }: FornecedoresTabProps) => {
     try {
       const { error } = await supabase.from("suppliers").delete().eq("id", id);
       if (error) throw error;
-      toast.success("Fornecedor excluído!");
+      toast.success("Fornecedor excluído");
       loadSuppliers();
     } catch (error) {
       console.error("Erro ao excluir fornecedor:", error);

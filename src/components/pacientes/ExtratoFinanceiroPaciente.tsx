@@ -308,7 +308,7 @@ export const ExtratoFinanceiroPaciente = ({
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
-      toast.success("Extrato gerado com sucesso!");
+      toast.success("Extrato gerado com sucesso");
     } catch (error) {
       console.error("Erro ao gerar extrato:", error);
       toast.error("Erro ao gerar extrato PDF");

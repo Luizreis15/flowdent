@@ -145,7 +145,7 @@ const PatientDetails = () => {
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast.success("Código copiado!");
+    toast.success("Código copiado");
   };
 
   const handleWhatsApp = () => {
@@ -157,7 +157,7 @@ const PatientDetails = () => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copiado!");
+    toast.success("Link copiado");
   };
 
   const scrollToSection = (section: CadastroSection) => {

@@ -95,7 +95,7 @@ export function RespostasRapidas({ clinicId }: RespostasRapidasProps) {
           .update({ title: title.trim(), content: content.trim(), shortcut: shortcut.trim() || null, category })
           .eq("id", editing);
         if (error) throw error;
-        toast.success("Resposta atualizada!");
+        toast.success("Resposta atualizada");
       } else {
         const { error } = await supabase
           .from("crm_quick_replies")
@@ -107,7 +107,7 @@ export function RespostasRapidas({ clinicId }: RespostasRapidasProps) {
             category,
           });
         if (error) throw error;
-        toast.success("Resposta criada!");
+        toast.success("Resposta criada");
       }
       resetForm();
       loadReplies();
@@ -124,7 +124,7 @@ export function RespostasRapidas({ clinicId }: RespostasRapidasProps) {
         .delete()
         .eq("id", id);
       if (error) throw error;
-      toast.success("Resposta removida!");
+      toast.success("Resposta removida");
       loadReplies();
     } catch (error) {
       toast.error("Erro ao remover");

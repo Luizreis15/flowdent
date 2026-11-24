@@ -49,7 +49,7 @@ export function NovaTransacaoModal({ open, onOpenChange, clinicId, onSuccess }: 
 
       if (error) throw error;
 
-      toast.success("Transação adicionada com sucesso!");
+      toast.success("Transação adicionada com sucesso");
       onSuccess();
       onOpenChange(false);
       

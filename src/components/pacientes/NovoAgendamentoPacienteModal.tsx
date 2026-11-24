@@ -224,7 +224,7 @@ export const NovoAgendamentoPacienteModal = ({
         });
 
       if (error) throw error;
-      toast.success("Agendamento criado com sucesso!");
+      toast.success("Agendamento criado com sucesso");
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {

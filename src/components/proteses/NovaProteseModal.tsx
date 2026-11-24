@@ -224,7 +224,7 @@ export function NovaProteseModal({
       }
 
       toast({
-        title: "Prótese criada!",
+        title: "Prótese criada",
         description: "O trabalho foi adicionado ao Kanban com a primeira etapa",
       });
 

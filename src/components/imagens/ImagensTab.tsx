@@ -120,7 +120,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
 
       if (dbError) throw dbError;
 
-      toast.success("Arquivo enviado com sucesso!");
+      toast.success("Arquivo enviado com sucesso");
       setShowUploadModal(false);
       setSelectedFile(null);
       setFileName("");
@@ -147,7 +147,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
 
       if (dbError) throw dbError;
 
-      toast.success("Arquivo excluído com sucesso!");
+      toast.success("Arquivo excluído com sucesso");
       loadFiles();
     } catch (error) {
       console.error("Erro ao excluir arquivo:", error);

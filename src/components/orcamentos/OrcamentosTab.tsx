@@ -139,7 +139,7 @@ export const OrcamentosTab = ({ budgets, onRefresh, onNewBudget }: OrcamentosTab
       };
 
       await generateRecibo(reciboData);
-      toast.success("Recibo gerado com sucesso!");
+      toast.success("Recibo gerado com sucesso");
     } catch (error: any) {
       console.error("Erro ao gerar recibo:", error);
       toast.error("Erro ao gerar recibo");

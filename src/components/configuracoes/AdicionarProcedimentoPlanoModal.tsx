@@ -138,7 +138,7 @@ export default function AdicionarProcedimentoPlanoModal({
 
       if (error) throw error;
 
-      toast.success("Procedimento adicionado ao plano!");
+      toast.success("Procedimento adicionado ao plano");
       onSuccess();
       onOpenChange(false);
     } catch (error) {
@@ -201,7 +201,7 @@ export default function AdicionarProcedimentoPlanoModal({
 
       if (linkError) throw linkError;
 
-      toast.success("Procedimento criado e adicionado ao plano!");
+      toast.success("Procedimento criado e adicionado ao plano");
       onSuccess();
       onOpenChange(false);
     } catch (error) {

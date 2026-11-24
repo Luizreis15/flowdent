@@ -126,7 +126,7 @@ export const PagamentoDespesaDrawer = ({
 
       if (error) throw error;
 
-      toast.success("Pagamento registrado com sucesso!");
+      toast.success("Pagamento registrado com sucesso");
       onSuccess();
     } catch (error) {
       console.error("Erro ao registrar pagamento:", error);

@@ -129,7 +129,7 @@ export const TratamentosTab = ({ patientId }: TratamentosTabProps) => {
 
       if (error) throw error;
 
-      toast.success("Dentes associados com sucesso!");
+      toast.success("Dentes associados com sucesso");
       setSelectedDentes([]);
       loadTreatments();
     } catch (error: any) {

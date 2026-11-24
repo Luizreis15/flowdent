@@ -137,7 +137,7 @@ const Auth = () => {
         });
       } else {
         toast({
-          title: "Email enviado!",
+          title: "Email enviado",
           description: "Verifique sua caixa de entrada para redefinir sua senha.",
         });
         setIsForgotPassword(false);
@@ -201,7 +201,7 @@ const Auth = () => {
       });
     } else {
       toast({
-        title: "Senha redefinida!",
+        title: "Senha redefinida",
         description: "Sua senha foi alterada com sucesso.",
       });
       

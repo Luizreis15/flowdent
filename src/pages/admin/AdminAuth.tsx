@@ -141,7 +141,7 @@ const AdminAuth = () => {
     if (error) {
       toast.error(error.message || "Erro ao redefinir senha");
     } else {
-      toast.success("Senha redefinida com sucesso!");
+      toast.success("Senha redefinida com sucesso");
       setIsResetPassword(false);
       setNewPassword("");
       setConfirmPassword("");
@@ -170,7 +170,7 @@ const AdminAuth = () => {
           return;
         }
 
-        toast.success("Bem-vindo ao painel administrativo!");
+        toast.success("Bem-vindo ao painel administrativo");
         navigate("/admin/dashboard");
       }
     } catch (error: any) {

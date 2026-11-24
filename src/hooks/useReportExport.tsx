@@ -325,7 +325,7 @@ export const useReportExport = () => {
 
       const fileName = `relatorio-financeiro-${data.periodo}.pdf`;
       doc.save(fileName);
-      toast.success("PDF exportado com sucesso!");
+      toast.success("PDF exportado com sucesso");
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
       toast.error("Erro ao exportar PDF");
@@ -443,7 +443,7 @@ export const useReportExport = () => {
 
       const fileName = `relatorio-financeiro-${data.periodo}.xlsx`;
       XLSX.writeFile(workbook, fileName);
-      toast.success("Excel exportado com sucesso!");
+      toast.success("Excel exportado com sucesso");
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       toast.error("Erro ao exportar Excel");

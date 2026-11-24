@@ -215,7 +215,7 @@ const Cadastro = () => {
 
     setLoading(false);
     toast({
-      title: "Conta criada com sucesso!",
+      title: "Conta criada com sucesso",
       description: "Você será redirecionado para o onboarding.",
     });
   };

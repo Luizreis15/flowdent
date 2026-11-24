@@ -28,7 +28,7 @@ export const useRelatorioExport = () => {
       a.download = `${fileName}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("CSV exportado com sucesso!");
+      toast.success("CSV exportado com sucesso");
     } catch {
       toast.error("Erro ao exportar CSV");
     }
@@ -46,7 +46,7 @@ export const useRelatorioExport = () => {
       ws["!cols"] = columns.map(() => ({ wch: 20 }));
       XLSX.utils.book_append_sheet(wb, ws, "Relatório");
       XLSX.writeFile(wb, `${fileName}.xlsx`);
-      toast.success("Excel exportado com sucesso!");
+      toast.success("Excel exportado com sucesso");
     } catch {
       toast.error("Erro ao exportar Excel");
     }
@@ -76,7 +76,7 @@ export const useRelatorioExport = () => {
       });
 
       doc.save(`${fileName}.pdf`);
-      toast.success("PDF exportado com sucesso!");
+      toast.success("PDF exportado com sucesso");
     } catch {
       toast.error("Erro ao exportar PDF");
     }

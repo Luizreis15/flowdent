@@ -157,7 +157,7 @@ const Prontuario = () => {
 
       if (error) throw error;
 
-      toast.success("Paciente cadastrado com sucesso!");
+      toast.success("Paciente cadastrado com sucesso");
       setIsSheetOpen(false);
       setFormData({
         full_name: "",

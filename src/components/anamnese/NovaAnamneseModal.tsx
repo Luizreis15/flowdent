@@ -295,8 +295,8 @@ export default function NovaAnamneseModal({
 
       toast.success(
         status === "finalizada"
-          ? "Anamnese finalizada com sucesso!"
-          : "Rascunho salvo com sucesso!"
+          ? "Anamnese finalizada com sucesso"
+          : "Rascunho salvo com sucesso"
       );
       onSuccess();
       onClose();

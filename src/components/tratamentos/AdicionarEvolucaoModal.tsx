@@ -109,7 +109,7 @@ export const AdicionarEvolucaoModal = ({
 
       if (error) throw error;
 
-      toast.success("Evolução registrada com sucesso!");
+      toast.success("Evolução registrada com sucesso");
       onSuccess();
       onOpenChange(false);
       resetForm();

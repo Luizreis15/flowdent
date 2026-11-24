@@ -80,7 +80,7 @@ const EnviarConviteModal = ({
       setInviteLink(link);
 
       toast({
-        title: "Convite gerado!",
+        title: "Convite gerado",
         description: "Link criado com sucesso. Copie e envie ao paciente.",
       });
 
@@ -99,7 +99,7 @@ const EnviarConviteModal = ({
     navigator.clipboard.writeText(inviteLink);
     setCopied(true);
     toast({
-      title: "Link copiado!",
+      title: "Link copiado",
       description: "O link foi copiado para a área de transferência.",
     });
     setTimeout(() => setCopied(false), 2000);

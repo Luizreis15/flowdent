@@ -123,7 +123,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
           .eq("id", editingCategory.id);
 
         if (error) throw error;
-        toast.success("Categoria atualizada!");
+        toast.success("Categoria atualizada");
       } else {
         const { error } = await supabase.from("expense_categories").insert({
           clinic_id: clinicaId,
@@ -134,7 +134,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
         });
 
         if (error) throw error;
-        toast.success("Categoria criada!");
+        toast.success("Categoria criada");
       }
 
       setShowCategoryModal(false);
@@ -151,7 +151,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
     try {
       const { error } = await supabase.from("expense_categories").delete().eq("id", id);
       if (error) throw error;
-      toast.success("Categoria excluída!");
+      toast.success("Categoria excluída");
       loadData();
     } catch (error) {
       console.error("Erro ao excluir categoria:", error);
@@ -195,7 +195,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
           .eq("id", editingType.id);
 
         if (error) throw error;
-        toast.success("Tipo atualizado!");
+        toast.success("Tipo atualizado");
       } else {
         const { error } = await supabase.from("expense_types").insert({
           clinic_id: clinicaId,
@@ -206,7 +206,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
         });
 
         if (error) throw error;
-        toast.success("Tipo criado!");
+        toast.success("Tipo criado");
       }
 
       setShowTypeModal(false);
@@ -223,7 +223,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
     try {
       const { error } = await supabase.from("expense_types").delete().eq("id", id);
       if (error) throw error;
-      toast.success("Tipo excluído!");
+      toast.success("Tipo excluído");
       loadData();
     } catch (error) {
       console.error("Erro ao excluir tipo:", error);

@@ -57,7 +57,7 @@ export default function EditarProcedimentoModal({ open, onOpenChange, item, onSu
 
       if (error) throw error;
 
-      toast.success("Valor atualizado com sucesso!");
+      toast.success("Valor atualizado com sucesso");
       onSuccess();
       onOpenChange(false);
     } catch (error) {
