@@ -477,11 +477,11 @@ const Agenda = () => {
   });
 
   const statusColors: Record<string, string> = {
-    confirmed: "bg-emerald-600 text-white",
-    scheduled: "bg-primary/10 text-primary",
+    confirmed: "bg-sinal-ok-tenue text-sinal-ok",
+    scheduled: "bg-acao-tenue text-acao",
     completed: "bg-muted text-muted-foreground",
-    cancelled: "bg-destructive/10 text-destructive",
-    no_show: "bg-amber-500 text-white",
+    cancelled: "bg-sinal-alerta-tenue text-sinal-alerta",
+    no_show: "bg-sinal-alerta-tenue text-sinal-alerta",
   };
 
   const statusLabels: Record<string, string> = {
@@ -698,7 +698,7 @@ const Agenda = () => {
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div 
                 className={cn(
-                  "h-full transition-all duration-500 rounded-full",
+                  "h-full transition-[width] duration-500 rounded-full",
                   occupancyRate >= 70 ? "bg-sinal-ok" : 
                   occupancyRate >= 40 ? "bg-yellow-500" : "bg-destructive"
                 )}
@@ -733,7 +733,7 @@ const Agenda = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm">
-                <span className="w-3 h-3 rounded bg-sinal-ok-tenue border border-sinal-ok" />
+                <span className="w-3 h-3 rounded-sm border border-dashed border-bone-400" />
                 <span className="text-muted-foreground">{availableSlots} disponíveis</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -766,7 +766,7 @@ const Agenda = () => {
                 return (
                   <div
                     key={time}
-                    className="flex items-center gap-4 p-4 rounded-lg border-l-4 transition-all bg-card hover:shadow-md cursor-pointer"
+                    className="flex items-center gap-4 p-4 rounded-md border border-l-4 bg-card transition-colors duration-150 hover:bg-muted/40 cursor-pointer"
                     style={{ borderLeftColor: dentistColor }}
                     onClick={() => handleAppointmentClick(appointment)}
                   >
@@ -831,12 +831,12 @@ const Agenda = () => {
                 return (
                   <div
                     key={time}
-                    className="flex items-center gap-4 p-3 rounded-lg bg-muted/40 border-l-4 border-muted-foreground/20"
+                    className="flex items-center gap-4 px-4 py-2"
                   >
-                    <div className="flex items-center justify-center w-16 shrink-0">
-                      <span className="text-sm font-medium text-muted-foreground/60">{time}</span>
+                    <div className="w-16 shrink-0">
+                      <span className="text-sm tabular-nums text-muted-foreground/60">{time}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground/60 italic">Horário passado</span>
+                    <span className="text-[13px] text-muted-foreground/60">Passado</span>
                   </div>
                 );
               }
@@ -847,19 +847,17 @@ const Agenda = () => {
                   key={time}
                   onClick={() => handleSlotClick(selectedDate, time)}
                   className={cn(
-                    "w-full flex items-center gap-4 p-4 rounded-lg border-l-4 transition-all",
-                    "bg-sinal-ok-tenue border-l-sinal-ok",
-                    "hover:shadow-md hover:scale-[1.01] cursor-pointer",
-                    "group"
+                    "group w-full flex items-center gap-4 rounded-md border border-dashed border-border px-4 py-3 cursor-pointer",
+                    "transition-colors duration-150 hover:border-primary/40 hover:bg-acao-tenue"
                   )}
                 >
-                  <div className="flex items-center justify-center w-16 shrink-0">
-                    <span className="text-lg font-bold text-sinal-ok">{time}</span>
+                  <div className="w-16 shrink-0 text-left">
+                    <span className="text-[15px] font-medium tabular-nums text-foreground">{time}</span>
                   </div>
                   <div className="flex-1 flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-sinal-ok group-hover:scale-110 transition-transform" />
-                    <span className="font-medium text-sinal-ok">
-                      Horário Disponível
+                    <Plus className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+                    <span className="text-sm text-muted-foreground group-hover:text-foreground">
+                      Horário livre
                     </span>
                     <span className="text-sm text-muted-foreground hidden sm:inline">
                       — Clique para agendar
@@ -1001,12 +999,12 @@ const Agenda = () => {
                           key={dayKey}
                           onClick={() => apt ? handleAppointmentClick(apt) : (!slotPassed && handleSlotClick(targetDate, time))}
                           className={cn(
-                            "min-h-[48px] rounded border transition-all p-1.5 relative",
+                            "min-h-[48px] rounded border transition-colors duration-150 p-1.5 relative",
                             apt 
-                              ? "cursor-pointer hover:shadow-md" 
+                              ? "cursor-pointer hover:brightness-[0.98]" 
                               : slotPassed
-                                ? "bg-muted/30 cursor-not-allowed"
-                                : "bg-sinal-ok-tenue border-sinal-ok/30 hover:border-sinal-ok cursor-pointer group"
+                                ? "bg-muted/30 border-transparent cursor-not-allowed"
+                                : "bg-card border-border hover:border-primary/40 hover:bg-acao-tenue cursor-pointer group"
                           )}
                           style={apt ? { 
                             borderLeftColor: dentistColor, 
@@ -1052,7 +1050,7 @@ const Agenda = () => {
           {/* Legenda */}
           <div className="flex items-center gap-4 mt-4 pt-3 border-t flex-wrap text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded border-2 border-sinal-ok bg-sinal-ok-tenue"></div>
+              <div className="w-3 h-3 rounded-sm border border-dashed border-bone-400"></div>
               <span className="text-muted-foreground">Disponível</span>
             </div>
             <div className="flex items-center gap-2">
@@ -1446,7 +1444,7 @@ const Agenda = () => {
                       type="date"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value, time: "" })}
-                      className={formData.date ? "border-sinal-ok bg-sinal-ok-tenue" : ""}
+                      className=""
                     />
                   </div>
 
@@ -1506,7 +1504,7 @@ const Agenda = () => {
                           onValueChange={(value) => setFormData({ ...formData, time: value })}
                           disabled={!formData.date || !formData.dentistId}
                         >
-                          <SelectTrigger className={formData.time ? "border-sinal-ok bg-sinal-ok-tenue" : ""}>
+                          <SelectTrigger>
                             <SelectValue placeholder={!formData.dentistId ? "Selecione dentista" : !formData.date ? "Selecione data" : "Selecione horário"} />
                           </SelectTrigger>
                           <SelectContent>
@@ -1616,11 +1614,11 @@ const Agenda = () => {
                           key={idx}
                           onClick={() => handleDayClick(day)}
                           className={cn(
-                            "relative min-h-[80px] p-2 rounded-lg border-2 transition-all",
+                            "relative min-h-[80px] p-2 rounded-md border transition-colors duration-150",
                             "flex flex-col items-start justify-start",
-                            "hover:border-primary hover:shadow-md hover:scale-[1.02]",
+                            "hover:border-primary/50",
                             isCurrentMonth ? "bg-card" : "bg-muted/30",
-                            isSelected && "border-primary bg-primary/5 shadow-md",
+                            isSelected && "border-primary bg-acao-tenue",
                             !isSelected && "border-border",
                             isTodayDate && "ring-2 ring-primary/20"
                           )}
@@ -1661,9 +1659,7 @@ const Agenda = () => {
                           {/* Badge showing slots info */}
                           {isCurrentMonth && occupiedCount === 0 && (
                             <div className="absolute bottom-1 right-1">
-                              <Badge variant="outline" className="text-[10px] px-1 py-0 bg-sinal-ok-tenue text-sinal-ok border-sinal-ok/30">
-                                Livre
-                              </Badge>
+                              <span className="text-[10px] text-muted-foreground">Livre</span>
                             </div>
                           )}
                         </button>

@@ -36,11 +36,11 @@ interface DetalhesAgendamentoModalProps {
 }
 
 const statusColors: Record<string, string> = {
-  confirmed: "bg-emerald-600 text-white",
+  confirmed: "bg-sinal-ok-tenue text-sinal-ok",
   scheduled: "bg-primary/10 text-primary",
   completed: "bg-muted text-muted-foreground",
   cancelled: "bg-destructive/10 text-destructive",
-  no_show: "bg-amber-500 text-white",
+  no_show: "bg-sinal-alerta-tenue text-sinal-alerta",
 };
 
 const statusLabels: Record<string, string> = {
@@ -457,24 +457,24 @@ export const DetalhesAgendamentoModal = ({
                       variant="outline"
                       className={cn(
                         "h-auto py-3 flex-col gap-1",
-                        appointment.status === "confirmed" && "border-emerald-600 bg-emerald-50 dark:bg-emerald-950"
+                        appointment.status === "confirmed" && "border-sinal-ok/40 bg-sinal-ok-tenue"
                       )}
                       onClick={() => handleUpdateStatus("confirmed")}
                       disabled={saving || appointment.status === "confirmed"}
                     >
-                      <Check className="h-5 w-5 text-emerald-600" />
+                      <Check className="h-5 w-5 text-sinal-ok" />
                       <span className="text-xs">Confirmar</span>
                     </Button>
                     <Button
                       variant="outline"
                       className={cn(
                         "h-auto py-3 flex-col gap-1",
-                        appointment.status === "no_show" && "border-amber-500 bg-amber-50 dark:bg-amber-950"
+                        appointment.status === "no_show" && "border-sinal-alerta/40 bg-sinal-alerta-tenue"
                       )}
                       onClick={() => handleUpdateStatus("no_show")}
                       disabled={saving || appointment.status === "no_show"}
                     >
-                      <X className="h-5 w-5 text-amber-500" />
+                      <X className="h-5 w-5 text-sinal-alerta" />
                       <span className="text-xs">Faltou</span>
                     </Button>
                     <Button
@@ -483,7 +483,7 @@ export const DetalhesAgendamentoModal = ({
                       onClick={() => setIsRescheduling(true)}
                       disabled={saving}
                     >
-                      <RefreshCw className="h-5 w-5 text-blue-500" />
+                      <RefreshCw className="h-5 w-5 text-primary" />
                       <span className="text-xs">Reagendar</span>
                     </Button>
                   </div>
