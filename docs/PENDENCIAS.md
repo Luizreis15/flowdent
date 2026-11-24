@@ -59,17 +59,9 @@ Bugs de dados corrigidos no caminho (PR #11):
 - "Pagamentos atrasados" sempre 0: usava `payments.due_date` (coluna inexistente). Agora `receivable_titles`
   com a regra de vencido do Contas a Receber (7 vencidos em 2026-11-24).
 
-Próximas etapas sugeridas do redesign (não iniciadas):
-1. Telas ainda não revisadas uma a uma: CRM, Ortodontia, Próteses, Estoque, Relatórios, Configurações,
-   Portal do Paciente, IA Assistente, Super Admin. Mesmo método: `CabecalhoPagina`, `FaixaIndicadores`,
-   selos tênues, ações em caixa normal.
-2. Layout mobile: com a faixa de impersonação ativa há uma faixa vazia sob ela (navbar mobile escondida);
-   revisar a casca mobile (`Navbar`, `MobileBottomNav`, `MobileHome`).
-3. **Família tipográfica: decisão aberta do dono** (ementa, seção 4). Hoje roda na fonte de sistema.
-   Requisitos: numerais tabulares, pesos 400–700, legível a 13px, acentuação completa, Google Fonts ou
-   licença web. A Geist foi testada e retirada por não ter sido aprovada.
-4. Títulos e botões em "Title Case" ("Novo Paciente", "Ver Horários", "Agendar Consulta") → caixa de frase,
-   se o dono quiser padronizar.
+Continuação do redesign: ver [PLANO-FRONTEND.md](PLANO-FRONTEND.md) (fases A–C em produção, D1 em PR;
+depois D2 Configurações/Perfil/Assinatura/Portal/IA, E mobile e estados, F acabamento, G super admin).
+Decisões abertas do dono: família tipográfica, modo escuro, estilo de ícone/ilustração.
 
 ---
 
@@ -120,7 +112,10 @@ Em ordem de prioridade sugerida:
    texto padrão. Mensagens personalizadas seriam funcionalidade nova → precisa de aprovação.
 7. **`producao_eventos` vazia**: o fechamento de comissões lê uma tabela que nada preenche.
 8. **Tabelas incompletas**: `cadeiras` (sem uso na agenda), `repasse_regras` (sem tela de escrita).
-9. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
+9. **Importação de NF-e no estoque**: o botão "Upload XML NFe" abria um modal "em desenvolvimento" e foi
+   retirado da tela na fase D1 (`UploadXMLModal.tsx` segue no repositório). Implementar é funcionalidade nova.
+10. **Produto inativado não pode ser reativado**: não há ação para isso na tela de Produtos.
+11. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
    importação (só super admin). Decidir se precisa.
 
 ## P5 — Higiene do repositório
