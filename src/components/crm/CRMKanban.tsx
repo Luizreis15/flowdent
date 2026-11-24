@@ -27,10 +27,10 @@ interface KanbanConversation {
 }
 
 const STAGES = [
-  { key: 'novo', label: 'Novo', color: 'bg-blue-500' },
-  { key: 'em_atendimento', label: 'Em Atendimento', color: 'bg-yellow-500' },
-  { key: 'aguardando', label: 'Aguardando', color: 'bg-orange-500' },
-  { key: 'finalizado', label: 'Finalizado', color: 'bg-green-500' },
+  { key: 'novo', label: 'Novo', color: 'bg-tinta-500' },
+  { key: 'em_atendimento', label: 'Em atendimento', color: 'bg-acento-500' },
+  { key: 'aguardando', label: 'Aguardando', color: 'bg-sinal-espera' },
+  { key: 'finalizado', label: 'Finalizado', color: 'bg-sinal-ok' },
 ];
 
 export function CRMKanban({ clinicId }: CRMKanbanProps) {
@@ -130,7 +130,7 @@ export function CRMKanban({ clinicId }: CRMKanbanProps) {
                     key={conv.id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, conv.id)}
-                    className={`p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow ${
+                    className={`p-3 cursor-grab active:cursor-grabbing transition-colors duration-150 hover:bg-muted/40 ${
                       dragging === conv.id ? 'opacity-50' : ''
                     }`}
                   >

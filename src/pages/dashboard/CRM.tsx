@@ -1,3 +1,4 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,8 +77,8 @@ const CRM = () => {
   const statusColors: Record<string, string> = {
     draft: "bg-muted text-muted-foreground",
     scheduled: "bg-primary/10 text-primary",
-    sending: "bg-yellow-100 text-yellow-800",
-    completed: "bg-secondary/10 text-secondary",
+    sending: "bg-sinal-espera-tenue text-sinal-espera",
+    completed: "bg-sinal-ok-tenue text-sinal-ok",
     cancelled: "bg-destructive/10 text-destructive",
   };
 
@@ -97,8 +98,8 @@ const CRM = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">CRM Odontológico</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-h1 text-foreground">CRM Odontológico</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Relacionamento automático e campanhas personalizadas
           </p>
         </div>
@@ -118,58 +119,14 @@ const CRM = () => {
         </div>
       </div>
 
-      {/* Métricas */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Mensagens Enviadas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{metrics.totalSent}</div>
-            <p className="text-xs text-muted-foreground mt-1">Total histórico</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Entregues
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-secondary">{metrics.totalDelivered}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {responseRate}% taxa de entrega
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Falhas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-destructive">{metrics.totalFailed}</div>
-            <p className="text-xs text-muted-foreground mt-1">Mensagens com erro</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Automações Ativas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{metrics.activeAutomations}</div>
-            <p className="text-xs text-muted-foreground mt-1">Fluxos ativos</p>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        itens={[
+          { rotulo: "Mensagens enviadas", valor: metrics.totalSent, nota: "Total histórico" },
+          { rotulo: "Entregues", valor: metrics.totalDelivered, nota: `${responseRate}% de entrega` },
+          { rotulo: "Falhas", valor: metrics.totalFailed, nota: "Mensagens com erro", tom: metrics.totalFailed > 0 ? "alerta" : "padrao" },
+          { rotulo: "Automações ativas", valor: metrics.activeAutomations, nota: "Fluxos ativos" },
+        ]}
+      />
 
       <Tabs defaultValue="campaigns" className="space-y-4">
         <TabsList>
@@ -208,7 +165,7 @@ const CRM = () => {
                   {campaigns.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-md transition-shadow"
+                      className="flex items-center gap-4 p-4 rounded-md border bg-card transition-colors duration-150 hover:bg-muted/40"
                     >
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10">
                         <MessageSquare className="h-6 w-6 text-primary" />
