@@ -131,7 +131,7 @@ export const SidebarFilters = ({ clinicId }: SidebarFiltersProps) => {
       <Button 
         size="default" 
         onClick={() => navigate("/dashboard/agenda")}
-        className="w-full font-semibold bg-[hsl(var(--flowdent-blue))] hover:bg-[hsl(var(--flow-turquoise))]"
+        className="w-full font-semibold bg-primary hover:bg-acento-600"
       >
         <Plus className="h-4 w-4 mr-2" />
         Novo Agendamento

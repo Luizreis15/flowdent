@@ -191,7 +191,7 @@ export const AgendaCalendar = ({ clinicId }: AgendaCalendarProps) => {
                             ? "border-transparent" 
                             : slotPassed
                               ? "border-muted-foreground/10 bg-muted/30 cursor-not-allowed"
-                              : "border-muted-foreground/10 hover:border-[hsl(var(--success-green))] hover:bg-[hsl(var(--card-green))] cursor-pointer group bg-muted/20"
+                              : "border-muted-foreground/10 hover:border-sinal-ok hover:bg-sinal-ok-tenue cursor-pointer group bg-muted/20"
                         )}
                         onClick={() => !apt && !slotPassed && handleSlotClick(dayIndex, hour)}
                       >
@@ -214,7 +214,7 @@ export const AgendaCalendar = ({ clinicId }: AgendaCalendarProps) => {
                           null
                         ) : (
                           <div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Plus className="h-4 w-4 text-[hsl(var(--success-green))]" />
+                            <Plus className="h-4 w-4 text-sinal-ok" />
                           </div>
                         )}
                       </div>
@@ -245,7 +245,7 @@ export const AgendaCalendar = ({ clinicId }: AgendaCalendarProps) => {
             <span className="text-sm text-muted-foreground">Concluído</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded border-2 border-[hsl(var(--success-green))] bg-[hsl(var(--card-green))]"></div>
+            <div className="w-3 h-3 rounded border-2 border-sinal-ok bg-sinal-ok-tenue"></div>
             <span className="text-sm text-muted-foreground">Clique para agendar</span>
           </div>
         </div>

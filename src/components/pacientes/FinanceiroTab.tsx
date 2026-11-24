@@ -383,7 +383,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
         <Card>
           <CardContent className="pt-4 pb-3">
             <p className="text-xs text-muted-foreground">Total Recebido</p>
-            <p className="text-xl font-bold text-[hsl(var(--success-green))]">{formatCurrency(totalPago)}</p>
+            <p className="text-xl font-bold text-sinal-ok">{formatCurrency(totalPago)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -470,7 +470,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
                             {p.payment_date ? format(new Date(p.payment_date), "dd/MM/yyyy", { locale: ptBR }) : "-"}
                           </p>
                         </div>
-                        <span className="font-semibold text-sm text-[hsl(var(--success-green))]">
+                        <span className="font-semibold text-sm text-sinal-ok">
                           {formatCurrency(p.value)}
                         </span>
                       </div>
@@ -582,7 +582,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
                             {format(new Date(t.due_date), "dd/MM/yyyy", { locale: ptBR })}
                           </TableCell>
                           <TableCell className="text-right text-sm">{formatCurrency(t.amount)}</TableCell>
-                          <TableCell className="text-right text-sm text-[hsl(var(--success-green))]">
+                          <TableCell className="text-right text-sm text-sinal-ok">
                             {formatCurrency(t.paid_amount || 0)}
                           </TableCell>
                           <TableCell className="text-right font-semibold text-sm">{formatCurrency(t.balance)}</TableCell>
@@ -670,7 +670,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
                           {p.payment_date ? format(new Date(p.payment_date), "dd/MM/yyyy", { locale: ptBR }) : "-"}
                         </TableCell>
                         <TableCell className="text-sm">{getMethodLabel(p.payment_method)}</TableCell>
-                        <TableCell className="text-right font-semibold text-sm text-[hsl(var(--success-green))]">
+                        <TableCell className="text-right font-semibold text-sm text-sinal-ok">
                           {formatCurrency(p.value)}
                         </TableCell>
                         <TableCell>

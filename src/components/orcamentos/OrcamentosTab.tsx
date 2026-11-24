@@ -183,19 +183,19 @@ export const OrcamentosTab = ({ budgets, onRefresh, onNewBudget }: OrcamentosTab
 
             <div className="max-w-2xl space-y-3 text-left">
               <div className="flex items-start gap-3">
-                <Check className="h-5 w-5 text-[hsl(var(--success-green))] mt-0.5 flex-shrink-0" />
+                <Check className="h-5 w-5 text-sinal-ok mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
                   Transforme o orçamento em <span className="font-semibold text-foreground">tratamentos e débitos</span>
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <Check className="h-5 w-5 text-[hsl(var(--success-green))] mt-0.5 flex-shrink-0" />
+                <Check className="h-5 w-5 text-sinal-ok mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
                   Composição <span className="font-semibold text-foreground">híbrida de pagamento</span> com múltiplas formas
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <Check className="h-5 w-5 text-[hsl(var(--success-green))] mt-0.5 flex-shrink-0" />
+                <Check className="h-5 w-5 text-sinal-ok mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
                   Fácil e completo, com <span className="font-semibold text-foreground">odontograma</span> e <span className="font-semibold text-foreground">aprovação guiada</span>
                 </p>

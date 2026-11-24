@@ -234,7 +234,7 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
     const isOverdue = due < today && status !== "paid" && status !== "cancelled" && status !== "renegotiated";
 
     const config: Record<string, { label: string; icon: React.ReactNode; className: string }> = {
-      paid: { label: "Pago", icon: <CheckCircle className="h-3 w-3 mr-1" />, className: "bg-[hsl(var(--success-green))] text-white" },
+      paid: { label: "Pago", icon: <CheckCircle className="h-3 w-3 mr-1" />, className: "bg-sinal-ok text-white" },
       cancelled: { label: "Cancelado", icon: <XCircle className="h-3 w-3 mr-1" />, className: "bg-muted text-muted-foreground" },
       renegotiated: { label: "Renegociado", icon: <RefreshCcw className="h-3 w-3 mr-1" />, className: "bg-muted text-muted-foreground" },
       partial: { label: "Parcial", icon: <Clock className="h-3 w-3 mr-1" />, className: "bg-yellow-500 text-white" },
@@ -395,10 +395,10 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
           </CardContent>
         </Card>
 
-        <Card className="flex-shrink-0 w-[130px] lg:w-auto bg-[hsl(var(--success-green)/0.1)]">
+        <Card className="flex-shrink-0 w-[130px] lg:w-auto bg-sinal-ok/10">
           <CardContent className="p-3 lg:pt-4">
             <div className="text-xs font-medium text-muted-foreground">Total Recebido</div>
-            <div className="text-lg lg:text-2xl font-bold text-[hsl(var(--success-green))]">{formatCurrency(aging.totalPago)}</div>
+            <div className="text-lg lg:text-2xl font-bold text-sinal-ok">{formatCurrency(aging.totalPago)}</div>
           </CardContent>
         </Card>
       </div>

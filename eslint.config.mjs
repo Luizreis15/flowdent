@@ -12,6 +12,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 import quality from "./eslint-rules/index.cjs";
+import design from "./eslint-rules/design-rules.cjs";
 
 export default defineConfig([
   // Existing project config, preserved as it was.
@@ -61,6 +62,39 @@ export default defineConfig([
           layers: ["/src/pages/", "/src/components/"],
         },
       ],
+    },
+  },
+
+  // Regras de design (ementa de identidade). Cor arbitrária já está em zero e é erro;
+  // degradê e transition-all começam como aviso, com a contagem anotada, e sobem para erro
+  // quando chegarem a zero (fases B–D do docs/PLANO-FRONTEND.md).
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: { design },
+    rules: {
+      "design/no-arbitrary-color": "error",
+      // Baseline 2026-11-24: 19 degradês (fora landing e ui).
+      "design/no-gradient": "warn",
+      // Baseline 2026-11-24: 40 ocorrências (fora landing e ui).
+      "design/no-transition-all": "warn",
+    },
+  },
+
+  {
+    // Landing parada por decisão do dono; o verde do botão de WhatsApp é a cor da marca dele.
+    files: ["src/components/landing/**", "src/pages/Landing*.tsx"],
+    rules: {
+      "design/no-arbitrary-color": "off",
+      "design/no-gradient": "off",
+      "design/no-transition-all": "off",
+    },
+  },
+
+  {
+    // Primitivos shadcn/ui: animações e variantes vêm do vendor.
+    files: ["src/components/ui/**"],
+    rules: {
+      "design/no-transition-all": "off",
     },
   },
 

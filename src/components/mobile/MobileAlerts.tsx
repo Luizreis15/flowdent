@@ -28,9 +28,9 @@ const MobileAlerts = ({ clinicId, pendingCount }: MobileAlertsProps) => {
       icon: Clock,
       title: `${pendingCount} confirmação${pendingCount > 1 ? "ões" : ""} pendente${pendingCount > 1 ? "s" : ""}`,
       subtitle: "Pacientes aguardando confirmação",
-      colorClass: "text-[hsl(var(--warning-amber))]",
-      bgClass: "bg-[hsl(var(--card-amber))]",
-      borderClass: "border-l-[hsl(var(--warning-amber))]",
+      colorClass: "text-sinal-espera",
+      bgClass: "bg-sinal-espera-tenue",
+      borderClass: "border-l-sinal-espera",
       action: () => navigate("/dashboard/agenda"),
     });
   }

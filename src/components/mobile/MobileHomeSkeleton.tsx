@@ -4,7 +4,7 @@ const MobileHomeSkeleton = () => {
   return (
     <div className="min-h-[100dvh] overflow-hidden">
       {/* Hero skeleton */}
-      <div className="bg-gradient-to-br from-[hsl(var(--flowdent-blue))] via-[hsl(var(--flow-turquoise))] to-[hsl(var(--health-mint))]">
+      <div className="bg-gradient-to-br from-primary via-acento-600 to-acento-400">
         <div className="px-4 pt-12 pb-10">
           <Skeleton className="h-3 w-32 bg-white/20 mb-2" />
           <Skeleton className="h-7 w-48 bg-white/20" />

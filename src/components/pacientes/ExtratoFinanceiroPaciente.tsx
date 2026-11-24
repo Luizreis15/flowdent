@@ -330,10 +330,10 @@ export const ExtratoFinanceiroPaciente = ({
         <Card>
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-[hsl(var(--success-green))]" />
+              <TrendingUp className="h-4 w-4 text-sinal-ok" />
               <p className="text-xs text-muted-foreground">Taxa Pagamento</p>
             </div>
-            <p className="text-2xl font-bold text-[hsl(var(--success-green))]">{metrics.taxaPagamento.toFixed(1)}%</p>
+            <p className="text-2xl font-bold text-sinal-ok">{metrics.taxaPagamento.toFixed(1)}%</p>
           </CardContent>
         </Card>
 
@@ -343,7 +343,7 @@ export const ExtratoFinanceiroPaciente = ({
               <AlertTriangle className="h-4 w-4 text-destructive" />
               <p className="text-xs text-muted-foreground">Inadimplência</p>
             </div>
-            <p className={`text-2xl font-bold ${metrics.taxaInadimplencia > 0 ? "text-destructive" : "text-[hsl(var(--success-green))]"}`}>
+            <p className={`text-2xl font-bold ${metrics.taxaInadimplencia > 0 ? "text-destructive" : "text-sinal-ok"}`}>
               {metrics.taxaInadimplencia.toFixed(1)}%
             </p>
             {metrics.qtdVencido > 0 && (
@@ -360,7 +360,7 @@ export const ExtratoFinanceiroPaciente = ({
               <BarChart3 className="h-4 w-4 text-primary" />
               <p className="text-xs text-muted-foreground">Total Recebido</p>
             </div>
-            <p className="text-2xl font-bold text-[hsl(var(--success-green))]">{formatCurrency(metrics.totalPago)}</p>
+            <p className="text-2xl font-bold text-sinal-ok">{formatCurrency(metrics.totalPago)}</p>
           </CardContent>
         </Card>
 
@@ -456,7 +456,7 @@ export const ExtratoFinanceiroPaciente = ({
         <CardContent>
           {metrics.totalVencido === 0 ? (
             <div className="text-center py-6">
-              <Badge className="bg-[hsl(var(--success-green))]/10 text-[hsl(var(--success-green))] text-sm px-4 py-1">
+              <Badge className="bg-sinal-ok/10 text-sinal-ok text-sm px-4 py-1">
                 ✓ Paciente em dia — sem títulos vencidos
               </Badge>
             </div>
