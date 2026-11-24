@@ -1,15 +1,13 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Search, AlertTriangle, Clock, CheckCircle, XCircle,
-  DollarSign, Plus, ChevronLeft, ChevronRight, Download, Undo2,
-} from "lucide-react";
+import {Search, AlertTriangle, Clock, CheckCircle, XCircle, DollarSign, Plus, ChevronLeft, ChevronRight, Download} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NovaDespesaModalV2 } from "./NovaDespesaModalV2";
@@ -324,67 +322,17 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* Aging Cards */}
-      <div className="flex lg:grid lg:grid-cols-6 gap-3 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-        <Card
-          className={`cursor-pointer transition-all flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "all" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => { setAgingFilter("all"); setPage(0); }}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">Total a Pagar</div>
-            <div className="text-lg lg:text-2xl font-bold">{formatCurrency(aging.total)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-primary flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "aVencer" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => { setAgingFilter("aVencer"); setPage(0); }}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">A Vencer</div>
-            <div className="text-lg lg:text-2xl font-bold text-primary">{formatCurrency(aging.aVencer)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-amber-500 flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "vencido1a30" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => { setAgingFilter("vencido1a30"); setPage(0); }}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">1-30 dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-amber-600">{formatCurrency(aging.vencido1a30)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-orange-500 flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "vencido31a60" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => { setAgingFilter("vencido31a60"); setPage(0); }}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">31-60 dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-orange-600">{formatCurrency(aging.vencido31a60)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-sinal-alerta flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "vencido60mais" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => { setAgingFilter("vencido60mais"); setPage(0); }}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">60+ dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-sinal-alerta">{formatCurrency(aging.vencido60mais)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all border-l-4 border-l-sinal-ok flex-shrink-0 w-[130px] lg:w-auto`}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">Total Pago</div>
-            <div className="text-lg lg:text-2xl font-bold text-sinal-ok">{formatCurrency(aging.totalPago)}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        compacto
+        itens={[
+          { rotulo: "Total a pagar", ...separarMoeda(formatCurrency(aging.total)), selecionado: agingFilter === "all", onClick: () => { setAgingFilter("all"); setPage(0); } },
+          { rotulo: "A vencer", ...separarMoeda(formatCurrency(aging.aVencer)), selecionado: agingFilter === "aVencer", onClick: () => { setAgingFilter("aVencer"); setPage(0); } },
+          { rotulo: "1–30 dias", ...separarMoeda(formatCurrency(aging.vencido1a30)), tom: aging.vencido1a30 > 0 ? "espera" : "padrao", selecionado: agingFilter === "vencido1a30", onClick: () => { setAgingFilter("vencido1a30"); setPage(0); } },
+          { rotulo: "31–60 dias", ...separarMoeda(formatCurrency(aging.vencido31a60)), tom: aging.vencido31a60 > 0 ? "espera" : "padrao", selecionado: agingFilter === "vencido31a60", onClick: () => { setAgingFilter("vencido31a60"); setPage(0); } },
+          { rotulo: "60+ dias", ...separarMoeda(formatCurrency(aging.vencido60mais)), tom: aging.vencido60mais > 0 ? "alerta" : "padrao", selecionado: agingFilter === "vencido60mais", onClick: () => { setAgingFilter("vencido60mais"); setPage(0); } },
+          { rotulo: "Total pago", ...separarMoeda(formatCurrency(aging.totalPago)) },
+        ]}
+      />
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-3">
@@ -437,9 +385,9 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
             </SelectContent>
           </Select>
 
-          <Button onClick={() => setShowNovaDespesa(true)} className="bg-sinal-alerta hover:bg-sinal-alerta/90 whitespace-nowrap">
+          <Button onClick={() => setShowNovaDespesa(true)} className="whitespace-nowrap">
             <Plus className="h-4 w-4 mr-2" />
-            Nova Despesa
+            Nova despesa
           </Button>
         </div>
       </div>

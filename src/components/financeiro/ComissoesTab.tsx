@@ -1,11 +1,12 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { DollarSign, TrendingUp, Clock, CheckCircle, Plus } from "lucide-react";
+import { DollarSign, Plus} from "lucide-react";
 import { FechamentoComissoesModal } from "./FechamentoComissoesModal";
 import { AdiantamentoModal } from "./AdiantamentoModal";
 import { formatCurrency } from "@/lib/utils";
@@ -158,53 +159,13 @@ export const ComissoesTab = ({ clinicId }: ComissoesTabProps) => {
         </div>
       </div>
 
-      {/* Cards de Resumo */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="border-l-4 border-l-yellow-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-muted-foreground">PROVISIONADO</span>
-              <Clock className="h-5 w-5 text-yellow-500" />
-            </div>
-            <div className="text-2xl font-bold text-yellow-600">
-              {formatCurrency(provisionado)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Aguardando fechamento
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-blue-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-muted-foreground">APROVADO</span>
-              <TrendingUp className="h-5 w-5 text-blue-500" />
-            </div>
-            <div className="text-2xl font-bold text-blue-600">
-              {formatCurrency(aprovado)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Aguardando pagamento
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-muted-foreground">PAGO</span>
-              <CheckCircle className="h-5 w-5 text-green-500" />
-            </div>
-            <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(pago)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Pagamentos realizados
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        itens={[
+          { rotulo: "Provisionado", ...separarMoeda(formatCurrency(provisionado)), nota: "Aguardando fechamento" },
+          { rotulo: "Aprovado", ...separarMoeda(formatCurrency(aprovado)), nota: "Aguardando pagamento" },
+          { rotulo: "Pago", ...separarMoeda(formatCurrency(pago)), nota: "Pagamentos realizados" },
+        ]}
+      />
 
       {/* Tabela de Provisões */}
       <div className="border rounded-lg">

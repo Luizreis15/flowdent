@@ -1,5 +1,8 @@
+import { CORES_CATEGORICAS, CORES_GRAFICO } from "@/lib/coresGrafico";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,10 +13,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area 
 } from "recharts";
-import { 
-  TrendingUp, TrendingDown, DollarSign, Users, FileText, 
-  Download, Calendar, AlertTriangle, CreditCard, Percent, FileSpreadsheet, Printer 
-} from "lucide-react";
+import { Users, FileText, Download, Calendar, AlertTriangle, CreditCard, FileSpreadsheet, Printer} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useReportExport } from "@/hooks/useReportExport";
@@ -69,7 +69,7 @@ interface AgingData {
   cor: string;
 }
 
-const COLORS = ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+const COLORS = CORES_CATEGORICAS;
 
 export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabProps) => {
   const [loading, setLoading] = useState(true);
@@ -384,11 +384,11 @@ export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabPro
     });
 
     setAgingData([
-      { faixa: "A Vencer", valor: aging.aVencer.valor, quantidade: aging.aVencer.quantidade, cor: "#22c55e" },
-      { faixa: "1-30 dias", valor: aging["1-30"].valor, quantidade: aging["1-30"].quantidade, cor: "#f59e0b" },
-      { faixa: "31-60 dias", valor: aging["31-60"].valor, quantidade: aging["31-60"].quantidade, cor: "#f97316" },
-      { faixa: "61-90 dias", valor: aging["61-90"].valor, quantidade: aging["61-90"].quantidade, cor: "#ef4444" },
-      { faixa: "90+ dias", valor: aging["90+"].valor, quantidade: aging["90+"].quantidade, cor: "#991b1b" },
+      { faixa: "A Vencer", valor: aging.aVencer.valor, quantidade: aging.aVencer.quantidade, cor: CORES_GRAFICO.neutra },
+      { faixa: "1-30 dias", valor: aging["1-30"].valor, quantidade: aging["1-30"].quantidade, cor: "hsl(var(--sinal-espera) / 0.7)" },
+      { faixa: "31-60 dias", valor: aging["31-60"].valor, quantidade: aging["31-60"].quantidade, cor: "hsl(var(--sinal-espera))" },
+      { faixa: "61-90 dias", valor: aging["61-90"].valor, quantidade: aging["61-90"].quantidade, cor: "hsl(var(--sinal-alerta) / 0.75)" },
+      { faixa: "90+ dias", valor: aging["90+"].valor, quantidade: aging["90+"].quantidade, cor: "hsl(var(--sinal-alerta))" },
     ]);
   };
 
@@ -545,62 +545,25 @@ export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabPro
 
         {/* DRE Tab */}
         <TabsContent value="dre" className="space-y-6">
-          {/* Cards resumo */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="border-l-4 border-l-green-500">
-              <CardContent className="pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Receita Bruta</p>
-                    <p className="text-xl font-bold text-green-600">{formatCurrency(dreData?.receitaBruta || 0)}</p>
-                  </div>
-                  <TrendingUp className="h-6 w-6 text-green-400" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-red-500">
-              <CardContent className="pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Despesas Totais</p>
-                    <p className="text-xl font-bold text-red-600">
-                      {formatCurrency((dreData?.despesasOperacionais || 0) + (dreData?.custoServicos || 0))}
-                    </p>
-                  </div>
-                  <TrendingDown className="h-6 w-6 text-red-400" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-blue-500">
-              <CardContent className="pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Resultado Líquido</p>
-                    <p className={`text-xl font-bold ${(dreData?.resultadoLiquido || 0) >= 0 ? "text-blue-600" : "text-red-600"}`}>
-                      {formatCurrency(dreData?.resultadoLiquido || 0)}
-                    </p>
-                  </div>
-                  <DollarSign className="h-6 w-6 text-blue-400" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-purple-500">
-              <CardContent className="pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Margem Líquida</p>
-                    <p className="text-xl font-bold text-purple-600">
-                      {dreData?.receitaBruta ? ((dreData.resultadoLiquido / dreData.receitaBruta) * 100).toFixed(1) : 0}%
-                    </p>
-                  </div>
-                  <Percent className="h-6 w-6 text-purple-400" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <FaixaIndicadores
+            itens={[
+              { rotulo: "Receita bruta", ...separarMoeda(formatCurrency(dreData?.receitaBruta || 0)) },
+              {
+                rotulo: "Despesas totais",
+                ...separarMoeda(formatCurrency((dreData?.despesasOperacionais || 0) + (dreData?.custoServicos || 0))),
+              },
+              {
+                rotulo: "Resultado líquido",
+                ...separarMoeda(formatCurrency(dreData?.resultadoLiquido || 0)),
+                tom: (dreData?.resultadoLiquido || 0) < 0 ? "alerta" : "padrao",
+              },
+              {
+                rotulo: "Margem líquida",
+                valor: dreData?.receitaBruta ? ((dreData.resultadoLiquido / dreData.receitaBruta) * 100).toFixed(1) : 0,
+                sufixo: "%",
+              },
+            ]}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* DRE Detalhado */}
@@ -673,14 +636,14 @@ export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabPro
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={monthlyTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" fontSize={12} />
-                    <YAxis fontSize={12} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={CORES_GRAFICO.grade} vertical={false} />
+                    <XAxis stroke={CORES_GRAFICO.eixo} tickLine={false} dataKey="name" fontSize={12} />
+                    <YAxis stroke={CORES_GRAFICO.eixo} tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                     <Tooltip formatter={(value: number) => formatCurrency(value)} />
                     <Legend />
-                    <Area type="monotone" dataKey="receitas" name="Receitas" fill="#22c55e" fillOpacity={0.3} stroke="#22c55e" />
-                    <Area type="monotone" dataKey="despesas" name="Despesas" fill="#ef4444" fillOpacity={0.3} stroke="#ef4444" />
-                    <Line type="monotone" dataKey="resultado" name="Resultado" stroke="#3b82f6" strokeWidth={2} />
+                    <Area type="monotone" dataKey="receitas" name="Receitas" fill={CORES_GRAFICO.destaque} fillOpacity={0.12} stroke={CORES_GRAFICO.destaque} strokeWidth={2} />
+                    <Area type="monotone" dataKey="despesas" name="Despesas" fill={CORES_GRAFICO.neutra} fillOpacity={0.12} stroke={CORES_GRAFICO.neutra} strokeWidth={2} />
+                    <Line type="monotone" dataKey="resultado" name="Resultado" stroke={CORES_GRAFICO.apoio} strokeWidth={2} dot={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -704,11 +667,11 @@ export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabPro
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={professionalRevenue} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                      <YAxis type="category" dataKey="nome" width={120} fontSize={12} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={CORES_GRAFICO.grade} vertical={false} />
+                      <XAxis stroke={CORES_GRAFICO.eixo} tickLine={false} type="number" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                      <YAxis stroke={CORES_GRAFICO.eixo} tickLine={false} axisLine={false} type="category" dataKey="nome" width={120} fontSize={12} />
                       <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                      <Bar dataKey="receita" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="receita" fill={CORES_GRAFICO.destaque} radius={[0, 4, 4, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -761,11 +724,11 @@ export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabPro
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={procedureRevenue}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="nome" fontSize={10} angle={-45} textAnchor="end" height={80} />
-                      <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={CORES_GRAFICO.grade} vertical={false} />
+                      <XAxis stroke={CORES_GRAFICO.eixo} tickLine={false} dataKey="nome" fontSize={10} angle={-45} textAnchor="end" height={80} />
+                      <YAxis stroke={CORES_GRAFICO.eixo} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                       <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                      <Bar dataKey="receita" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="receita" fill={CORES_GRAFICO.destaque} radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -886,9 +849,9 @@ export const RelatoriosFinanceiroTab = ({ clinicId }: RelatoriosFinanceiroTabPro
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={agingData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="faixa" fontSize={12} />
-                    <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={CORES_GRAFICO.grade} vertical={false} />
+                    <XAxis stroke={CORES_GRAFICO.eixo} tickLine={false} dataKey="faixa" fontSize={12} />
+                    <YAxis stroke={CORES_GRAFICO.eixo} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                     <Tooltip formatter={(value: number) => formatCurrency(value)} />
                     <Bar dataKey="valor" radius={[4, 4, 0, 0]}>
                       {agingData.map((entry, index) => (

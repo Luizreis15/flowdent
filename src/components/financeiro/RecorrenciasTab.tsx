@@ -1,10 +1,11 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Repeat, TrendingDown, TrendingUp, Calendar, Play, Pause, Trash2 } from "lucide-react";
+import { Repeat, Calendar, Trash2} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -141,49 +142,13 @@ export const RecorrenciasTab = ({ clinicId }: RecorrenciasTabProps) => {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-l-4 border-l-primary">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Recorrências Ativas</p>
-                <p className="text-2xl font-bold">{activeCount}</p>
-              </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Repeat className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-red-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">A Pagar (mensal)</p>
-                <p className="text-2xl font-bold text-red-600">{formatCurrency(totalPagar)}</p>
-              </div>
-              <div className="p-3 bg-red-100 rounded-lg">
-                <TrendingDown className="h-6 w-6 text-red-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">A Receber (mensal)</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(totalReceber)}</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        itens={[
+          { rotulo: "Recorrências ativas", valor: activeCount },
+          { rotulo: "A pagar (mensal)", ...separarMoeda(formatCurrency(totalPagar)) },
+          { rotulo: "A receber (mensal)", ...separarMoeda(formatCurrency(totalReceber)) },
+        ]}
+      />
 
       {/* Table */}
       <div className="border rounded-lg">

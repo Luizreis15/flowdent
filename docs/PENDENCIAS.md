@@ -101,22 +101,26 @@ removido; `types.ts` regenerado).
 
 Em ordem de prioridade sugerida:
 
-1. **Super admin não lê `receivable_titles`** (só há policy por clínica): visualizando uma clínica, o super
+1. **Campanhas do CRM saem sem destinatários** (`NovaCampanhaModal.tsx`): a busca usa `patients.nome` e
+   `patients.telefone` (colunas inexistentes; são `full_name` e `phone`) e **ignora o segmento escolhido**.
+   Corrigir só as colunas faria uma campanha para "Inativos" enviar WhatsApp a **todos** os pacientes com
+   telefone. Implementar o filtro de segmento junto, com aprovação do dono (envio em massa a pacientes reais).
+2. **Super admin não lê `receivable_titles`** (só há policy por clínica): visualizando uma clínica, o super
    admin vê "Pagamentos atrasados" = 0 e o Contas a Receber vazio. Decidir se o super admin deve ler
    (policy `is_super_admin`) — impersonação hoje é só no cliente, as consultas rodam como super admin.
-2. **RPCs SECURITY DEFINER com `_user_id` livre** (`get_user_clinic_id`, `has_role`, `get_user_perfil`,
+3. **RPCs SECURITY DEFINER com `_user_id` livre** (`get_user_clinic_id`, `has_role`, `get_user_perfil`,
    `is_super_admin`): revelam clínica/perfil de outros usuários. `20261118100000` tratou as de gatilho e o
    onboarding; estas 6 seguem expostas porque estão dentro de policies. Avaliar versões sem parâmetro.
-3. **Referências cruzadas em INSERT**: policies validam o `clinic_id` do registro, mas não que o
+4. **Referências cruzadas em INSERT**: policies validam o `clinic_id` do registro, mas não que o
    `patient_id`/`professional_id`/`procedure_id` referenciado seja da mesma clínica (`budgets`,
    `budget_items.procedure_id`, `appointments.dentist_id`). Mesma técnica do trigger `guard_plano_item_procedimento`.
-4. **Consultas com listas de IDs na URL** (`.in("patient_id", ids)`): quebram com muitos pacientes. Corrigidas
+5. **Consultas com listas de IDs na URL** (`.in("patient_id", ids)`): quebram com muitos pacientes. Corrigidas
    no dashboard; `Ortodontia.tsx` usa o padrão com lista pequena (ok hoje). Procurar outros casos ao mexer nas telas.
-5. **`send-whatsapp` lê colunas inexistentes** (`mensagem_confirmacao`, `mensagem_lembrete`): sempre cai no
+6. **`send-whatsapp` lê colunas inexistentes** (`mensagem_confirmacao`, `mensagem_lembrete`): sempre cai no
    texto padrão. Mensagens personalizadas seriam funcionalidade nova → precisa de aprovação.
-6. **`producao_eventos` vazia**: o fechamento de comissões lê uma tabela que nada preenche.
-7. **Tabelas incompletas**: `cadeiras` (sem uso na agenda), `repasse_regras` (sem tela de escrita).
-8. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
+7. **`producao_eventos` vazia**: o fechamento de comissões lê uma tabela que nada preenche.
+8. **Tabelas incompletas**: `cadeiras` (sem uso na agenda), `repasse_regras` (sem tela de escrita).
+9. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
    importação (só super admin). Decidir se precisa.
 
 ## P5 — Higiene do repositório
