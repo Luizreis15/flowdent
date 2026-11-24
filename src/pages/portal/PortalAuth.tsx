@@ -128,7 +128,7 @@ const PortalAuth = () => {
     }
 
     toast({
-      title: "Senha redefinida!",
+      title: "Senha redefinida",
       description: "Sua senha foi alterada com sucesso.",
     });
     setIsResetPassword(false);
@@ -185,7 +185,7 @@ const PortalAuth = () => {
         }
 
         toast({
-          title: "Login realizado!",
+          title: "Login realizado",
           description: "Bem-vindo ao portal do paciente.",
         });
 
@@ -274,7 +274,7 @@ const PortalAuth = () => {
           .eq("id", invite.id);
 
         toast({
-          title: "Conta criada!",
+          title: "Conta criada",
           description: "Sua conta foi criada com sucesso. Faça login para continuar.",
         });
 

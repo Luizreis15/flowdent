@@ -76,7 +76,7 @@ const Clinica = () => {
       await criarPlanoPadrao((clinicData as any).id);
 
       toast({
-        title: "Clínica criada com sucesso!",
+        title: "Clínica criada com sucesso",
         description: "Agora vamos cadastrar o profissional responsável.",
       });
 

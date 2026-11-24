@@ -86,7 +86,7 @@ export function NovaCampanhaModal({ open, onOpenChange, onSuccess }: NovaCampanh
         }
       }
 
-      toast({ title: "Campanha criada!", description: `${patients?.length || 0} destinatários adicionados` });
+      toast({ title: "Campanha criada", description: `${patients?.length || 0} destinatários adicionados` });
       onSuccess();
       onOpenChange(false);
       setForm({ name: "", type: "custom", message_template: "", segment: "all", scheduled_at: "", send_now: true });

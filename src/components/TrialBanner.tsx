@@ -51,7 +51,7 @@ export default function TrialBanner({ daysLeft }: TrialBannerProps) {
               onClick={() => navigate("/dashboard/assinatura")}
               className="shrink-0 bg-white text-yellow-700 hover:bg-white/90"
             >
-              ASSINAR AGORA
+              Assinar agora
             </Button>
             <button
               onClick={handleClose}

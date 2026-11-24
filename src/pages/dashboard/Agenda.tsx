@@ -591,7 +591,7 @@ const Agenda = () => {
 
       if (error) throw error;
 
-      toast.success("Agendamento criado com sucesso!");
+      toast.success("Agendamento criado com sucesso");
       setIsSheetOpen(false);
       setFormData({
         patientId: "",

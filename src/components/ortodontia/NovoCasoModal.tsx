@@ -152,7 +152,7 @@ export function NovoCasoModal({ open, onOpenChange, onSuccess }: NovoCasoModalPr
         }
       }
 
-      toast.success("Caso ortodôntico criado com sucesso!");
+      toast.success("Caso ortodôntico criado com sucesso");
       resetForm();
       onOpenChange(false);
       onSuccess();

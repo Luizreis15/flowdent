@@ -415,7 +415,6 @@ export const PaymentDrawer = ({
             <Button
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green)/0.9)]"
             >
               {loading ? (
                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Processando...</>

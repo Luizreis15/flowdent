@@ -112,7 +112,7 @@ export const NovaDespesaModal = ({ open, onOpenChange, clinicId, onSuccess }: No
 
       if (error) throw error;
 
-      toast.success("Despesa criada com sucesso!");
+      toast.success("Despesa criada com sucesso");
       resetForm();
       onSuccess();
     } catch (error) {

@@ -91,7 +91,7 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
 
       if (error) throw error;
 
-      toast.success("Plano atualizado com sucesso!");
+      toast.success("Plano atualizado com sucesso");
       onSuccess();
       onOpenChange(false);
     } catch (error) {

@@ -121,7 +121,7 @@ export const PermissoesPerfilModal = ({
       const hasError = results.some((r) => r.error);
       if (hasError) throw new Error("Erro ao salvar algumas permissões");
 
-      toast.success("Permissões atualizadas com sucesso!");
+      toast.success("Permissões atualizadas com sucesso");
       onClose();
     } catch (err: any) {
       toast.error("Erro ao salvar: " + err.message);

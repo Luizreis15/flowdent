@@ -134,7 +134,7 @@ const AdminClinics = () => {
 
       if (error) throw error;
 
-      toast.success("Clínica de teste criada com sucesso!");
+      toast.success("Clínica de teste criada com sucesso");
       setShowCreateModal(false);
       setNewClinic({ nome: "", cnpj: "", telefone: "" });
       loadClinics();

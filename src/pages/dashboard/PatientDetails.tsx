@@ -145,7 +145,7 @@ const PatientDetails = () => {
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast.success("Código copiado!");
+    toast.success("Código copiado");
   };
 
   const handleWhatsApp = () => {
@@ -157,7 +157,7 @@ const PatientDetails = () => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copiado!");
+    toast.success("Link copiado");
   };
 
   const scrollToSection = (section: CadastroSection) => {
@@ -371,21 +371,21 @@ const PatientDetails = () => {
         <>
           {/* Mobile Header */}
           <div className="bg-card rounded-xl border shadow-sm overflow-hidden -mx-4 sm:mx-0 mb-4">
-            <div className="bg-gradient-to-r from-[hsl(var(--flowdent-blue))] to-[hsl(var(--flow-turquoise))] px-4 py-4 text-white">
+            <div className="border-b px-4 py-4">
               <div className="flex items-center gap-3">
-                <button onClick={() => navigate("/dashboard/prontuario")} className="p-1.5 -ml-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <button onClick={() => navigate("/dashboard/prontuario")} className="p-1.5 -ml-1.5 rounded-md text-muted-foreground hover:bg-muted transition-colors" aria-label="Voltar">
                   <ArrowLeft className="h-5 w-5" />
                 </button>
                 <div className="flex-1 min-w-0">
-                  <h1 className="font-bold text-lg truncate">{patient.full_name}</h1>
-                  <p className="text-white/80 text-sm">#{patientCode}</p>
+                  <h1 className="text-h2 truncate text-foreground">{patient.full_name}</h1>
+                  <p className="text-sm text-muted-foreground tabular-nums">#{patientCode}</p>
                 </div>
-                <Badge className="bg-white/20 text-white border-0 shrink-0">{isActive ? "Ativo" : "Inativo"}</Badge>
+                <Badge variant={isActive ? "default" : "secondary"} className="shrink-0">{isActive ? "Ativo" : "Inativo"}</Badge>
               </div>
             </div>
             <div className="px-4 py-4">
               <div className="flex items-start gap-3">
-                <Avatar className="h-14 w-14 border-4 border-card shadow-lg -mt-9 shrink-0">
+                <Avatar className="h-12 w-12 shrink-0">
                   <AvatarFallback className="text-xl bg-primary/10 text-primary">{patient.full_name.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 flex gap-2 flex-wrap">
@@ -481,7 +481,7 @@ const PatientDetails = () => {
             {/* Right column - Tabs (2/3) */}
             <div className="col-span-8 xl:col-span-9">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full h-auto p-1 gap-1 flex-wrap justify-start bg-muted/50">
+                <TabsList className="w-full h-auto p-1 gap-0.5 flex-nowrap justify-start overflow-x-auto scrollbar-hide bg-muted/50">
                   {tabItems.map((tab) => (
                     <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
                   ))}
@@ -527,7 +527,7 @@ const PatientDetails = () => {
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between gap-2">
     <span className="text-xs text-muted-foreground shrink-0">{label}</span>
-    <span className="text-body-sm text-right truncate capitalize">{value}</span>
+    <span className="text-body-sm text-right truncate first-letter:uppercase">{value}</span>
   </div>
 );
 

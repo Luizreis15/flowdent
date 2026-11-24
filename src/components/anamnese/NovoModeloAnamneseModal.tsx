@@ -49,7 +49,7 @@ export default function NovoModeloAnamneseModal({
 
       if (error) throw error;
 
-      toast.success("Modelo criado com sucesso!");
+      toast.success("Modelo criado com sucesso");
       onSuccess();
       handleClose();
     } catch (error) {

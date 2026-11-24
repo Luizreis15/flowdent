@@ -235,7 +235,7 @@ const NovoAgendamentoMobileModal = ({ open, onOpenChange, clinicId, onSuccess }:
         });
 
       if (error) throw error;
-      toast.success("Agendamento criado com sucesso!");
+      toast.success("Agendamento criado com sucesso");
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {

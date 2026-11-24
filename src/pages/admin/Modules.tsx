@@ -98,7 +98,7 @@ const AdminModules = () => {
     setSaving(true);
     try {
       await supabase.from("system_modules").insert(moduleForm);
-      toast.success("Módulo criado!");
+      toast.success("Módulo criado");
       setShowModuleModal(false);
       setModuleForm({ code: "", name: "", description: "" });
       loadData();
@@ -121,7 +121,7 @@ const AdminModules = () => {
         ...flagForm,
         module_id: flagForm.module_id || null,
       });
-      toast.success("Feature flag criada!");
+      toast.success("Feature flag criada");
       setShowFlagModal(false);
       setFlagForm({ key: "", name: "", description: "", module_id: "" });
       loadData();

@@ -142,8 +142,8 @@ export const Odontograma = ({ dentesSelecionados, onDentesChange, statusDentes }
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3 h-10">
-          <TabsTrigger value="permanentes" className="text-xs sm:text-sm">PERMANENTES</TabsTrigger>
-          <TabsTrigger value="deciduos" className="text-xs sm:text-sm">DECÍDUOS</TabsTrigger>
+          <TabsTrigger value="permanentes" className="text-xs sm:text-sm">Permanentes</TabsTrigger>
+          <TabsTrigger value="deciduos" className="text-xs sm:text-sm">Decíduos</TabsTrigger>
           <TabsTrigger value="hof" className="text-xs sm:text-sm">HOF</TabsTrigger>
         </TabsList>
 

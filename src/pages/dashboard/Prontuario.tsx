@@ -157,7 +157,7 @@ const Prontuario = () => {
 
       if (error) throw error;
 
-      toast.success("Paciente cadastrado com sucesso!");
+      toast.success("Paciente cadastrado com sucesso");
       setIsSheetOpen(false);
       setFormData({
         full_name: "",
@@ -488,7 +488,7 @@ const Prontuario = () => {
                     onClick={() => setIsSheetOpen(false)} 
                     disabled={saving}
                   >
-                    FECHAR
+                    Fechar
                   </Button>
                   <Button type="submit" disabled={saving}>
                     {saving ? "SALVANDO..." : "SALVAR"}

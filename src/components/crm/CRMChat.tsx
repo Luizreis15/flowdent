@@ -285,7 +285,7 @@ export function CRMChat({ clinicId }: CRMChatProps) {
         .eq("id", convId);
 
       setNewConvOpen(false);
-      toast.success("Conversa iniciada!");
+      toast.success("Conversa iniciada");
       loadConversations();
       setSelectedId(convId);
     } catch (error) {

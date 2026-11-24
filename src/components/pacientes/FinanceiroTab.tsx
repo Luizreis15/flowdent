@@ -169,7 +169,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; className: string }> = {
-      paid: { label: "Pago", className: "bg-[hsl(var(--success-green))] text-white" },
+      paid: { label: "Pago", className: "border-transparent bg-sinal-ok-tenue text-sinal-ok" },
       partial: { label: "Parcial", className: "bg-yellow-500 text-white" },
       open: { label: "Em aberto", className: "bg-primary text-primary-foreground" },
       overdue: { label: "Vencido", className: "bg-destructive text-destructive-foreground" },

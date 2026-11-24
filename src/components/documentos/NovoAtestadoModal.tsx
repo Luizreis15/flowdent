@@ -500,7 +500,7 @@ export const NovoAtestadoModal = ({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              FECHAR
+              Fechar
             </Button>
             <Button onClick={handleSalvar} disabled={loading}>
               {loading ? "SALVANDO..." : "SALVAR ATESTADO"}

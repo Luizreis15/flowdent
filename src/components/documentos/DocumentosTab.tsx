@@ -113,14 +113,14 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
                   className="w-full"
                   onClick={() => handleNovoClick(doc.type)}
                 >
-                  NOVO
+                  Novo
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full"
                   onClick={() => handleHistoricoClick(doc.type)}
                 >
-                  VER HISTÓRICO
+                  Ver histórico
                 </Button>
               </div>
             </CardContent>
@@ -141,14 +141,14 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
                 className="w-full"
                 onClick={handlePersonalizadoClick}
               >
-                NOVO
+                Novo
               </Button>
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => handleHistoricoClick("personalizado")}
               >
-                VER HISTÓRICO
+                Ver histórico
               </Button>
             </div>
           </CardContent>

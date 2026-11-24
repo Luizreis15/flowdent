@@ -184,7 +184,7 @@ export function ConsultaManutencaoModal({ open, onOpenChange, casoId, tipoTratam
         );
       }
 
-      toast.success("Consulta registrada e agendamento sincronizado!");
+      toast.success("Consulta registrada e agendamento sincronizado");
       resetForm();
       onOpenChange(false);
       onSuccess();

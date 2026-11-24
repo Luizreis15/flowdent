@@ -63,7 +63,7 @@ const CRM = () => {
         body: { campaignId },
       });
       if (error) throw error;
-      toast({ title: "Campanha enviada!", description: `${data.sentCount} mensagens enviadas` });
+      toast({ title: "Campanha enviada", description: `${data.sentCount} mensagens enviadas` });
       loadData();
     } catch (err) {
       console.error(err);

@@ -132,7 +132,7 @@ export const AgendaProfissionalInline = ({ profissional }: AgendaProfissionalInl
       const { error: insertError } = await supabase.from("profissional_agenda_config").insert(configsToInsert);
       if (insertError) throw insertError;
 
-      toast.success("Agenda configurada com sucesso!");
+      toast.success("Agenda configurada com sucesso");
     } catch (error: any) {
       toast.error("Erro ao salvar: " + error.message);
     } finally {

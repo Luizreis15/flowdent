@@ -132,11 +132,11 @@ const AdminLeads = () => {
           .update(formData)
           .eq("id", selectedLead.id);
         if (error) throw error;
-        toast.success("Lead atualizado!");
+        toast.success("Lead atualizado");
       } else {
         const { error } = await supabase.from("leads").insert(formData);
         if (error) throw error;
-        toast.success("Lead criado!");
+        toast.success("Lead criado");
       }
       setShowModal(false);
       loadLeads();
@@ -166,7 +166,7 @@ const AdminLeads = () => {
         last_contact_at: new Date().toISOString(),
       }).eq("id", selectedLead.id);
 
-      toast.success("Interação registrada!");
+      toast.success("Interação registrada");
       setShowInteractionModal(false);
       setInteractionData({ type: "call", description: "" });
       loadLeads();
@@ -180,7 +180,7 @@ const AdminLeads = () => {
   const handleUpdateStatus = async (leadId: string, newStatus: string) => {
     try {
       await supabase.from("leads").update({ status: newStatus }).eq("id", leadId);
-      toast.success("Status atualizado!");
+      toast.success("Status atualizado");
       loadLeads();
     } catch (error) {
       toast.error("Erro ao atualizar status");

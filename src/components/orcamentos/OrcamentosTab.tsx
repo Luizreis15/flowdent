@@ -139,7 +139,7 @@ export const OrcamentosTab = ({ budgets, onRefresh, onNewBudget }: OrcamentosTab
       };
 
       await generateRecibo(reciboData);
-      toast.success("Recibo gerado com sucesso!");
+      toast.success("Recibo gerado com sucesso");
     } catch (error: any) {
       console.error("Erro ao gerar recibo:", error);
       toast.error("Erro ao gerar recibo");
@@ -152,11 +152,10 @@ export const OrcamentosTab = ({ budgets, onRefresh, onNewBudget }: OrcamentosTab
     return (
       <div className="space-y-6">
         <Button 
-          className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green)/0.9)]"
           onClick={onNewBudget}
         >
           <Plus className="h-4 w-4 mr-2" />
-          NOVO ORÇAMENTO
+          Novo orçamento
         </Button>
 
         <Card className="border-none shadow-none">
@@ -213,11 +212,10 @@ export const OrcamentosTab = ({ budgets, onRefresh, onNewBudget }: OrcamentosTab
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Orçamentos</h2>
         <Button 
-          className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green)/0.9)]"
           onClick={onNewBudget}
         >
           <Plus className="h-4 w-4 mr-2" />
-          NOVO ORÇAMENTO
+          Novo orçamento
         </Button>
       </div>
 

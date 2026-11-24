@@ -269,7 +269,7 @@ export const NovaDespesaModalV2 = ({ open, onOpenChange, clinicId, onSuccess }: 
 
       toast.success(formData.parcelado 
         ? `${formData.numeroParcelas} parcelas criadas com sucesso!` 
-        : "Despesa criada com sucesso!");
+        : "Despesa criada com sucesso");
       
       resetForm();
       onOpenChange(false);

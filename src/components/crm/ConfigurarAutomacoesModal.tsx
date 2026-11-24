@@ -114,7 +114,7 @@ export function ConfigurarAutomacoesModal({ open, onOpenChange }: ConfigurarAuto
         }
       }
 
-      toast({ title: "Automações salvas!" });
+      toast({ title: "Automações salvas" });
       onOpenChange(false);
     } catch (err) {
       console.error(err);

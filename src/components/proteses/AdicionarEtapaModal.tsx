@@ -149,7 +149,7 @@ export function AdicionarEtapaModal({
       }
 
       toast({
-        title: "Etapa adicionada!",
+        title: "Etapa adicionada",
         description: `Etapa "${nomeEtapa}" foi criada com sucesso`,
       });
 

@@ -120,7 +120,7 @@ const AdminUsers = () => {
           .eq("role", "super_admin");
       }
 
-      toast.success("Usuário atualizado com sucesso!");
+      toast.success("Usuário atualizado com sucesso");
       setShowModal(false);
       loadUsers();
     } catch (error: any) {

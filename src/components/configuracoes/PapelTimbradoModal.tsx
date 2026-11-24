@@ -120,7 +120,7 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
 
       await uploadPatientFile(filePath, file, { upsert: true });
       setLogoUrl(filePath);
-      toast.success("Logo enviado com sucesso!");
+      toast.success("Logo enviado com sucesso");
     } catch (error) {
       console.error("Erro ao fazer upload:", error);
       toast.error("Erro ao fazer upload da imagem");
@@ -144,7 +144,7 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
 
       if (error) throw error;
 
-      toast.success("Papel timbrado salvo com sucesso!");
+      toast.success("Papel timbrado salvo com sucesso");
       onOpenChange(false);
     } catch (error) {
       console.error("Erro ao salvar:", error);

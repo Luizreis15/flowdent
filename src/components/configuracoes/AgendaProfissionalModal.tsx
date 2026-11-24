@@ -291,7 +291,7 @@ export const AgendaProfissionalModal = ({
         });
       }
 
-      toast.success("Agenda configurada com sucesso!");
+      toast.success("Agenda configurada com sucesso");
       onClose();
     } catch (error: any) {
       toast.error("Erro ao salvar configurações: " + error.message);
