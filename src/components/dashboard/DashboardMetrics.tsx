@@ -1,40 +1,17 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, DollarSign, Users, PieChart } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { startOfMonth, startOfDay, endOfDay } from "date-fns";
-import { cn, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { HorarioFuncionamento } from "@/components/configuracoes/HorarioFuncionamentoCard";
 
 interface DashboardMetricsProps {
   clinicId: string;
 }
 
-const metricConfigs = [
-  {
-    key: "appointments",
-    title: "Consultas Hoje",
-    icon: Calendar,
-  },
-  {
-    key: "revenue",
-    title: "Faturamento do Mês",
-    icon: DollarSign,
-  },
-  {
-    key: "patients",
-    title: "Novos Pacientes",
-    icon: Users,
-  },
-  {
-    key: "occupation",
-    title: "Ocupação",
-    icon: PieChart,
-  },
-];
 
 export const DashboardMetrics = React.memo(({ clinicId }: DashboardMetricsProps) => {
   const today = new Date();
@@ -121,7 +98,9 @@ export const DashboardMetrics = React.memo(({ clinicId }: DashboardMetricsProps)
         .maybeSingle();
       
       if (error) throw error;
-      return data?.horario_funcionamento as unknown as HorarioFuncionamento | null;
+      // Sem configuração cadastrada a consulta devolve undefined, que o React Query rejeita
+      // (e repete até desistir): o dashboard ficava preso no carregamento.
+      return (data?.horario_funcionamento ?? null) as unknown as HorarioFuncionamento | null;
     },
   });
 
@@ -129,19 +108,12 @@ export const DashboardMetrics = React.memo(({ clinicId }: DashboardMetricsProps)
   const { data: paymentsMonth, isLoading: loadingPayments } = useQuery({
     queryKey: ["payments-month", clinicId],
     queryFn: async () => {
-      const { data: patients } = await supabase
-        .from("patients")
-        .select("id")
-        .eq("clinic_id", clinicId);
-      
-      if (!patients) return { total: 0, received: 0 };
-
-      const patientIds = patients.map(p => p.id);
-      
+      // Filtra pela clínica via join, numa consulta só. Antes os IDs de todos os pacientes
+      // iam na URL (.in com 780 UUIDs), que estourava o limite e a métrica nunca carregava.
       const { data, error } = await supabase
         .from("payments")
-        .select("value, status")
-        .in("patient_id", patientIds)
+        .select("value, status, patient_id!inner(clinic_id)")
+        .eq("patient_id.clinic_id", clinicId)
         .gte("payment_date", startOfCurrentMonth.toISOString().split('T')[0]);
       
       if (error) throw error;
@@ -187,78 +159,35 @@ export const DashboardMetrics = React.memo(({ clinicId }: DashboardMetricsProps)
     ? Math.min(Math.round((totalAppointments / totalCapacity) * 100), 100) 
     : 0;
 
-  const formatCurrencyCompact = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 0,
-    }).format(value);
-  };
 
   if (loadingAppointments || loadingPayments || loadingPatients || loadingDentists || loadingConfig) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-        {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-24" />
-        ))}
-      </div>
+      <Skeleton className="h-[104px] w-full rounded-lg" />
     );
   }
 
-  const metricsData = [
-    {
-      ...metricConfigs[0],
-      value: totalAppointments,
-      subValue: totalAppointments > 0 ? `${confirmedAppointments} confirmadas` : null,
-      progress: totalAppointments > 0 ? (confirmedAppointments / totalAppointments) * 100 : 0,
-    },
-    {
-      ...metricConfigs[1],
-      value: formatCurrency(paymentsMonth?.total || 0),
-      subValue: `${formatCurrency(paymentsMonth?.received || 0)} recebido`,
-    },
-    {
-      ...metricConfigs[2],
-      value: newPatients,
-      subValue: "Este mês",
-    },
-    {
-      ...metricConfigs[3],
-      value: `${occupationRate}%`,
-      subValue: `${totalAppointments} de ${totalCapacity} slots`,
-      progress: occupationRate,
-    },
-  ];
-
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {metricsData.map((metric) => {
-        const Icon = metric.icon;
-        return (
-          <Card key={metric.key} className="bg-card border hover:shadow-sm transition-shadow">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  {metric.title}
-                </span>
-                <div className="p-1.5 rounded-md bg-muted">
-                  <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-foreground">
-                {metric.value}
-              </div>
-              {'subValue' in metric && metric.subValue && (
-                <p className="text-xs text-muted-foreground mt-1">{metric.subValue}</p>
-              )}
-              {'progress' in metric && metric.progress !== undefined && metric.progress > 0 && (
-                <Progress value={metric.progress} className="h-1 mt-2" />
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
+    <FaixaIndicadores
+      itens={[
+        {
+          rotulo: "Consultas hoje",
+          valor: totalAppointments,
+          nota: totalAppointments > 0 ? `${confirmedAppointments} confirmadas` : "Nenhuma agendada",
+        },
+        {
+          rotulo: "Faturamento do mês",
+          ...separarMoeda(formatCurrency(paymentsMonth?.total || 0)),
+          nota: `${formatCurrency(paymentsMonth?.received || 0)} recebido`,
+        },
+        { rotulo: "Novos pacientes", valor: newPatients ?? 0, nota: "Este mês" },
+        {
+          rotulo: "Ocupação",
+          valor: occupationRate,
+          sufixo: "%",
+          nota: `${totalAppointments} de ${totalCapacity} horários`,
+        },
+      ]}
+    />
   );
 });
 

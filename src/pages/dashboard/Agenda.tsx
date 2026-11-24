@@ -1133,7 +1133,7 @@ const Agenda = () => {
             </Button>
             
             <div className="text-center min-w-[200px]">
-              <h2 className="text-lg font-semibold capitalize">
+              <h2 className="text-lg font-semibold first-letter:uppercase">
                 {viewMode === "day-slots" 
                   ? format(selectedDate, "EEEE, dd 'de' MMMM yyyy", { locale: ptBR })
                   : viewMode === "week"
@@ -1681,10 +1681,10 @@ const Agenda = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl capitalize">
+                    <CardTitle className="text-xl first-letter:uppercase">
                       {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
                     </CardTitle>
-                    <CardDescription className="capitalize">
+                    <CardDescription className="first-letter:uppercase">
                       {format(selectedDate, "EEEE", { locale: ptBR })}
                     </CardDescription>
                   </div>
@@ -1695,7 +1695,6 @@ const Agenda = () => {
                     <Button 
                       size="sm" 
                       onClick={() => setViewMode("day-slots")}
-                      className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90"
                     >
                       Ver Horários
                     </Button>
@@ -1705,11 +1704,10 @@ const Agenda = () => {
               <CardContent>
                 {selectedDayAppointments.length === 0 ? (
                   <div className="text-center py-8">
-                    <CalendarIcon className="h-12 w-12 mx-auto mb-3 text-[hsl(var(--success-green))]/50" />
+                    <CalendarIcon className="h-10 w-10 mx-auto mb-3 text-muted-foreground/60" />
                     <p className="text-muted-foreground mb-4">Nenhum agendamento neste dia</p>
                     <Button 
                       onClick={() => setViewMode("day-slots")}
-                      className="bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90"
                     >
                       <Plus className="mr-2 h-4 w-4" />
                       Agendar Consulta
@@ -1753,7 +1751,7 @@ const Agenda = () => {
                     {/* Button to see all slots */}
                     <Button 
                       variant="outline" 
-                      className="w-full mt-4 border-[hsl(var(--success-green))] text-[hsl(var(--success-green))] hover:bg-[hsl(var(--card-green))]"
+                      className="w-full mt-4"
                       onClick={() => setViewMode("day-slots")}
                     >
                       <Plus className="mr-2 h-4 w-4" />
