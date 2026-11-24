@@ -58,8 +58,8 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 
 | Fase | Escopo | PRs | Estado |
 |---|---|---|---|
-| **A — Fundação** | Cores escritas à mão → tokens; regra de lint de design; família tipográfica | 1–2 | **Em andamento** |
-| B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | — |
+| **A — Fundação** | Cores escritas à mão → tokens; regra de lint de design; família tipográfica | 1–2 | Itens 1 e 2 em produção (PR #14); fonte aguarda decisão |
+| B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | B1 (Financeiro) em andamento |
 | C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | — |
 | D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | — |
 | E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | — |

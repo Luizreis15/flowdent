@@ -1,16 +1,14 @@
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect, useMemo } from "react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Search, Filter, AlertTriangle, Clock, CheckCircle, XCircle,
-  DollarSign, FileText, RefreshCcw, ChevronLeft, ChevronRight, Undo2,
-} from "lucide-react";
+import {Search, Filter, AlertTriangle, Clock, CheckCircle, XCircle, DollarSign, FileText, RefreshCcw, ChevronLeft, ChevronRight, Undo2} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PaymentDrawer } from "./PaymentDrawer";
@@ -343,65 +341,17 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* Aging Cards */}
-      <div className="flex lg:grid lg:grid-cols-6 gap-3 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-        <Card
-          className={`cursor-pointer transition-all flex-shrink-0 w-[130px] lg:w-auto ${agingFilter === "all" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => setAgingFilter("all")}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">Em Aberto</div>
-            <div className="text-lg lg:text-2xl font-bold">{formatCurrency(aging.total)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all flex-shrink-0 w-[130px] lg:w-auto border-l-4 border-l-primary ${agingFilter === "aVencer" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => setAgingFilter("aVencer")}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">A Vencer</div>
-            <div className="text-lg lg:text-2xl font-bold text-primary">{formatCurrency(aging.aVencer)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all flex-shrink-0 w-[130px] lg:w-auto border-l-4 border-l-yellow-500 ${agingFilter === "vencido1a30" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => setAgingFilter("vencido1a30")}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">1-30 dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-yellow-600">{formatCurrency(aging.vencido1a30)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all flex-shrink-0 w-[130px] lg:w-auto border-l-4 border-l-orange-500 ${agingFilter === "vencido31a60" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => setAgingFilter("vencido31a60")}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">31-60 dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-orange-600">{formatCurrency(aging.vencido31a60)}</div>
-          </CardContent>
-        </Card>
-
-        <Card
-          className={`cursor-pointer transition-all flex-shrink-0 w-[130px] lg:w-auto border-l-4 border-l-destructive ${agingFilter === "vencido60mais" ? "ring-2 ring-primary" : ""}`}
-          onClick={() => setAgingFilter("vencido60mais")}
-        >
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">60+ dias</div>
-            <div className="text-lg lg:text-2xl font-bold text-destructive">{formatCurrency(aging.vencido60mais)}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="flex-shrink-0 w-[130px] lg:w-auto bg-sinal-ok/10">
-          <CardContent className="p-3 lg:pt-4">
-            <div className="text-xs font-medium text-muted-foreground">Total Recebido</div>
-            <div className="text-lg lg:text-2xl font-bold text-sinal-ok">{formatCurrency(aging.totalPago)}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <FaixaIndicadores
+        compacto
+        itens={[
+          { rotulo: "Em aberto", ...separarMoeda(formatCurrency(aging.total)), selecionado: agingFilter === "all", onClick: () => setAgingFilter("all") },
+          { rotulo: "A vencer", ...separarMoeda(formatCurrency(aging.aVencer)), selecionado: agingFilter === "aVencer", onClick: () => setAgingFilter("aVencer") },
+          { rotulo: "1–30 dias", ...separarMoeda(formatCurrency(aging.vencido1a30)), tom: aging.vencido1a30 > 0 ? "espera" : "padrao", selecionado: agingFilter === "vencido1a30", onClick: () => setAgingFilter("vencido1a30") },
+          { rotulo: "31–60 dias", ...separarMoeda(formatCurrency(aging.vencido31a60)), tom: aging.vencido31a60 > 0 ? "espera" : "padrao", selecionado: agingFilter === "vencido31a60", onClick: () => setAgingFilter("vencido31a60") },
+          { rotulo: "60+ dias", ...separarMoeda(formatCurrency(aging.vencido60mais)), tom: aging.vencido60mais > 0 ? "alerta" : "padrao", selecionado: agingFilter === "vencido60mais", onClick: () => setAgingFilter("vencido60mais") },
+          { rotulo: "Total recebido", ...separarMoeda(formatCurrency(aging.totalPago)) },
+        ]}
+      />
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
