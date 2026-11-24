@@ -9,8 +9,8 @@ Contexto completo: [AUDITORIA-CONSISTENCIA.md](AUDITORIA-CONSISTENCIA.md) (seç�
 - **Migrations do PR #3 aplicadas em produção**: `20261118100000` (REVOKE em funções de gatilho e
   `complete_user_onboarding`), `20261118110000` (`search_path`), `20261118120000` (17 policies passam a usar
   `get_user_clinic_id()`; nenhuma policy lê mais `profiles`). Testadas localmente (79/79) antes.
-- **P3 passo 1 aplicado**: `20261123100000_renomear_legados` (tabelas/coluna viraram `_legacy_*`),
-  `WhatsAppConfigModal.tsx` removido. Falta o passo 2 (DROP) — ver P3.
+- **P3 concluído**: legados renomeados (`20261123100000`) e removidos (`20261123110000`);
+  `WhatsAppConfigModal.tsx` removido; `types.ts` regenerado do banco.
 - **Landing parada por decisão do dono** (possível LP com profissional externo). PRs #6 e #7 ficam em rascunho.
 - **Redesign do app (telas internas) pedido pelo dono**, ainda não iniciado. Perguntas em aberto: escopo só
   app?, mesclar PR #5 (logo) antes?, referência visual? Proposta: casca do app + componentes base primeiro,
@@ -90,10 +90,9 @@ Passos:
 1. ~~Revalidar contagens e referências~~ — feito em 2026-11-23.
 2. ~~Remover `WhatsAppConfigModal.tsx`~~ — feito (branch `chore/remover-legados`).
 3. ~~Renomear para `_legacy_*`~~ — aplicado em produção (`20261123100000_renomear_legados`).
-   **Falta:** depois de um ciclo sem erro, migration de `DROP` de `_legacy_whatsapp_config`,
-   `_legacy_tenant_feature_overrides` e `appointments._legacy_duracao_minutos` (o dono roda o SQL; o
-   conector recusa DROP).
-4. Regenerar `src/integrations/supabase/types.ts` (ver P5) — ainda cita os nomes antigos.
+4. ~~DROP dos `_legacy_*`~~ — aplicado em produção em 2026-11-23 (`20261123110000_dropar_legados`, rodado
+   pelo dono no SQL Editor). **P3 concluído.**
+5. ~~Regenerar `src/integrations/supabase/types.ts`~~ — feito na mesma branch (`chore/dropar-legados`).
 
 ## P4 — Achados da auditoria ainda não tratados
 
@@ -130,7 +129,7 @@ Em ordem de prioridade sugerida:
    Para testar localmente foi usada uma pré-migration só local
    (`20251030203000_local_only_seed_admin.sql`, numa cópia em scratchpad). Solução definitiva a desenhar
    sem editar migrations já aplicadas (ex.: `supabase/seed.sql` local).
-2. **Regenerar tipos**: `supabase gen types typescript --linked > src/integrations/supabase/types.ts`
+2. ~~Regenerar tipos~~ — feito em 2026-11-23 (via conector Supabase). Para refazer: `supabase gen types typescript --linked > src/integrations/supabase/types.ts`
    (colunas novas: `procedimentos.clinica_id`; funções novas: `is_clinic_admin` etc.). Rodar build depois.
 3. **Testes automatizados**: não existem no front. Sugestão: rodar `supabase/verificacoes/*.test.sql` em CI
    com `supabase start` (depende do item 1).
