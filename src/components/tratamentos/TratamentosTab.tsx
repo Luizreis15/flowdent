@@ -141,7 +141,7 @@ export const TratamentosTab = ({ patientId }: TratamentosTabProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-green-500"><CheckCircle2 className="h-3 w-3 mr-1" />Finalizado</Badge>;
+        return <Badge className="border-transparent bg-sinal-ok-tenue text-sinal-ok"><CheckCircle2 className="h-3 w-3 mr-1" />Finalizado</Badge>;
       case "in_progress":
         return <Badge className="bg-yellow-500"><Clock className="h-3 w-3 mr-1" />Em andamento</Badge>;
       default:
@@ -214,7 +214,7 @@ export const TratamentosTab = ({ patientId }: TratamentosTabProps) => {
           {/* Legenda */}
           <div className="mt-4 flex gap-4 justify-center text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-green-500"></div>
+              <div className="w-4 h-4 rounded-full bg-clinico-executado"></div>
               <span>Finalizado</span>
             </div>
             <div className="flex items-center gap-2">
@@ -250,7 +250,7 @@ export const TratamentosTab = ({ patientId }: TratamentosTabProps) => {
             className="bg-primary"
           >
             <Plus className="h-4 w-4 mr-2" />
-            ADICIONAR EVOLUÇÃO
+            Adicionar evolução
           </Button>
         </CardHeader>
         <CardContent>

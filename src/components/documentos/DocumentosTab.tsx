@@ -113,7 +113,7 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
                   className="w-full"
                   onClick={() => handleNovoClick(doc.type)}
                 >
-                  NOVO
+                  Novo
                 </Button>
                 <Button
                   variant="outline"
@@ -141,7 +141,7 @@ export const DocumentosTab = ({ patientId }: DocumentosTabProps) => {
                 className="w-full"
                 onClick={handlePersonalizadoClick}
               >
-                NOVO
+                Novo
               </Button>
               <Button
                 variant="outline"

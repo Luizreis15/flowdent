@@ -170,13 +170,13 @@ export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
     const appointmentDate = parseISO(date);
     switch (status) {
       case "completed":
-        return <Badge className="bg-[hsl(var(--success-green))] text-white">Realizado</Badge>;
+        return <Badge className="border-transparent bg-sinal-ok-tenue text-sinal-ok">Realizado</Badge>;
       case "confirmed":
         return <Badge className="bg-blue-500 text-white">Confirmado</Badge>;
       case "cancelled":
         return <Badge variant="destructive">Cancelado</Badge>;
       case "no_show":
-        return <Badge className="bg-orange-500 text-white">Não compareceu</Badge>;
+        return <Badge className="border-transparent bg-sinal-alerta-tenue text-sinal-alerta">Não compareceu</Badge>;
       case "scheduled":
         if (isPast(appointmentDate) && !isToday(appointmentDate)) {
           return <Badge className="bg-yellow-500 text-white">Pendente</Badge>;
@@ -240,7 +240,7 @@ export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
         <Card>
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
               </div>
               <div>

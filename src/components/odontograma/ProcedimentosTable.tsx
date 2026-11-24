@@ -32,9 +32,9 @@ interface ProcedimentosTableProps {
 }
 
 const STATUS_COLORS = {
-  a_realizar: "bg-red-500",
-  executado: "bg-green-500",
-  existente: "bg-blue-500",
+  a_realizar: "bg-clinico-a-realizar",
+  executado: "bg-clinico-executado",
+  existente: "bg-clinico-protese",
 };
 
 export const ProcedimentosTable = ({
@@ -50,7 +50,7 @@ export const ProcedimentosTable = ({
       {/* Botões de Ação */}
       <div className="flex gap-2">
         <Button 
-          className="bg-orange-500 hover:bg-orange-600 text-white flex-1"
+          className="flex-1"
           onClick={onAddProcedimento}
         >
           <Plus className="mr-2 h-4 w-4" />
