@@ -34,25 +34,25 @@ const STATUS_CONFIG = {
   enviado: {
     label: "Enviado",
     icon: Send,
-    color: "bg-blue-500",
+    color: "bg-tinta-500",
     badgeVariant: "default" as const,
   },
   em_execucao: {
     label: "Em Execução",
     icon: Loader2,
-    color: "bg-orange-500",
+    color: "bg-sinal-espera",
     badgeVariant: "secondary" as const,
   },
   concluida: {
     label: "Concluída",
     icon: Check,
-    color: "bg-green-500",
+    color: "bg-sinal-ok",
     badgeVariant: "default" as const,
   },
   cancelada: {
     label: "Cancelada",
     icon: XCircle,
-    color: "bg-red-500",
+    color: "bg-sinal-alerta",
     badgeVariant: "destructive" as const,
   },
 };
@@ -83,7 +83,7 @@ export function EtapaTimeline({ etapas, etapaAtualId }: EtapaTimelineProps) {
               <div
                 className={cn(
                   "absolute left-[15px] top-8 w-0.5 h-[calc(100%-8px)]",
-                  etapa.status === "concluida" ? "bg-green-500" : "bg-muted"
+                  etapa.status === "concluida" ? "bg-sinal-ok" : "bg-muted"
                 )}
               />
             )}

@@ -155,7 +155,7 @@ export default function AnamnesesTab({ patientId }: AnamnesesTabProps) {
                     )}
                     {anamnese.alerta_descricao && (
                       <p className="text-destructive font-medium mt-2">
-                        ⚠️ {anamnese.alerta_descricao}
+                        {anamnese.alerta_descricao}
                       </p>
                     )}
                   </div>

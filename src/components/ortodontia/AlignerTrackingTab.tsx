@@ -169,7 +169,7 @@ export function AlignerTrackingTab({ casoId }: AlignerTrackingTabProps) {
       {totalCount > 0 && (
         <div className="w-full bg-muted rounded-full h-2">
           <div
-            className="bg-primary rounded-full h-2 transition-all"
+            className="bg-primary rounded-full h-2 transition-[width] duration-300"
             style={{ width: `${(trocados / totalCount) * 100}%` }}
           />
         </div>

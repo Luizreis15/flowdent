@@ -970,7 +970,7 @@ export const NovoDocumentoModal = ({
 
                 <div className="text-sm text-muted-foreground border-l-4 border-primary/50 pl-4 py-2 bg-primary/5 rounded">
                   <p>
-                    💡 <strong>Conta pra gente, como foi sua experiência usando este novo recurso?</strong>
+                    <strong>Conta pra gente, como foi sua experiência usando este novo recurso?</strong>
                   </p>
                 </div>
               </>

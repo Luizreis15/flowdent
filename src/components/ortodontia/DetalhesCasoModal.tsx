@@ -212,7 +212,7 @@ export function DetalhesCasoModal({ open, onOpenChange, casoId, onRefresh }: Det
                     </div>
                     <div className="w-full bg-muted rounded-full h-3">
                       <div
-                        className="bg-primary rounded-full h-3 transition-all"
+                        className="bg-primary rounded-full h-3 transition-[width] duration-300"
                         style={{ width: `${Math.min((progresso.atual / progresso.total) * 100, 100)}%` }}
                       />
                     </div>
@@ -274,7 +274,7 @@ export function DetalhesCasoModal({ open, onOpenChange, casoId, onRefresh }: Det
                   <Card>
                     <CardContent className="p-4 space-y-2">
                       <h4 className="font-semibold text-sm flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-500" /> Responsável Financeiro
+                        <AlertTriangle className="w-4 h-4 text-sinal-espera" /> Responsável financeiro
                       </h4>
                       <p className="text-sm font-medium">{caso.responsible.name}</p>
                       <p className="text-xs text-muted-foreground">

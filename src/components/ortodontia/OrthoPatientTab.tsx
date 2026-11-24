@@ -74,7 +74,7 @@ export function OrthoPatientTab({ patientId }: OrthoPatientTabProps) {
           return (
             <Card
               key={caso.id}
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="cursor-pointer transition-colors duration-150 hover:bg-muted/30"
               onClick={() => { setSelectedCasoId(caso.id); setDetalhesOpen(true); }}
             >
               <CardContent className="p-4 space-y-2">
@@ -97,7 +97,7 @@ export function OrthoPatientTab({ patientId }: OrthoPatientTabProps) {
                     </div>
                     <div className="w-full bg-muted rounded-full h-2">
                       <div
-                        className="bg-primary rounded-full h-2 transition-all"
+                        className="bg-primary rounded-full h-2 transition-[width] duration-300"
                         style={{ width: `${Math.min((progresso.atual / progresso.total) * 100, 100)}%` }}
                       />
                     </div>

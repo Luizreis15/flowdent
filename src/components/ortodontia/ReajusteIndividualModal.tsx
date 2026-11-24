@@ -95,7 +95,7 @@ export function ReajusteIndividualModal({ open, onOpenChange, casoId, valorAtual
 
           {novoValor > 0 && (
             <div className="text-sm bg-muted p-3 rounded-md">
-              Novo valor: <span className="font-bold text-green-600">R$ {novoValor.toFixed(2)}</span>
+              Novo valor: <span className="font-semibold tabular-nums text-foreground">R$ {novoValor.toFixed(2)}</span>
             </div>
           )}
 

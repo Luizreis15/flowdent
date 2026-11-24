@@ -31,9 +31,9 @@ interface Document {
 }
 
 const statusColors: Record<string, string> = {
-  rascunho: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-  finalizado: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  assinado: "bg-green-500/10 text-green-700 dark:text-green-400",
+  rascunho: "bg-sinal-espera-tenue text-sinal-espera",
+  finalizado: "bg-acao-tenue text-acao",
+  assinado: "bg-sinal-ok-tenue text-sinal-ok",
 };
 
 const statusLabels: Record<string, string> = {
@@ -394,7 +394,7 @@ export const HistoricoDocumentosModal = ({
             )}
 
             {selectedDoc.signed_at && (
-              <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+              <div className="text-sm text-sinal-ok font-medium">
                 Assinado em {format(new Date(selectedDoc.signed_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
               </div>
             )}
@@ -465,7 +465,7 @@ export const HistoricoDocumentosModal = ({
             </div>
           ) : (
             documents.map((doc) => (
-              <Card key={doc.id} className="hover:shadow-md transition-shadow">
+              <Card key={doc.id} className="transition-colors duration-150 hover:bg-muted/30">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -479,7 +479,7 @@ export const HistoricoDocumentosModal = ({
                         Criado em {format(new Date(doc.created_at), "dd/MM/yyyy 'às' HH:mm")}
                       </p>
                       {doc.signed_at && (
-                        <p className="text-sm text-green-600 dark:text-green-400">
+                        <p className="text-sm text-sinal-ok">
                           Assinado em {format(new Date(doc.signed_at), "dd/MM/yyyy 'às' HH:mm")}
                         </p>
                       )}
