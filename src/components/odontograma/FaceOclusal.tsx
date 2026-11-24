@@ -82,9 +82,9 @@ export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false }: Fa
       >
         <defs>
           <radialGradient id={`oclusal-${id}`} cx="0.42" cy="0.4" r="0.7">
-            <stop offset="0" stopColor="#fbf8f1" />
-            <stop offset="0.7" stopColor="#efe7d7" />
-            <stop offset="1" stopColor="#ddd1ba" />
+            <stop offset="0" style={{ stopColor: "hsl(var(--bone-0))" }} />
+            <stop offset="0.7" style={{ stopColor: "hsl(var(--bone-50))" }} />
+            <stop offset="1" style={{ stopColor: "hsl(var(--bone-200))" }} />
           </radialGradient>
           <clipPath id={`contorno-${id}`}>
             <path d={contorno} />
@@ -98,11 +98,9 @@ export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false }: Fa
             <path
               key={face}
               d={d}
-              fill={preenchimento(face)}
-              fillOpacity={faces[face] ? 0.8 : 1}
-              stroke="#fffdf8"
+              style={{ fill: preenchimento(face), stroke: "hsl(var(--bone-0))" }}
               strokeWidth={0.22}
-              className={cn("cursor-pointer transition-[fill,fill-opacity] duration-150", !faces[face] && "hover:fill-[#d8ccb6]")}
+              className={cn("cursor-pointer transition-[fill] duration-150", !faces[face] && "hover:!fill-bone-200")}
               onClick={() => onFaceClick(face)}
             >
               <title>{`Dente ${numero} — ${NOME_FACE[face]}`}</title>
@@ -111,19 +109,17 @@ export const FaceOclusal = ({ numero, faces, onFaceClick, selected = false }: Fa
           <path
             d={contorno}
             transform={mesa}
-            fill={faces.oclusal ? COR_STATUS[faces.oclusal] : "#f6f1e6"}
-            fillOpacity={faces.oclusal ? 0.85 : 1}
-            stroke="#fffdf8"
+            style={{ fill: faces.oclusal ? COR_STATUS[faces.oclusal] : "hsl(var(--bone-50))", stroke: "hsl(var(--bone-0))" }}
             strokeWidth={0.4}
-            className={cn("cursor-pointer transition-[fill] duration-150", !faces.oclusal && "hover:fill-[#e2d7c3]")}
+            className={cn("cursor-pointer transition-[fill] duration-150", !faces.oclusal && "hover:!fill-bone-200")}
             onClick={() => onFaceClick("oclusal")}
           >
             <title>{`Dente ${numero} — ${anterior ? "incisal" : "oclusal"}`}</title>
           </path>
-          <path d={sulcos} fill="none" stroke="#a8946d" strokeWidth={0.2} strokeLinecap="round" opacity={0.7} pointerEvents="none" />
+          <path d={sulcos} fill="none" style={{ stroke: "hsl(var(--bone-400))" }} strokeWidth={0.2} strokeLinecap="round" pointerEvents="none" />
         </g>
 
-        <path d={contorno} fill="none" stroke="#b8a785" strokeWidth={0.2} strokeLinejoin="round" pointerEvents="none" />
+        <path d={contorno} fill="none" style={{ stroke: "hsl(var(--bone-400))" }} strokeWidth={0.2} strokeLinejoin="round" pointerEvents="none" />
       </svg>
     </div>
   );

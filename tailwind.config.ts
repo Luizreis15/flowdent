@@ -2,34 +2,32 @@ import type { Config } from "tailwindcss";
 
 /*
  * As telas usam cores cruas do Tailwind (bg-green-600, text-blue-500…) em mais de 500
- * lugares. Em vez de trocar uma a uma, as famílias são redefinidas como rampas
- * calibradas dentro da paleta Flowdent: o significado fica (verde = ok, vermelho =
- * alerta, âmbar = espera), a matiz saturada de fora da marca sai.
+ * lugares, fora da paleta fechada. Cada família é apontada para tokens que JÁ existem
+ * (ementa de identidade, seção 3): nenhuma cor nova é criada.
+ *   azuis e roxos → rampa tinta · teal/ciano → rampa acento · cinzas → rampa bone
+ *   verdes → sinal-ok · vermelhos → sinal-alerta · âmbar/laranja/amarelo → sinal-espera
  */
-const LUMINOSIDADE: Record<string, number> = {
-  50: 96, 100: 92, 200: 84, 300: 72, 400: 60, 500: 48, 600: 39, 700: 31, 800: 24, 900: 18, 950: 11,
-};
-const rampa = (matiz: number, saturacao: number) =>
-  Object.fromEntries(
-    Object.entries(LUMINOSIDADE).map(([passo, l]) => [passo, `hsl(${matiz} ${saturacao}% ${l}% / <alpha-value>)`]),
-  );
+const PASSOS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+const token = (nome: string) => `hsl(var(--${nome}) / <alpha-value>)`;
+const rampaDe = (prefixo: string, maior = 950) =>
+  Object.fromEntries(PASSOS.map((p) => [p, token(`${prefixo}-${Math.min(p, maior)}`)]));
+const sinal = (nome: string) =>
+  Object.fromEntries(PASSOS.map((p) => [p, token(p <= 200 ? `${nome}-tenue` : nome)]));
 
-const ok = rampa(148, 38);       // sinal-ok
-const alerta = rampa(4, 56);     // sinal-alerta
-const espera = rampa(38, 64);    // sinal-espera
-const tinta = rampa(222, 48);    // azul da marca
-const acento = rampa(187, 44);   // verde-azulado do lettering
-const ameixa = rampa(286, 18);   // categorias que precisavam de uma terceira matiz, contida
-const bone = rampa(38, 6);       // neutros
+const tinta = rampaDe("tinta");
+const acento = rampaDe("acento", 900);
+const bone = rampaDe("bone");
+const ok = sinal("sinal-ok");
+const alerta = sinal("sinal-alerta");
+const espera = sinal("sinal-espera");
 
-const coresCalibradas = {
+const coresDaPaleta = {
+  blue: tinta, sky: tinta, indigo: tinta, purple: tinta, violet: tinta, fuchsia: tinta, pink: tinta,
+  teal: acento, cyan: acento,
+  gray: bone, slate: bone, zinc: bone, neutral: bone, stone: bone,
   green: ok, emerald: ok, lime: ok,
   red: alerta, rose: alerta,
   amber: espera, orange: espera, yellow: espera,
-  blue: tinta, sky: tinta, indigo: tinta,
-  teal: acento, cyan: acento,
-  purple: ameixa, violet: ameixa, fuchsia: ameixa, pink: ameixa,
-  gray: bone, slate: bone, zinc: bone, neutral: bone, stone: bone,
 };
 
 export default {
@@ -46,7 +44,7 @@ export default {
     },
     extend: {
       colors: {
-        ...coresCalibradas,
+        ...coresDaPaleta,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -101,17 +99,6 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
-      fontFamily: {
-        sans: ["Geist", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
-      },
-      // Hierarquia vem de tamanho e cor, não de peso. bold/extrabold/black (238 usos)
-      // ficam em 600, o teto do sistema.
-      fontWeight: {
-        bold: "600",
-        extrabold: "600",
-        black: "600",
-      },
       backgroundImage: {
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-card': 'var(--gradient-card)',
@@ -144,13 +131,13 @@ export default {
         'linha-padrao': '44px',
       },
       fontSize: {
-        'h1': ['1.75rem', { lineHeight: '2.125rem', fontWeight: '500', letterSpacing: '-0.015em' }],
-        'h2': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '500' }],
-        'section': ['1rem', { lineHeight: '1.5rem', fontWeight: '500' }],
+        'h1': ['1.625rem', { lineHeight: '2rem', fontWeight: '700', letterSpacing: '-0.01em' }],
+        'h2': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
+        'section': ['1.125rem', { lineHeight: '1.5rem', fontWeight: '600' }],
         'body': ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '400' }],
         'body-sm': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '400' }],
         'table': ['0.8125rem', { lineHeight: '1.25rem', fontWeight: '400' }],
-        'table-header': ['0.75rem', { lineHeight: '1rem', fontWeight: '500' }],
+        'table-header': ['0.8125rem', { lineHeight: '1.125rem', fontWeight: '600', letterSpacing: '0.02em' }],
       },
       keyframes: {
         "accordion-down": {

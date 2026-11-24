@@ -258,15 +258,14 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    font-feature-settings: "ss01", "cv11";
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Valores alinham em coluna: tabelas, preços e horários usam algarismos de largura fixa */
+  /* Numerais tabulares (requisito da ementa): valores alinham em coluna */
   table, time, [data-numero] {
     font-variant-numeric: tabular-nums;
   }
@@ -305,26 +304,26 @@
 
 /* ===== Desktop Enterprise Typography ===== */
 @media (min-width: 1024px) {
-  .text-h1 { font-size: 1.75rem; line-height: 2.125rem; font-weight: 500; letter-spacing: -0.015em; }
-  .text-h2 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
-  .text-section { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+  .text-h1 { font-size: 1.625rem; line-height: 2rem; font-weight: 700; letter-spacing: -0.01em; }
+  .text-h2 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; }
+  .text-section { font-size: 1.125rem; line-height: 1.5rem; font-weight: 600; }
   .text-body { font-size: 0.9375rem; line-height: 1.5rem; font-weight: 400; }
   .text-body-sm { font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; }
   .text-table { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 400; }
-  .text-table-header { font-size: 0.75rem; line-height: 1rem; font-weight: 500; color: hsl(var(--muted-foreground)); }
-  .text-caption { font-size: 0.8125rem; line-height: 1.125rem; font-weight: 400; }
-  .text-label { font-size: 0.75rem; line-height: 1rem; font-weight: 500; color: hsl(var(--muted-foreground)); }
+  .text-table-header { font-size: 0.8125rem; line-height: 1.125rem; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  .text-caption { font-size: 0.8125rem; line-height: 1.125rem; font-weight: 500; }
+  .text-label { font-size: 0.75rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 }
 
 /* ===== Mobile Design System Utilities ===== */
 
 /* Mobile Typography scale */
 @media (max-width: 1023px) {
-  .text-title { font-size: 1.375rem; line-height: 1.75rem; font-weight: 500; }
-  .text-section { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+  .text-title { font-size: 1.375rem; line-height: 1.75rem; font-weight: 600; }
+  .text-section { font-size: 1.125rem; line-height: 1.5rem; font-weight: 600; }
   .text-body { font-size: 0.9375rem; line-height: 1.375rem; font-weight: 400; }
-  .text-caption { font-size: 0.8125rem; line-height: 1.125rem; font-weight: 400; }
-  .text-label { font-size: 0.75rem; line-height: 1rem; font-weight: 500; color: hsl(var(--muted-foreground)); }
+  .text-caption { font-size: 0.8125rem; line-height: 1.125rem; font-weight: 500; }
+  .text-label { font-size: 0.75rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 }
 
 /* Pressed state for touch */

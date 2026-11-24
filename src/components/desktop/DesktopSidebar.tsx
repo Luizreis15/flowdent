@@ -39,7 +39,7 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    title: "Operacional",
+    title: "OPERACIONAL",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Agenda", href: "/dashboard/agenda", icon: Calendar, permission: "agenda" },
@@ -47,7 +47,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: "Controle clínico",
+    title: "CONTROLE CLÍNICO",
     items: [
       { name: "Ortodontia", href: "/dashboard/ortodontia", icon: SmilePlus, permission: "ortodontia" },
       { name: "Próteses", href: "/dashboard/proteses", icon: FlaskConical, permission: "proteses" },
@@ -65,7 +65,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: "Gestão e relatórios",
+    title: "GESTÃO E RELATÓRIOS",
     items: [
       { name: "Financeiro", href: "/dashboard/financeiro", icon: DollarSign, permission: "financeiro" },
       { name: "CRM", href: "/dashboard/crm", icon: MessageSquare, permission: "crm" },
@@ -73,7 +73,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: "Ferramentas",
+    title: "FERRAMENTAS",
     items: [
       { name: "Portal Paciente", href: "/dashboard/portal-paciente", icon: Users, permission: "portal_paciente" },
       { name: "IA Assistente", href: "/dashboard/ia-assistente", icon: Sparkles, permission: "ia_assistente" },
@@ -114,7 +114,7 @@ const DesktopSidebar = () => {
           <CollapsibleTrigger asChild>
             <button
               className={cn(
-                "flex h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors duration-150",
+                "flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
                 active
                   ? "bg-card text-foreground font-medium shadow-sm ring-1 ring-sidebar-border [&>svg:first-child]:text-primary"
                   : "text-sidebar-foreground/70 hover:bg-bone-200/60 hover:text-sidebar-foreground"
@@ -157,7 +157,7 @@ const DesktopSidebar = () => {
         key={item.name}
         to={item.href}
         className={cn(
-          "flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors duration-150",
+          "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
           active
             ? "bg-card text-foreground font-medium shadow-sm ring-1 ring-sidebar-border [&>svg:first-child]:text-primary"
             : "text-sidebar-foreground/70 hover:bg-bone-200/60 hover:text-sidebar-foreground"
@@ -185,7 +185,7 @@ const DesktopSidebar = () => {
             <Link
               to="/super-admin"
               className={cn(
-                "mb-1 flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors duration-150",
+                "mb-1 flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
                 "text-sidebar-foreground/70 hover:bg-bone-200/60 hover:text-sidebar-foreground"
               )}
             >
@@ -200,7 +200,7 @@ const DesktopSidebar = () => {
             return (
               <div key={group.title} className={cn("space-y-0.5", groupIndex > 0 && "pt-4")}>
                 <div className="px-2.5 pb-1.5 pt-2">
-                  <span className="text-xs font-medium text-sidebar-foreground/45">{group.title}</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">{group.title}</span>
                 </div>
                 {visibleItems.map(renderNavItem)}
               </div>
