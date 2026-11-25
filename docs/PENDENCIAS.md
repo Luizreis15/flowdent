@@ -1,6 +1,6 @@
 # Pendências — FlowDent
 
-Ponto de retomada. Atualizado em 2026-11-25: D2 em produção (PR #21); aceite do convite do Portal em PR.
+Ponto de retomada. Atualizado em 2026-11-25: D2 (PR #21) e aceite do convite do Portal (PR #22) em produção.
 Contexto da auditoria de banco: [AUDITORIA-CONSISTENCIA.md](AUDITORIA-CONSISTENCIA.md) (seção "Status da execução").
 
 ## Onde paramos
@@ -117,8 +117,8 @@ Em ordem de prioridade sugerida:
 10. **Produto inativado não pode ser reativado**: não há ação para isso na tela de Produtos.
 11. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
    importação (só super admin). Decidir se precisa.
-12. **Convite do Portal do Paciente** — corrigido no PR `feat/portal-aceite-convite` (migration
-   `20261124100000_aceite_convite_portal`, **aplicar em produção após o merge**; rollback e teste com 26 casos
+12. **Convite do Portal do Paciente** — corrigido no PR #22 (migration
+   `20261124100000_aceite_convite_portal`, **aplicada em produção em 2026-11-25**; rollback e teste com 26 casos
    em `supabase/rollbacks/` e `supabase/verificacoes/`). Funções `validar_convite_portal(token)` (sem login) e
    `vincular_convite_portal(token)` (e-mail da conta igual ao do convite e confirmado; conta da equipe recusada).
    Botão "Convidar paciente" de volta na tela do Portal. O `AuthContext` não manda mais o paciente para o
