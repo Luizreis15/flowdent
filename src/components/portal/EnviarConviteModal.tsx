@@ -77,6 +77,11 @@ const EnviarConviteModal = ({
 
   const generateInvite = async () => {
     if (!paciente) return;
+    const emailConvite = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailConvite)) {
+      toast({ title: "E-mail inválido", description: "Confira o e-mail do paciente.", variant: "destructive" });
+      return;
+    }
     setLoading(true);
 
     try {
@@ -84,8 +89,10 @@ const EnviarConviteModal = ({
         .from("patient_portal_invites")
         .select("token")
         .eq("patient_id", paciente.id)
+        .eq("email", emailConvite)
         .is("used_at", null)
         .gt("expires_at", new Date().toISOString())
+        .limit(1)
         .maybeSingle();
 
       let token = existingInvite?.token ?? "";
@@ -97,7 +104,7 @@ const EnviarConviteModal = ({
 
         const { error: inviteError } = await supabase.from("patient_portal_invites").insert({
           patient_id: paciente.id,
-          email,
+          email: emailConvite,
           token,
           invited_by: user.id,
         });
@@ -106,8 +113,9 @@ const EnviarConviteModal = ({
 
       setInviteLink(`${window.location.origin}/portal/auth?token=${token}`);
       onConviteGerado?.();
-    } catch (error: any) {
-      toast({ title: "Não foi possível gerar o convite", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const descricao = error instanceof Error ? error.message : "Tente de novo.";
+      toast({ title: "Não foi possível gerar o convite", description: descricao, variant: "destructive" });
     } finally {
       setLoading(false);
     }

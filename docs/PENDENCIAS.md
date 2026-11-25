@@ -1,6 +1,6 @@
 # Pendências — FlowDent
 
-Ponto de retomada. Atualizado em 2026-11-24, com a fase D2 do redesign em PR.
+Ponto de retomada. Atualizado em 2026-11-25: D2 (PR #21) e aceite do convite do Portal (PR #22) em produção.
 Contexto da auditoria de banco: [AUDITORIA-CONSISTENCIA.md](AUDITORIA-CONSISTENCIA.md) (seção "Status da execução").
 
 ## Onde paramos
@@ -59,7 +59,7 @@ Bugs de dados corrigidos no caminho (PR #11):
 - "Pagamentos atrasados" sempre 0: usava `payments.due_date` (coluna inexistente). Agora `receivable_titles`
   com a regra de vencido do Contas a Receber (7 vencidos em 2026-11-24).
 
-Continuação do redesign: ver [PLANO-FRONTEND.md](PLANO-FRONTEND.md) (fases A–D1 em produção, D2 em PR;
+Continuação do redesign: ver [PLANO-FRONTEND.md](PLANO-FRONTEND.md) (fases A–D2 em produção;
 depois E mobile e estados, F acabamento, G super admin).
 Decisões abertas do dono: família tipográfica, modo escuro, estilo de ícone/ilustração.
 
@@ -117,13 +117,13 @@ Em ordem de prioridade sugerida:
 10. **Produto inativado não pode ser reativado**: não há ação para isso na tela de Produtos.
 11. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
    importação (só super admin). Decidir se precisa.
-12. **Convite do Portal do Paciente não pode ser aceito** (achado na D2; **próximo PR, aprovado pelo dono**):
-   `PortalAuth` lê `patient_portal_invites` pelo token sem login, mas a única policy é da equipe da clínica
-   (o paciente sempre vê "Convite inválido"); e `patient_portal_access` só aceita INSERT de admin da clínica.
-   Plano: RPCs SECURITY DEFINER `validar_convite_portal(token)` e `vincular_convite_portal(token)` (exige
-   e-mail do usuário igual ao do convite), migration reversível com teste local. Depois, devolver o botão
-   "Convidar paciente" na tela do Portal (`EnviarConviteModal` já tem a busca de paciente).
-   O lado do paciente (`PortalDashboard`) ainda não tem conteúdo: consultas, documentos e financeiro.
+12. **Convite do Portal do Paciente** — corrigido no PR #22 (migration
+   `20261124100000_aceite_convite_portal`, **aplicada em produção em 2026-11-25**; rollback e teste com 26 casos
+   em `supabase/rollbacks/` e `supabase/verificacoes/`). Funções `validar_convite_portal(token)` (sem login) e
+   `vincular_convite_portal(token)` (e-mail da conta igual ao do convite e confirmado; conta da equipe recusada).
+   Botão "Convidar paciente" de volta na tela do Portal. O `AuthContext` não manda mais o paciente para o
+   onboarding de clínica nas rotas `/portal`. Falta: o conteúdo do lado do paciente (`PortalDashboard`):
+   consultas, documentos e financeiro; e enviar o link por e-mail/WhatsApp (hoje a equipe copia o link).
 13. **Preferências e Notificações do Perfil não têm efeito**: as telas gravam em `user_preferences` e
    `user_notifications_settings`, mas nada no app nem nas edge functions lê essas tabelas. Decidir:
    ligar as preferências (formato de data, densidade, e-mails) ou retirar as abas.

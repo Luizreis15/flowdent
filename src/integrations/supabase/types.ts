@@ -6406,6 +6406,15 @@ export type Database = {
         Args: { _clinic_id: string }
         Returns: undefined
       }
+      validar_convite_portal: {
+        Args: { _token: string }
+        Returns: {
+          clinica: string | null
+          email: string
+          primeiro_nome: string
+        }[]
+      }
+      vincular_convite_portal: { Args: { _token: string }; Returns: string }
     }
     Enums: {
       base_calculo_repasse: "valor_bruto" | "valor_liquido" | "valor_recebido"
