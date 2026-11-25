@@ -157,7 +157,7 @@ export default function GerenciarProcedimentosPlanoModal({
                   <SelectValue placeholder="Especialidade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todas">Todas Especialidades</SelectItem>
+                  <SelectItem value="todas">Todas especialidades</SelectItem>
                   {especialidades.map(esp => (
                     <SelectItem key={esp} value={esp}>{esp}</SelectItem>
                   ))}
@@ -176,8 +176,8 @@ export default function GerenciarProcedimentosPlanoModal({
                     <TableHead className="w-24">Código</TableHead>
                     <TableHead>Procedimento</TableHead>
                     <TableHead className="w-32">Especialidade</TableHead>
-                    <TableHead className="w-28 text-right">Valor Base</TableHead>
-                    <TableHead className="w-28 text-right">Valor Plano</TableHead>
+                    <TableHead className="w-28 text-right">Valor base</TableHead>
+                    <TableHead className="w-28 text-right">Valor plano</TableHead>
                     <TableHead className="w-20 text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -251,7 +251,7 @@ export default function GerenciarProcedimentosPlanoModal({
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover Procedimento</AlertDialogTitle>
+            <AlertDialogTitle>Remover procedimento</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja remover este procedimento do plano? 
               O procedimento continuará disponível na tabela base.

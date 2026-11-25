@@ -57,13 +57,13 @@ export function NovoLocalEstoqueModal({ open, onOpenChange, clinicaId }: NovoLoc
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novo Local de Estoque</DialogTitle>
+          <DialogTitle>Novo local de estoque</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome do Local *</Label>
+              <Label htmlFor="nome">Nome do local *</Label>
               <Input id="nome" {...register("nome")} required placeholder="Ex: Consultório 1, Depósito Principal" />
             </div>
 

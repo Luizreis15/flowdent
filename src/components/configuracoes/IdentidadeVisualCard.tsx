@@ -85,7 +85,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Palette className="h-5 w-5" />
-          Identidade Visual
+          Identidade visual
         </CardTitle>
         <CardDescription>
           Personalize a aparência dos documentos impressos (receituários, atestados, contratos) com a identidade da sua clínica.
@@ -94,7 +94,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
       <CardContent className="space-y-6">
         {/* Logo Upload */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">Logotipo da Clínica</Label>
+          <Label className="text-base font-medium">Logotipo da clínica</Label>
           <div className="flex items-center gap-4">
             {value.logotipo_url ? (
               <div className="relative w-20 h-20 border rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center">
@@ -114,7 +114,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
                 <Button variant="outline" size="sm" asChild disabled={uploading}>
                   <label className="cursor-pointer">
                     {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
-                    {uploading ? "Enviando..." : "Enviar Logo"}
+                    {uploading ? "Enviando..." : "Enviar logotipo"}
                     <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
                   </label>
                 </Button>
@@ -131,7 +131,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
 
         {/* Cor Primária */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">Cor Primária dos Documentos</Label>
+          <Label className="text-base font-medium">Cor primária dos documentos</Label>
           <p className="text-sm text-muted-foreground">
             Aplicada nos títulos, linhas decorativas e destaques dos PDFs.
           </p>
@@ -141,8 +141,8 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
                 key={preset.value}
                 type="button"
                 onClick={() => onChange({ ...value, cor_primaria: preset.value })}
-                className={`w-10 h-10 rounded-lg border-2 transition-all ${
-                  value.cor_primaria === preset.value ? "border-foreground scale-110 ring-2 ring-offset-2 ring-primary" : "border-transparent hover:scale-105"
+                className={`h-10 w-10 rounded-md border transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  value.cor_primaria === preset.value ? "ring-2 ring-foreground ring-offset-2" : "border-border hover:ring-1 hover:ring-border hover:ring-offset-2"
                 }`}
                 style={{ backgroundColor: preset.value }}
                 title={preset.label}
@@ -162,7 +162,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
 
         {/* Layout do Cabeçalho */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">Layout do Cabeçalho</Label>
+          <Label className="text-base font-medium">Layout do cabeçalho</Label>
           <Select
             value={value.layout_cabecalho}
             onValueChange={(v) => onChange({ ...value, layout_cabecalho: v })}
@@ -183,7 +183,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
         {/* Marca d'água */}
         <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
           <div>
-            <Label className="text-base font-medium">Logo em Marca d'Água</Label>
+            <Label className="text-base font-medium">Logo em marca d'água</Label>
             <p className="text-sm text-muted-foreground mt-1">
               Exibe o logotipo com baixa opacidade ao fundo de cada página do documento.
             </p>
@@ -196,7 +196,7 @@ export function IdentidadeVisualCard({ clinicaId, value, onChange }: IdentidadeV
 
         {/* Redes Sociais */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">Redes Sociais</Label>
+          <Label className="text-base font-medium">Redes sociais</Label>
           <p className="text-sm text-muted-foreground">
             Exibidas no rodapé dos documentos impressos para maior conexão com os pacientes.
           </p>

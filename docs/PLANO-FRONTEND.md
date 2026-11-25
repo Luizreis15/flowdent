@@ -61,7 +61,7 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 | **A — Fundação** | Cores escritas à mão → tokens; regra de lint de design; família tipográfica | 1–2 | Itens 1 e 2 em produção (PR #14); fonte aguarda decisão |
 | B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | Concluída (PRs #15–#17) |
 | C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | Concluída (PRs #18–#19) |
-| D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | D1 (Estoque, Produtos, Movimentações, Relatórios) em PR; D2 a seguir |
+| D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | D1 em produção (PR #20); D2 (Configurações, Perfil, Assinatura, Portal, IA) em PR |
 | E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | — |
 | F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | — |
 | G — Super admin | 21 telas internas | 1–2 | — |
@@ -92,6 +92,26 @@ Estimativa: 13–16 PRs. A–C levam o app a ~8; E e F fazem a diferença entre 
   só recebia o período filtrado; Movimentações nunca carregava (join com `usuarios` inexistente);
   "movimentações hoje" contava só entre as 10 últimas; busca de produtos quebrava com vírgula ou parêntese.
 - Retirados: indicador "Remarcação" (status inexistente) e o botão "Upload XML NFe", que abria um esboço.
+
+### Fase D2 — o que entrou
+
+- Configurações, Perfil, Assinatura e Portal do Paciente no padrão "PROPOSTO" (cabeçalho, abas, selos tênues,
+  faixa de indicadores, estados vazios); rótulos e botões em caixa de frase.
+- Novos componentes de sistema: `Selo`/`SeloAtivo` (selo genérico nos tons do status) e `EsqueletoSecao`
+  (carregamento de seção/aba). Novo `src/lib/assinatura.ts` (nome do plano e situação da assinatura).
+- **IA Assistente saiu do menu** (decisão do dono): a tela mostrava pacientes, números e automações inventados.
+  A rota leva ao Dashboard e a permissão some da tela de permissões. O código segue no repositório.
+- **Portal do Paciente**: números e atividades inventados trocados por convites e acessos reais. O botão de
+  convite sai até o aceite funcionar (PENDENCIAS P4.12); o modal de convite ganhou busca de paciente.
+  Lado do paciente: sem degradê e sem os quatro botões que não levavam a lugar nenhum.
+- Retirados por serem só "em desenvolvimento" ou não funcionarem: aba "Anamnese" e aba "Contratos" de
+  Configurações; abas "Contratos", "Privacidade", "Integrações", "Logs" e "Encerramento" do Perfil; cartões de
+  2FA e sessões; botão "Upload foto" (não enviava nada).
+- Bugs corrigidos: **troca de senha não conferia a senha atual** (qualquer pessoa com a sessão aberta trocava);
+  "Portal de pagamento" no Perfil não fazia nada (agora abre o portal da Stripe via `customer-portal`);
+  Configurações ignorava a impersonação e abria vazia com erro; "Responsável pela clínica" mostrava o ID cru;
+  "Economize 10%" no plano anual (o desconto real é de 2 meses, ~17%, agora calculado dos preços);
+  duas buscas na aba Usuários.
 
 ## Decisões pendentes do dono
 

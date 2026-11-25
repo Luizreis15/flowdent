@@ -170,12 +170,12 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Editar Plano</DialogTitle>
+            <DialogTitle>Editar plano</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome do Plano</Label>
+              <Label htmlFor="nome">Nome do plano</Label>
               <Input
                 id="nome"
                 value={nome}
@@ -185,7 +185,7 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="ativo">Plano Ativo</Label>
+              <Label htmlFor="ativo">Plano ativo</Label>
               <Switch
                 id="ativo"
                 checked={ativo}
@@ -194,7 +194,7 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="padrao">Plano Padrão</Label>
+              <Label htmlFor="padrao">Plano padrão</Label>
               <Switch
                 id="padrao"
                 checked={isPadrao}
@@ -207,7 +207,7 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Percent className="h-4 w-4 text-muted-foreground" />
-                <Label>Ajuste em Massa</Label>
+                <Label>Ajuste em massa</Label>
               </div>
               <p className="text-sm text-muted-foreground">
                 Aplique um ajuste percentual a todos os {qtdProcedimentos} procedimentos deste plano.
@@ -229,9 +229,9 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
                   disabled={!percentualAjuste || aplicandoAjuste}
                 >
                   {valorAjuste > 0 ? (
-                    <TrendingUp className="h-4 w-4 mr-1 text-green-500" />
+                    <TrendingUp className="h-4 w-4 mr-1 text-sinal-ok" />
                   ) : valorAjuste < 0 ? (
-                    <TrendingDown className="h-4 w-4 mr-1 text-red-500" />
+                    <TrendingDown className="h-4 w-4 mr-1 text-sinal-alerta" />
                   ) : null}
                   Aplicar
                 </Button>
@@ -258,10 +258,10 @@ export default function EditarPlanoModal({ open, onOpenChange, plano, onSuccess 
       <AlertDialog open={showAjusteConfirm} onOpenChange={setShowAjusteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Ajuste em Massa</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar ajuste em massa</AlertDialogTitle>
             <AlertDialogDescription>
               Você está prestes a aplicar um ajuste de{" "}
-              <strong className={valorAjuste > 0 ? "text-green-600" : "text-red-600"}>
+              <strong className={valorAjuste > 0 ? "text-sinal-ok" : "text-sinal-alerta"}>
                 {valorAjuste > 0 ? '+' : ''}{valorAjuste}%
               </strong>{" "}
               em <strong>{qtdProcedimentos} procedimentos</strong> do plano "{plano?.nome}".

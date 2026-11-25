@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { HorarioFuncionamentoCard, HorarioFuncionamento, DEFAULT_HORARIO } from "./HorarioFuncionamentoCard";
 import { IdentidadeVisualCard, type BrandingConfig } from "./IdentidadeVisualCard";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface ClinicaTabProps {
   clinicaId: string;
@@ -20,6 +21,19 @@ export function ClinicaTab({ clinicaId }: ClinicaTabProps) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<any>(null);
+  const [nomeResponsavel, setNomeResponsavel] = useState<string | null>(null);
+
+  // O campo mostrava o ID cru do usuário responsável; agora mostra o nome
+  useEffect(() => {
+    const ownerId = config?.owner_user_id;
+    if (!ownerId) return;
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", ownerId)
+      .maybeSingle()
+      .then(({ data }) => setNomeResponsavel(data?.full_name || "—"));
+  }, [config?.owner_user_id]);
 
   useEffect(() => {
     loadConfig();
@@ -198,9 +212,7 @@ export function ClinicaTab({ clinicaId }: ClinicaTabProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <EsqueletoSecao />
     );
   }
 
@@ -208,7 +220,7 @@ export function ClinicaTab({ clinicaId }: ClinicaTabProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Dados da Clínica</CardTitle>
+          <CardTitle>Dados da clínica</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -247,7 +259,7 @@ export function ClinicaTab({ clinicaId }: ClinicaTabProps) {
               <Label htmlFor="responsavel">Responsável pela clínica *</Label>
               <Input
                 id="responsavel"
-                value={config?.owner_user_id || ""}
+                value={config?.owner_user_id ? (nomeResponsavel ?? "Carregando…") : "Não definido"}
                 disabled
                 maxLength={150}
               />
@@ -445,7 +457,7 @@ export function ClinicaTab({ clinicaId }: ClinicaTabProps) {
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={saving}>
           {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Salvar Configurações
+          Salvar configurações
         </Button>
       </div>
     </div>

@@ -143,7 +143,7 @@ export const ProfissionaisTab = ({ clinicaId }: ProfissionaisTabProps) => {
         </div>
         <Button onClick={() => setModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Novo Profissional
+          Novo profissional
         </Button>
       </div>
 

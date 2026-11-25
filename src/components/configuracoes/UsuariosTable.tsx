@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Selo } from "@/components/sistema/Selo";
 import { Edit, Mail, ShieldCheck } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DataTable, DataTableColumn } from "@/components/desktop/DataTable";
@@ -32,15 +32,6 @@ const perfilLabels: Record<string, string> = {
   assistente: "Assistente"
 };
 
-const perfilColors: Record<string, string> = {
-  admin: "bg-red-100 text-red-800",
-  recepcionista: "bg-blue-100 text-blue-800",
-  asb: "bg-green-100 text-green-800",
-  cirurgiao_dentista: "bg-purple-100 text-purple-800",
-  dentista: "bg-purple-100 text-purple-800",
-  recepcao: "bg-blue-100 text-blue-800",
-  assistente: "bg-green-100 text-green-800"
-};
 
 export const UsuariosTable = ({ usuarios, loading, onEdit, onToggleStatus, onResendInvite, onManagePermissions }: UsuariosTableProps) => {
   const columns: DataTableColumn<Usuario>[] = [
@@ -52,9 +43,7 @@ export const UsuariosTable = ({ usuarios, loading, onEdit, onToggleStatus, onRes
       label: "Perfil",
       sortable: true,
       render: (user) => (
-        <Badge className={perfilColors[user.perfil] || ""}>
-          {perfilLabels[user.perfil] || user.perfil}
-        </Badge>
+        <Selo tom={user.perfil === "admin" ? "tinta" : "neutro"}>{perfilLabels[user.perfil] || user.perfil}</Selo>
       ),
     },
     {
@@ -102,7 +91,7 @@ export const UsuariosTable = ({ usuarios, loading, onEdit, onToggleStatus, onRes
       columns={columns}
       data={usuarios}
       isLoading={loading}
-      searchPlaceholder="Buscar usuário..."
+      searchable={false}
       emptyMessage="Nenhum usuário encontrado"
     />
   );

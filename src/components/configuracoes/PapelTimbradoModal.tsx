@@ -183,7 +183,7 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Personalizar Papel Timbrado
+            Personalizar papel timbrado
           </DialogTitle>
         </DialogHeader>
 
@@ -404,7 +404,7 @@ export function PapelTimbradoModal({ open, onOpenChange, clinicaId }: PapelTimbr
           </Button>
           <Button onClick={handleSave} disabled={saving}>
             {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Salvar Configurações
+            Salvar configurações
           </Button>
         </div>
       </DialogContent>

@@ -1,6 +1,6 @@
 # Pendências — FlowDent
 
-Ponto de retomada. Atualizado em 2026-11-24, após o merge do PR #12 (`661becb`).
+Ponto de retomada. Atualizado em 2026-11-24, com a fase D2 do redesign em PR.
 Contexto da auditoria de banco: [AUDITORIA-CONSISTENCIA.md](AUDITORIA-CONSISTENCIA.md) (seção "Status da execução").
 
 ## Onde paramos
@@ -59,8 +59,8 @@ Bugs de dados corrigidos no caminho (PR #11):
 - "Pagamentos atrasados" sempre 0: usava `payments.due_date` (coluna inexistente). Agora `receivable_titles`
   com a regra de vencido do Contas a Receber (7 vencidos em 2026-11-24).
 
-Continuação do redesign: ver [PLANO-FRONTEND.md](PLANO-FRONTEND.md) (fases A–C em produção, D1 em PR;
-depois D2 Configurações/Perfil/Assinatura/Portal/IA, E mobile e estados, F acabamento, G super admin).
+Continuação do redesign: ver [PLANO-FRONTEND.md](PLANO-FRONTEND.md) (fases A–D1 em produção, D2 em PR;
+depois E mobile e estados, F acabamento, G super admin).
 Decisões abertas do dono: família tipográfica, modo escuro, estilo de ícone/ilustração.
 
 ---
@@ -117,6 +117,25 @@ Em ordem de prioridade sugerida:
 10. **Produto inativado não pode ser reativado**: não há ação para isso na tela de Produtos.
 11. **Catálogo de procedimentos**: o dono da clínica não altera os 335 procedimentos do sistema pela
    importação (só super admin). Decidir se precisa.
+12. **Convite do Portal do Paciente não pode ser aceito** (achado na D2; **próximo PR, aprovado pelo dono**):
+   `PortalAuth` lê `patient_portal_invites` pelo token sem login, mas a única policy é da equipe da clínica
+   (o paciente sempre vê "Convite inválido"); e `patient_portal_access` só aceita INSERT de admin da clínica.
+   Plano: RPCs SECURITY DEFINER `validar_convite_portal(token)` e `vincular_convite_portal(token)` (exige
+   e-mail do usuário igual ao do convite), migration reversível com teste local. Depois, devolver o botão
+   "Convidar paciente" na tela do Portal (`EnviarConviteModal` já tem a busca de paciente).
+   O lado do paciente (`PortalDashboard`) ainda não tem conteúdo: consultas, documentos e financeiro.
+13. **Preferências e Notificações do Perfil não têm efeito**: as telas gravam em `user_preferences` e
+   `user_notifications_settings`, mas nada no app nem nas edge functions lê essas tabelas. Decidir:
+   ligar as preferências (formato de data, densidade, e-mails) ou retirar as abas.
+14. **Papel timbrado e modelos de contrato**: a aba "Contratos" saiu de Configurações na D2. Os modelos
+   (`templates_contratos`, vazia) não tinham criação, edição nem uso; o cabeçalho e o rodapé do papel
+   timbrado (`configuracoes_clinica.cabecalho_personalizado`/`rodape_personalizado`) não são lidos por
+   nenhum documento. O logotipo segue em Configurações → Clínica → Identidade visual.
+15. **Assinatura promete recursos que não existem**: o plano Premium lista "Assistente IA para anamnese"
+   e "Integração com laboratórios"; a IA Assistente saiu do menu na D2 por mostrar dados inventados.
+   Rever a lista de recursos dos planos (texto comercial: decisão do dono).
+16. **Autenticação em duas etapas e sessões ativas**: os cartões "em desenvolvimento" saíram do Perfil.
+   Implementar é funcionalidade nova.
 
 ## P5 — Higiene do repositório
 

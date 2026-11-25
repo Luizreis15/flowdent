@@ -96,7 +96,7 @@ export const InviteUserModal = ({ open, onClose, clinicaId }: InviteUserModalPro
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Criar Novo Usuário</DialogTitle>
+          <DialogTitle>Criar novo usuário</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">

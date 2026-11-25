@@ -1,245 +1,125 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, FileText, MessageCircle, CreditCard, Mail } from "lucide-react";
-import EnviarConviteModal from "@/components/portal/EnviarConviteModal";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { Selo } from "@/components/sistema/Selo";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+
+/*
+ * Antes esta tela mostrava números e atividades inventados (182 usuários, "Maria Silva
+ * confirmou consulta"). Agora mostra só convites e acessos reais da clínica.
+ * O botão "Convidar paciente" volta quando o aceite do convite funcionar: hoje as policies
+ * de patient_portal_invites/patient_portal_access impedem o paciente de aceitar (ver PENDENCIAS).
+ */
+
+type SituacaoConvite = "pendente" | "aceito" | "expirado";
+
+const SELO_CONVITE: Record<SituacaoConvite, { rotulo: string; tom: "neutro" | "ok" | "espera" }> = {
+  pendente: { rotulo: "Pendente", tom: "espera" },
+  aceito: { rotulo: "Aceito", tom: "ok" },
+  expirado: { rotulo: "Expirado", tom: "neutro" },
+};
+
+const situacaoConvite = (c: { used_at: string | null; expires_at: string }): SituacaoConvite =>
+  c.used_at ? "aceito" : new Date(c.expires_at) < new Date() ? "expirado" : "pendente";
 
 const PortalPaciente = () => {
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  
-  const portalStats = {
-    activeUsers: 182,
-    monthlyLogins: 456,
-    appointmentsScheduled: 89,
-    messagesReceived: 234,
-  };
+  const { clinicId } = useAuth();
 
-  const recentActivities = [
-    {
-      patient: "Maria Silva",
-      action: "Confirmou consulta",
-      date: "2024-03-15 14:30",
-      type: "appointment",
+  const { data, isLoading } = useQuery({
+    queryKey: ["portal-paciente", clinicId],
+    enabled: !!clinicId,
+    queryFn: async () => {
+      // Filtra pela clínica via join, sem lista de IDs na URL
+      const [convitesRes, acessosRes] = await Promise.all([
+        supabase
+          .from("patient_portal_invites")
+          .select("id, email, created_at, expires_at, used_at, patients!inner(full_name, clinic_id)")
+          .eq("patients.clinic_id", clinicId!)
+          .order("created_at", { ascending: false })
+          .limit(50),
+        supabase
+          .from("patient_portal_access")
+          .select("id, patients!inner(clinic_id)", { count: "exact", head: true })
+          .eq("patients.clinic_id", clinicId!)
+          .eq("active", true),
+      ]);
+      if (convitesRes.error) throw convitesRes.error;
+      const convites = convitesRes.data || [];
+      return {
+        convites,
+        pendentes: convites.filter((c) => situacaoConvite(c) === "pendente").length,
+        aceitos: convites.filter((c) => situacaoConvite(c) === "aceito").length,
+        acessosAtivos: acessosRes.count || 0,
+      };
     },
-    {
-      patient: "Carlos Mendes",
-      action: "Enviou mensagem",
-      date: "2024-03-15 11:20",
-      type: "message",
-    },
-    {
-      patient: "Ana Paula Costa",
-      action: "Visualizou orçamento",
-      date: "2024-03-14 16:45",
-      type: "document",
-    },
-    {
-      patient: "Pedro Oliveira",
-      action: "Reagendou consulta",
-      date: "2024-03-14 09:15",
-      type: "appointment",
-    },
-  ];
-
-  const features = [
-    {
-      icon: Calendar,
-      title: "Agendamento Online",
-      description: "Pacientes podem marcar e reagendar consultas",
-      status: "Ativo",
-    },
-    {
-      icon: FileText,
-      title: "Histórico de Atendimentos",
-      description: "Acesso ao prontuário e documentos",
-      status: "Ativo",
-    },
-    {
-      icon: CreditCard,
-      title: "Pagamentos Online",
-      description: "Consulta e pagamento de orçamentos",
-      status: "Em desenvolvimento",
-    },
-    {
-      icon: MessageCircle,
-      title: "Chat com a Clínica",
-      description: "Comunicação direta e moderada",
-      status: "Ativo",
-    },
-  ];
+  });
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Portal do Paciente</h1>
-          <p className="text-muted-foreground mt-1">
-            Área exclusiva para pacientes gerenciarem seus atendimentos
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={() => setShowInviteModal(true)}>
-            <Mail className="mr-2 h-4 w-4" />
-            Enviar Convite
-          </Button>
-          <Button size="sm" variant="outline">
-            <Users className="mr-2 h-4 w-4" />
-            Gerenciar Acessos
-          </Button>
-        </div>
-      </div>
+      <CabecalhoPagina titulo="Portal do paciente" subtitulo="Convites e acessos dos pacientes ao portal" />
 
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Usuários Ativos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{portalStats.activeUsers}</div>
-            <p className="text-xs text-muted-foreground mt-1">73% dos pacientes</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Logins este Mês
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{portalStats.monthlyLogins}</div>
-            <p className="text-xs text-muted-foreground mt-1">2.5 por usuário</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Agendamentos Online
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-secondary">
-              {portalStats.appointmentsScheduled}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Este mês</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Mensagens Recebidas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{portalStats.messagesReceived}</div>
-            <p className="text-xs text-muted-foreground mt-1">Tempo médio: 2h</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Funcionalidades do Portal</CardTitle>
-            <CardDescription>
-              Recursos disponíveis para os pacientes
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-4 p-4 rounded-lg border bg-card"
-                >
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 flex-shrink-0">
-                    <feature.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold">{feature.title}</p>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${
-                          feature.status === "Ativo"
-                            ? "bg-secondary/20 text-secondary"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {feature.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
-            <CardDescription>
-              Últimas interações dos pacientes no portal
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentActivities.map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-muted/50"
-                >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 mt-0.5">
-                    <span className="text-xs font-semibold text-primary">
-                      {activity.patient.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{activity.patient}</p>
-                    <p className="text-sm text-muted-foreground">{activity.action}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {activity.date}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {isLoading ? (
+        <Skeleton className="h-[104px] rounded-lg" />
+      ) : (
+        <FaixaIndicadores
+          itens={[
+            { rotulo: "Pacientes com acesso", valor: data?.acessosAtivos ?? 0, nota: "Acessos ativos" },
+            {
+              rotulo: "Convites pendentes",
+              valor: data?.pendentes ?? 0,
+              nota: "Aguardando o paciente",
+              tom: data?.pendentes ? "espera" : "padrao",
+            },
+            { rotulo: "Convites aceitos", valor: data?.aceitos ?? 0, nota: "Nos últimos 50 convites" },
+          ]}
+        />
+      )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>Link do Portal</CardTitle>
-          <CardDescription>
-            Compartilhe este link com seus pacientes para acessarem o portal
-          </CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-[15px]">Convites</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
-            <div className="flex-1 px-4 py-2 rounded-lg border bg-muted text-sm font-mono">
-              https://flowdent.app/portal
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="space-y-2 px-5 pb-5">
+              {[0, 1, 2].map((i) => <Skeleton key={i} className="h-10" />)}
             </div>
-            <Button variant="outline">Copiar Link</Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            Cada paciente receberá credenciais de acesso por email após o primeiro
-            cadastro no sistema.
-          </p>
+          ) : data?.convites.length ? (
+            <ul className="divide-y border-t">
+              {data.convites.map((c) => {
+                const selo = SELO_CONVITE[situacaoConvite(c)];
+                return (
+                  <li key={c.id} className="flex items-center gap-3 px-5 py-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{c.patients?.full_name}</p>
+                      <p className="truncate text-[13px] text-muted-foreground">{c.email}</p>
+                    </div>
+                    <time className="shrink-0 text-[13px] text-muted-foreground tabular-nums">
+                      {format(new Date(c.created_at), "dd MMM yyyy", { locale: ptBR })}
+                    </time>
+                    <Selo tom={selo.tom} className="w-[76px] justify-center">
+                      {selo.rotulo}
+                    </Selo>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <EstadoVazio
+              icone={Users}
+              titulo="Nenhum paciente no portal ainda"
+              descricao="Os convites para o portal serão liberados em breve. Quando um paciente for convidado, ele aparece aqui."
+            />
+          )}
         </CardContent>
       </Card>
-
-      <EnviarConviteModal 
-        open={showInviteModal}
-        onOpenChange={setShowInviteModal}
-      />
     </div>
   );
 };

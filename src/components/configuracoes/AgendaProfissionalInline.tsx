@@ -186,11 +186,11 @@ export const AgendaProfissionalInline = ({ profissional }: AgendaProfissionalInl
                       <Input type="number" step="5" min="5" value={config.duracao_consulta_minutos} onChange={(e) => updateConfig(dia.value, "duracao_consulta_minutos", parseInt(e.target.value) || 30)} className="h-9" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs">Almoço Início</Label>
+                      <Label className="text-xs">Almoço início</Label>
                       <Input type="time" value={config.almoco_inicio || ""} onChange={(e) => updateConfig(dia.value, "almoco_inicio", e.target.value || null)} className="h-9" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs">Almoço Fim</Label>
+                      <Label className="text-xs">Almoço fim</Label>
                       <Input type="time" value={config.almoco_fim || ""} onChange={(e) => updateConfig(dia.value, "almoco_fim", e.target.value || null)} className="h-9" />
                     </div>
                   </div>

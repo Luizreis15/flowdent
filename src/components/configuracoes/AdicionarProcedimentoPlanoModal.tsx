@@ -217,13 +217,13 @@ export default function AdicionarProcedimentoPlanoModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Adicionar Procedimento ao Plano</DialogTitle>
+          <DialogTitle>Adicionar procedimento ao plano</DialogTitle>
         </DialogHeader>
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="existente">Da Tabela Base</TabsTrigger>
-            <TabsTrigger value="novo">Criar Novo</TabsTrigger>
+            <TabsTrigger value="existente">Da tabela base</TabsTrigger>
+            <TabsTrigger value="novo">Criar novo</TabsTrigger>
           </TabsList>
 
           <TabsContent value="existente" className="space-y-4 mt-4">
@@ -279,11 +279,11 @@ export default function AdicionarProcedimentoPlanoModal({
                 <p className="text-sm font-medium">{selectedProcedimento.descricao}</p>
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-xs">Valor Base</Label>
+                    <Label className="text-xs">Valor base</Label>
                     <p className="text-sm">{formatCurrency(selectedProcedimento.valor)}</p>
                   </div>
                   <div className="flex-1">
-                    <Label htmlFor="valorPlano" className="text-xs">Valor no Plano (R$)</Label>
+                    <Label htmlFor="valorPlano" className="text-xs">Valor no plano (R$)</Label>
                     <Input
                       id="valorPlano"
                       type="number"

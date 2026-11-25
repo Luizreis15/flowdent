@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SeloAtivo } from "@/components/sistema/Selo";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface CadeirasTabProps {
   clinicaId: string;
@@ -119,9 +121,7 @@ export function CadeirasTab({ clinicaId }: CadeirasTabProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <EsqueletoSecao />
     );
   }
 
@@ -129,7 +129,7 @@ export function CadeirasTab({ clinicaId }: CadeirasTabProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-medium">Cadeiras Clínicas</h3>
+          <h3 className="text-section text-foreground">Cadeiras clínicas</h3>
           <p className="text-sm text-muted-foreground">
             Gerencie as cadeiras utilizadas nos atendimentos
           </p>
@@ -138,7 +138,7 @@ export function CadeirasTab({ clinicaId }: CadeirasTabProps) {
           <DialogTrigger asChild>
             <Button onClick={() => setEditingCadeira(null)}>
               <Plus className="h-4 w-4 mr-2" />
-              Nova Cadeira
+              Nova cadeira
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -161,7 +161,7 @@ export function CadeirasTab({ clinicaId }: CadeirasTabProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Cadeiras Cadastradas</CardTitle>
+          <CardTitle>Cadeiras cadastradas</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -179,13 +179,7 @@ export function CadeirasTab({ clinicaId }: CadeirasTabProps) {
                   <TableCell className="font-medium">{cadeira.nome}</TableCell>
                   <TableCell>{cadeira.localizacao}</TableCell>
                   <TableCell className="text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      cadeira.ativo 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-gray-100 text-gray-800"
-                    }`}>
-                      {cadeira.ativo ? "Ativo" : "Inativo"}
-                    </span>
+                    <SeloAtivo ativo={cadeira.ativo} />
                   </TableCell>
                   <TableCell className="text-right">
                     <Button

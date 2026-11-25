@@ -1,83 +1,77 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CreditCard, ExternalLink } from "lucide-react";
-import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ExternalLink, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Selo } from "@/components/sistema/Selo";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { nomePlano, statusAssinatura } from "@/lib/assinatura";
 
 interface PlanoCobrancaTabProps {
   userId: string;
 }
 
-const PlanoCobrancaTab = ({ userId }: PlanoCobrancaTabProps) => {
+const PlanoCobrancaTab = (_props: PlanoCobrancaTabProps) => {
   const { plan, status, subscriptionEnd } = useSubscription();
   const navigate = useNavigate();
+  const [abrindoPortal, setAbrindoPortal] = useState(false);
+  const situacao = statusAssinatura(status);
 
-  const planNames: Record<string, string> = {
-    solo: "Plano Solo",
-    crescimento: "Plano Crescimento",
-    premium: "Plano Premium",
-    starter: "Teste Gratuito"
-  };
-
-  const statusNames: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-    trialing: { label: "Em Teste", variant: "secondary" },
-    active: { label: "Ativo", variant: "default" },
-    canceled: { label: "Cancelado", variant: "destructive" },
-    no_subscription: { label: "Sem Assinatura", variant: "outline" }
+  // Antes o botão não fazia nada; agora abre o portal de cobrança da Stripe (função customer-portal)
+  const abrirPortalCobranca = async () => {
+    setAbrindoPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      if (!data?.url) throw new Error("Portal sem endereço");
+      window.open(data.url, "_blank", "noopener");
+    } catch (error) {
+      console.error("Erro ao abrir o portal de cobrança:", error);
+      toast.error("Não foi possível abrir o portal de cobrança. Se você ainda não assinou um plano, escolha um em Assinatura.");
+    } finally {
+      setAbrindoPortal(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="grid gap-6 md:grid-cols-2">
       <Card>
-        <CardHeader>
-          <CardTitle>Resumo do Plano</CardTitle>
-          <CardDescription>Informações sobre sua assinatura atual</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-[15px]">Plano atual</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Plano atual</p>
-              <p className="text-2xl font-bold">{planNames[plan] || "Não definido"}</p>
-            </div>
-            <Badge variant={statusNames[status]?.variant || "outline"}>
-              {statusNames[status]?.label || status}
-            </Badge>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-section text-foreground">{nomePlano(plan)}</p>
+            <Selo tom={situacao.tom}>{situacao.rotulo}</Selo>
           </div>
-          
           {subscriptionEnd && (
-            <div className="pt-4 border-t">
-              <p className="text-sm text-muted-foreground">
-                Renovação: {new Date(subscriptionEnd).toLocaleDateString('pt-BR')}
-              </p>
-            </div>
+            <p className="text-[13px] text-muted-foreground tabular-nums">
+              Renovação em {new Date(subscriptionEnd).toLocaleDateString("pt-BR")}
+            </p>
           )}
-
-          <Button 
-            className="w-full mt-4" 
-            onClick={() => navigate("/dashboard/assinatura")}
-          >
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Gerenciar Assinatura
+          <Button variant="outline" onClick={() => navigate("/dashboard/assinatura")}>
+            Ver planos
           </Button>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Forma de Pagamento
-          </CardTitle>
-          <CardDescription>Método de pagamento cadastrado</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-[15px]">Forma de pagamento e faturas</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Gerencie seus métodos de pagamento através do portal de cobrança.
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Cartão, faturas e cancelamento ficam no portal de cobrança da Stripe.
           </p>
-          <Button variant="outline" className="w-full">
-            <CreditCard className="mr-2 h-4 w-4" />
-            Acessar Portal de Pagamento
+          <Button variant="outline" onClick={abrirPortalCobranca} disabled={abrindoPortal}>
+            {abrindoPortal ? (
+              <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+            ) : (
+              <ExternalLink className="mr-1.5 h-4 w-4" />
+            )}
+            Abrir portal de cobrança
           </Button>
         </CardContent>
       </Card>

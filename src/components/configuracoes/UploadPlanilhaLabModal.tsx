@@ -212,7 +212,7 @@ export function UploadPlanilhaLabModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
-            Importar Tabela de Preços
+            Importar tabela de preços
           </DialogTitle>
           <DialogDescription>
             Fornecedor: <strong>{supplierName}</strong>
@@ -238,7 +238,7 @@ export function UploadPlanilhaLabModal({
           <div className="border-2 border-dashed rounded-lg p-8 text-center">
             {file ? (
               <div className="flex items-center justify-center gap-3">
-                <FileSpreadsheet className="h-8 w-8 text-green-600" />
+                <FileSpreadsheet className="h-8 w-8 text-muted-foreground" />
                 <div className="text-left">
                   <p className="font-medium">{file.name}</p>
                   <p className="text-sm text-muted-foreground">
@@ -297,7 +297,7 @@ export function UploadPlanilhaLabModal({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-600" />
+                  <Check className="h-4 w-4 text-sinal-ok" />
                   {parsedData.length} itens prontos para importar
                 </h3>
               </div>

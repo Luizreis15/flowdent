@@ -8,7 +8,6 @@ import {
   DollarSign,
   MessageSquare,
   Users,
-  Sparkles,
   LayoutDashboard,
   Settings,
   FlaskConical,
@@ -75,15 +74,14 @@ const navGroups: NavGroup[] = [
   {
     title: "FERRAMENTAS",
     items: [
-      { name: "Portal Paciente", href: "/dashboard/portal-paciente", icon: Users, permission: "portal_paciente" },
-      { name: "IA Assistente", href: "/dashboard/ia-assistente", icon: Sparkles, permission: "ia_assistente" },
+      { name: "Portal do paciente", href: "/dashboard/portal-paciente", icon: Users, permission: "portal_paciente" },
     ],
   },
 ];
 
 const bottomNavigation: NavItem[] = [
   { name: "Configurações", href: "/dashboard/configuracoes", icon: Settings, permission: "configuracoes" },
-  { name: "Meu Perfil", href: "/dashboard/perfil", icon: User },
+  { name: "Meu perfil", href: "/dashboard/perfil", icon: User },
 ];
 
 const DesktopSidebar = () => {

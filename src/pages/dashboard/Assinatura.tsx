@@ -1,182 +1,170 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Check, CreditCard, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Check, Loader2, Minus } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
+import { Selo } from "@/components/sistema/Selo";
+import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { nomePlano, statusAssinatura } from "@/lib/assinatura";
+import { cn } from "@/lib/utils";
 
-const plans: Record<string, {
-  name: string;
-  monthly: number;
-  annual: number;
-  popular?: boolean;
-  features: string[];
-}> = {
-  solo: {
-    name: "Plano Solo",
-    monthly: 89.90,
-    annual: 899.00,
-    features: [
-      "1 Profissional/Agenda",
-      "Agendamento Online",
-      "Prontuário Digital",
-      "Gestão Financeira Básica"
-    ]
-  },
-  crescimento: {
-    name: "Plano Crescimento",
-    monthly: 134.90,
-    annual: 1349.00,
-    popular: true,
-    features: [
-      "Até 3 Profissionais/Agendas",
-      "Confirmação Automática (SMS/WhatsApp)",
-      "Assinatura Digital de Documentos",
-      "Relatórios Avançados"
-    ]
-  },
-  premium: {
-    name: "Plano Premium",
-    monthly: 179.90,
-    annual: 1799.00,
-    features: [
-      "Profissionais Ilimitados",
-      "Assistente IA para Anamnese",
-      "Integração com Laboratórios",
-      "Suporte Prioritário 24/7"
-    ]
-  }
-};
+type Periodo = "monthly" | "annual";
 
-const comparisonRows = [
-  { label: "Nº de Agendas", solo: "1", crescimento: "3", premium: "Ilimitado" },
-  { label: "Confirmação Automática", solo: false, crescimento: true, premium: true },
-  { label: "Assinatura Digital", solo: false, crescimento: true, premium: true },
-  { label: "Assistente IA", solo: false, crescimento: false, premium: true },
+const PLANOS: {
+  id: string;
+  nome: string;
+  mensal: number;
+  anual: number;
+  destaque?: boolean;
+  recursos: string[];
+}[] = [
+  {
+    id: "solo",
+    nome: "Solo",
+    mensal: 89.9,
+    anual: 899.0,
+    recursos: ["1 profissional/agenda", "Agendamento online", "Prontuário digital", "Gestão financeira básica"],
+  },
+  {
+    id: "crescimento",
+    nome: "Crescimento",
+    mensal: 134.9,
+    anual: 1349.0,
+    destaque: true,
+    recursos: [
+      "Até 3 profissionais/agendas",
+      "Confirmação automática (SMS/WhatsApp)",
+      "Assinatura digital de documentos",
+      "Relatórios avançados",
+    ],
+  },
+  {
+    id: "premium",
+    nome: "Premium",
+    mensal: 179.9,
+    anual: 1799.0,
+    recursos: [
+      "Profissionais ilimitados",
+      "Assistente IA para anamnese",
+      "Integração com laboratórios",
+      "Suporte prioritário 24/7",
+    ],
+  },
 ];
 
-const Assinatura = () => {
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("annual");
-  const [loading, setLoading] = useState<string | null>(null);
-  const { plan: currentPlan, status } = useSubscription();
+const COMPARACAO: { rotulo: string; valores: (string | boolean)[] }[] = [
+  { rotulo: "Agendas", valores: ["1", "3", "Ilimitadas"] },
+  { rotulo: "Confirmação automática", valores: [false, true, true] },
+  { rotulo: "Assinatura digital", valores: [false, true, true] },
+  { rotulo: "Assistente IA", valores: [false, false, true] },
+];
 
-  const handleCheckout = async (planId: string) => {
-    setLoading(planId);
+const brl = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+
+/** Meses que o plano anual deixa de cobrar em relação a 12 mensalidades (hoje, 2 em todos os planos). */
+const mesesGratis = Math.round(12 - PLANOS[0].anual / PLANOS[0].mensal);
+
+const Assinatura = () => {
+  const [periodo, setPeriodo] = useState<Periodo>("annual");
+  const [carregando, setCarregando] = useState<string | null>(null);
+  const { plan: planoAtual, status } = useSubscription();
+  const situacao = statusAssinatura(status);
+
+  const assinar = async (planoId: string) => {
+    setCarregando(planoId);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { plan: planId, billingPeriod }
+        body: { plan: planoId, billingPeriod: periodo },
       });
-
       if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (error: any) {
+      if (data?.url) window.open(data.url, "_blank");
+    } catch (error) {
       console.error("Erro ao criar checkout:", error);
-      toast.error("Erro ao processar pagamento. Tente novamente.");
+      toast.error("Não foi possível abrir o pagamento. Tente novamente.");
     } finally {
-      setLoading(null);
+      setCarregando(null);
     }
   };
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price);
-
   return (
-    <div className="space-y-8 p-6 max-w-7xl mx-auto">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Escolha Seu Plano Flowdent e Transforme Sua Clínica
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Planos flexíveis que crescem com você
-        </p>
-      </div>
+    <div className="space-y-6">
+      <CabecalhoPagina
+        titulo="Assinatura"
+        subtitulo={
+          status === "admin_impersonation" ? (
+            "Visualizando como super admin: a assinatura da clínica aparece em Super Admin → Locatários"
+          ) : (
+            <span className="inline-flex flex-wrap items-center gap-2">
+              Plano {nomePlano(planoAtual)}
+              <Selo tom={situacao.tom}>{situacao.rotulo}</Selo>
+            </span>
+          )
+        }
+        acoes={
+          <Tabs value={periodo} onValueChange={(v) => setPeriodo(v as Periodo)}>
+            <TabsList>
+              <TabsTrigger value="monthly">Mensal</TabsTrigger>
+              <TabsTrigger value="annual">Anual</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        }
+      />
 
-      <div className="flex items-center justify-center gap-4 p-4 bg-muted/50 rounded-lg max-w-md mx-auto">
-        <Label htmlFor="billing-toggle" className={billingPeriod === "monthly" ? "font-semibold" : ""}>
-          Mensal
-        </Label>
-        <Switch
-          id="billing-toggle"
-          checked={billingPeriod === "annual"}
-          onCheckedChange={(checked) => setBillingPeriod(checked ? "annual" : "monthly")}
-        />
-        <Label htmlFor="billing-toggle" className={billingPeriod === "annual" ? "font-semibold" : ""}>
-          Anual
-        </Label>
-        {billingPeriod === "annual" && (
-          <Badge variant="secondary" className="ml-2">Economize 10%</Badge>
-        )}
-      </div>
+      {status === "trialing" && (
+        <div className="flex gap-3 rounded-lg border-l-[3px] border-l-sinal-espera bg-sinal-espera-tenue px-4 py-3">
+          <p className="text-sm text-foreground">
+            Você está no período de teste. Escolha um plano para continuar usando todos os recursos depois do teste.
+          </p>
+        </div>
+      )}
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {Object.entries(plans).map(([planId, plan]) => {
-          const price = billingPeriod === "monthly" ? plan.monthly : plan.annual;
-          const isCurrentPlan = currentPlan === planId;
-          const isPopular = plan.popular;
-
+      <div className="grid gap-4 md:grid-cols-3">
+        {PLANOS.map((plano) => {
+          const preco = periodo === "monthly" ? plano.mensal : plano.anual;
+          const atual = planoAtual === plano.id;
           return (
-            <Card
-              key={planId}
-              className={`relative ${isPopular ? 'border-primary shadow-lg scale-105' : ''} ${isCurrentPlan ? 'ring-2 ring-primary' : ''}`}
-            >
-              {isPopular && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
-                  Mais Popular
-                </Badge>
-              )}
-              {isCurrentPlan && (
-                <Badge className="absolute -top-3 right-4 bg-green-500">
-                  Plano Atual
-                </Badge>
-              )}
-
-              <CardHeader className="text-center pb-8 pt-6">
-                <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <div className="space-y-1">
-                  <div className="text-4xl font-bold">{formatPrice(price)}</div>
-                  <CardDescription>
-                    por {billingPeriod === "monthly" ? "mês" : "ano"}
-                  </CardDescription>
+            <Card key={plano.id} className={cn("flex flex-col", (atual || plano.destaque) && "border-foreground/30")}>
+              <CardHeader className="gap-3 pb-4">
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-[15px]">{plano.nome}</CardTitle>
+                  {atual ? (
+                    <Selo tom="ok">Plano atual</Selo>
+                  ) : plano.destaque ? (
+                    <Selo tom="tinta">Mais popular</Selo>
+                  ) : null}
+                </div>
+                <div>
+                  <p className="flex items-baseline gap-1 tabular-nums">
+                    <span className="text-[28px] font-semibold leading-8 text-foreground">{brl(preco)}</span>
+                    <span className="text-sm text-muted-foreground">/{periodo === "monthly" ? "mês" : "ano"}</span>
+                  </p>
+                  <p className="mt-1 text-[13px] text-muted-foreground tabular-nums">
+                    {periodo === "annual"
+                      ? `Equivale a ${brl(plano.anual / 12)} por mês · ${mesesGratis} meses grátis`
+                      : `Ou ${brl(plano.anual)} por ano no plano anual`}
+                  </p>
                 </div>
               </CardHeader>
-
-              <CardContent className="space-y-6">
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
+              <CardContent className="flex flex-1 flex-col gap-5">
+                <ul className="space-y-2.5">
+                  {plano.recursos.map((recurso) => (
+                    <li key={recurso} className="flex items-start gap-2 text-sm text-foreground">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                      {recurso}
                     </li>
                   ))}
                 </ul>
-
                 <Button
-                  className="w-full"
-                  size="lg"
-                  variant={isCurrentPlan ? "outline" : isPopular ? "default" : "outline"}
-                  onClick={() => handleCheckout(planId)}
-                  disabled={loading === planId || isCurrentPlan}
+                  className="mt-auto w-full"
+                  variant={plano.destaque && !atual ? "default" : "outline"}
+                  onClick={() => assinar(plano.id)}
+                  disabled={carregando === plano.id || atual}
                 >
-                  {loading === planId ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processando...
-                    </>
-                  ) : isCurrentPlan ? (
-                    "Plano Atual"
-                  ) : (
-                    <>
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Escolher Plano
-                    </>
-                  )}
+                  {carregando === plano.id && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                  {atual ? "Plano atual" : `Assinar ${plano.nome}`}
                 </Button>
               </CardContent>
             </Card>
@@ -185,31 +173,36 @@ const Assinatura = () => {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Comparação Rápida</CardTitle>
-          <CardDescription>Veja as principais diferenças entre os planos</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-[15px]">Comparação</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4">Recurso</th>
-                  <th className="text-center py-3 px-4">Solo</th>
-                  <th className="text-center py-3 px-4">Crescimento</th>
-                  <th className="text-center py-3 px-4">Premium</th>
+                <tr className="border-y bg-muted/40">
+                  <th className="px-5 py-2.5 text-left font-semibold text-foreground">Recurso</th>
+                  {PLANOS.map((p) => (
+                    <th key={p.id} className="px-5 py-2.5 text-center font-semibold text-foreground">
+                      {p.nome}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody>
-                {comparisonRows.map((row, i) => (
-                  <tr key={i} className="border-b">
-                    <td className="py-3 px-4">{row.label}</td>
-                    {(["solo", "crescimento", "premium"] as const).map((col) => (
-                      <td key={col} className="text-center py-3 px-4">
-                        {typeof row[col] === "boolean" ? (
-                          row[col] ? <Check className="h-5 w-5 text-primary mx-auto" /> : "-"
+              <tbody className="divide-y">
+                {COMPARACAO.map((linha) => (
+                  <tr key={linha.rotulo}>
+                    <td className="px-5 py-2.5 text-foreground">{linha.rotulo}</td>
+                    {linha.valores.map((valor, i) => (
+                      <td key={i} className="px-5 py-2.5 text-center text-foreground">
+                        {typeof valor === "boolean" ? (
+                          valor ? (
+                            <Check className="mx-auto h-4 w-4" aria-label="Incluído" />
+                          ) : (
+                            <Minus className="mx-auto h-4 w-4 text-muted-foreground" aria-label="Não incluído" />
+                          )
                         ) : (
-                          row[col]
+                          valor
                         )}
                       </td>
                     ))}
@@ -220,21 +213,6 @@ const Assinatura = () => {
           </div>
         </CardContent>
       </Card>
-
-      {status === "trialing" && (
-        <Card className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-500">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-2">
-              <p className="text-yellow-800 dark:text-yellow-200">
-                Você está atualmente em período de teste gratuito
-              </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Escolha um plano acima para continuar usando todos os recursos após o período de teste
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

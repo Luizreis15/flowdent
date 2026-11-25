@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SeloAtivo } from "@/components/sistema/Selo";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface CategoriasTabProps {
   clinicaId: string;
@@ -119,9 +121,7 @@ export function CategoriasTab({ clinicaId }: CategoriasTabProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <EsqueletoSecao />
     );
   }
 
@@ -129,7 +129,7 @@ export function CategoriasTab({ clinicaId }: CategoriasTabProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-medium">Categorias de Procedimentos</h3>
+          <h3 className="text-section text-foreground">Categorias de procedimentos</h3>
           <p className="text-sm text-muted-foreground">
             Organize procedimentos por áreas especializadas
           </p>
@@ -138,7 +138,7 @@ export function CategoriasTab({ clinicaId }: CategoriasTabProps) {
           <DialogTrigger asChild>
             <Button onClick={() => setEditingCategoria(null)}>
               <Plus className="h-4 w-4 mr-2" />
-              Nova Categoria
+              Nova categoria
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -161,7 +161,7 @@ export function CategoriasTab({ clinicaId }: CategoriasTabProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Categorias Cadastradas</CardTitle>
+          <CardTitle>Categorias cadastradas</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -187,13 +187,7 @@ export function CategoriasTab({ clinicaId }: CategoriasTabProps) {
                   </TableCell>
                   <TableCell>{categoria.descricao}</TableCell>
                   <TableCell className="text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      categoria.ativo 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-gray-100 text-gray-800"
-                    }`}>
-                      {categoria.ativo ? "Ativo" : "Inativo"}
-                    </span>
+                    <SeloAtivo ativo={categoria.ativo} />
                   </TableCell>
                   <TableCell className="text-right">
                     <Button

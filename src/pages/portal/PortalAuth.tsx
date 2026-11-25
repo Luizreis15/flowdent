@@ -301,26 +301,26 @@ const PortalAuth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Logo className="h-10" />
           </div>
-          <CardTitle className="text-2xl">
-            {isResetPassword ? "Redefinir Senha" : "Portal do Paciente"}
+          <CardTitle className="text-h2">
+            {isResetPassword ? "Redefinir senha" : "Portal do paciente"}
           </CardTitle>
           <CardDescription>
             {isResetPassword
               ? "Defina uma nova senha para continuar"
-              : "Acesse seus agendamentos, documentos e informações"}
+              : "Entre com o e-mail e a senha que você criou pelo convite da clínica"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isResetPassword ? (
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="new-password">Nova Senha</Label>
+                <Label htmlFor="new-password">Nova senha</Label>
                 <Input
                   id="new-password"
                   type="password"
@@ -332,7 +332,7 @@ const PortalAuth = () => {
                 <p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
+                <Label htmlFor="confirm-password">Confirmar nova senha</Label>
                 <Input
                   id="confirm-password"
                   type="password"
@@ -349,7 +349,7 @@ const PortalAuth = () => {
                     Redefinindo...
                   </>
                 ) : (
-                  "Redefinir Senha"
+                  "Redefinir senha"
                 )}
               </Button>
             </form>
@@ -358,7 +358,7 @@ const PortalAuth = () => {
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Entrar</TabsTrigger>
                 <TabsTrigger value="signup" disabled={!inviteToken}>
-                  Criar Conta
+                  Criar conta
                 </TabsTrigger>
               </TabsList>
 
@@ -402,7 +402,7 @@ const PortalAuth = () => {
                 {inviteToken ? (
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-name">Nome Completo</Label>
+                      <Label htmlFor="signup-name">Nome completo</Label>
                       <Input
                         id="signup-name"
                         type="text"
@@ -432,7 +432,7 @@ const PortalAuth = () => {
                           Criando conta...
                         </>
                       ) : (
-                        "Criar Conta"
+                        "Criar conta"
                       )}
                     </Button>
                   </form>

@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Trash2, Edit } from "lucide-react";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 interface RemuneracaoTabProps {
   profissionalId: string;
@@ -171,7 +172,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
   };
 
   if (loading) {
-    return <div className="p-6 text-center">Carregando...</div>;
+    return <EsqueletoSecao />;
   }
 
   const showFixo = formData.tipo_remuneracao === "fixo_mensal" || formData.tipo_remuneracao === "hibrido";
@@ -181,7 +182,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Tipo de Remuneração *</Label>
+          <Label>Tipo de remuneração *</Label>
           <Select
             value={formData.tipo_remuneracao}
             onValueChange={(value) => setFormData({ ...formData, tipo_remuneracao: value })}
@@ -200,12 +201,12 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
         {showFixo && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Remuneração Fixa</CardTitle>
+              <CardTitle className="text-lg">Remuneração fixa</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Valor Fixo Mensal (R$)</Label>
+                  <Label>Valor fixo mensal (R$)</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -214,7 +215,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Dia de Pagamento (1-31)</Label>
+                  <Label>Dia de pagamento (1-31)</Label>
                   <Input
                     type="number"
                     min="1"
@@ -231,12 +232,12 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
         {showRepasse && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Repasse por Produção</CardTitle>
+              <CardTitle className="text-lg">Repasse por produção</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Modelo de Repasse</Label>
+                  <Label>Modelo de repasse</Label>
                   <Select
                     value={formData.modelo_repasse}
                     onValueChange={(value) => setFormData({ ...formData, modelo_repasse: value })}
@@ -254,7 +255,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Base de Cálculo Padrão</Label>
+                  <Label>Base de cálculo padrão</Label>
                   <Select
                     value={formData.base_calculo_padrao}
                     onValueChange={(value) => setFormData({ ...formData, base_calculo_padrao: value })}
@@ -263,9 +264,9 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="valor_bruto">Valor Bruto</SelectItem>
-                      <SelectItem value="valor_liquido">Valor Líquido (após taxas)</SelectItem>
-                      <SelectItem value="valor_recebido">Valor Recebido</SelectItem>
+                      <SelectItem value="valor_bruto">Valor bruto</SelectItem>
+                      <SelectItem value="valor_liquido">Valor líquido (após taxas)</SelectItem>
+                      <SelectItem value="valor_recebido">Valor recebido</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -273,7 +274,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
 
               {formData.modelo_repasse === "percentual_unico" && (
                 <div className="space-y-2">
-                  <Label>Percentual Único (%)</Label>
+                  <Label>Percentual único (%)</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -287,7 +288,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Mínimo Garantido Mensal (R$)</Label>
+                  <Label>Mínimo garantido mensal (R$)</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -296,7 +297,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Teto de Repasse Mensal (R$)</Label>
+                  <Label>Teto de repasse mensal (R$)</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -320,7 +321,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
 
                 {formData.adiantamento_permitido && (
                   <div className="space-y-2 pl-6">
-                    <Label>Limite de Adiantamento (R$)</Label>
+                    <Label>Limite de adiantamento (R$)</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -336,7 +337,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Dados Bancários</CardTitle>
+            <CardTitle className="text-lg">Dados bancários</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
@@ -364,7 +365,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Tipo de Conta</Label>
+                <Label>Tipo de conta</Label>
                 <Select
                   value={formData.tipo_conta}
                   onValueChange={(value) => setFormData({ ...formData, tipo_conta: value })}
@@ -391,11 +392,11 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Dados Fiscais</CardTitle>
+            <CardTitle className="text-lg">Dados fiscais</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Responsável Tributário</Label>
+              <Label>Responsável tributário</Label>
               <Select
                 value={formData.responsavel_tributario}
                 onValueChange={(value) => setFormData({ ...formData, responsavel_tributario: value })}
@@ -483,7 +484,7 @@ export const RemuneracaoTab = ({ profissionalId }: RemuneracaoTabProps) => {
                   checked={formData.gerar_rpa}
                   onCheckedChange={(checked) => setFormData({ ...formData, gerar_rpa: checked as boolean })}
                 />
-                <Label htmlFor="gerar_rpa" className="cursor-pointer">Gerar RPA/Recibo automaticamente</Label>
+                <Label htmlFor="gerar_rpa" className="cursor-pointer">Gerar RPA/recibo automaticamente</Label>
               </div>
             </div>
           </CardContent>

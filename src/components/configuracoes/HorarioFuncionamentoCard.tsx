@@ -122,7 +122,7 @@ export function HorarioFuncionamentoCard({ value, onChange }: HorarioFuncionamen
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="h-5 w-5" />
-          Horário de Funcionamento
+          Horário de funcionamento
         </CardTitle>
         <CardDescription>
           Configure os dias e horários de atendimento da clínica. Essas configurações serão utilizadas na agenda.
@@ -158,7 +158,7 @@ export function HorarioFuncionamentoCard({ value, onChange }: HorarioFuncionamen
             <div>Dia</div>
             <div className="text-center">Ativo</div>
             <div>Horário</div>
-            <div>Horário de Almoço</div>
+            <div>Horário de almoço</div>
           </div>
 
           {DIAS_SEMANA.map(({ key, label }) => {

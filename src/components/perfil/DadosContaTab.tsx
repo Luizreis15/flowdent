@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, User } from "lucide-react";
+import { User } from "lucide-react";
 import { z } from "zod";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
 
 const dadosContaSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
@@ -48,8 +49,11 @@ const DadosContaTab = ({ userId }: DadosContaTabProps) => {
     foto_perfil_url: "",
   });
 
+  const [email, setEmail] = useState("");
+
   useEffect(() => {
     loadProfileData();
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
   }, [userId]);
 
   const loadProfileData = async () => {
@@ -158,26 +162,21 @@ const DadosContaTab = ({ userId }: DadosContaTabProps) => {
   };
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <EsqueletoSecao linhas={5} />;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-6">
-        <Avatar className="h-24 w-24">
+        <Avatar className="h-16 w-16">
           <AvatarImage src={formData.foto_perfil_url} />
           <AvatarFallback>
-            <User className="h-12 w-12" />
+            <User className="h-7 w-7 text-muted-foreground" />
           </AvatarFallback>
         </Avatar>
-        <div>
-          <Button variant="outline" size="sm">
-            <Upload className="mr-2 h-4 w-4" />
-            Upload foto
-          </Button>
-          <p className="text-xs text-muted-foreground mt-2">
-            JPG, PNG ou WEBP. Máximo 2MB.
-          </p>
+        <div className="min-w-0">
+          <p className="text-section text-foreground">{formData.full_name || "Sem nome"}</p>
+          <p className="text-sm text-muted-foreground">{email}</p>
         </div>
       </div>
 
@@ -245,7 +244,7 @@ const DadosContaTab = ({ userId }: DadosContaTabProps) => {
       </div>
 
       <div className="border-t pt-6 space-y-4">
-        <h3 className="text-lg font-semibold">Endereço</h3>
+        <h3 className="text-section text-foreground">Endereço</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
