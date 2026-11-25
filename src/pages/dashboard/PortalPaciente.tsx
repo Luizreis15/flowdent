@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Users } from "lucide-react";
+import { UserPlus, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
@@ -10,12 +12,12 @@ import { EstadoVazio } from "@/components/sistema/EstadoVazio";
 import { Selo } from "@/components/sistema/Selo";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import EnviarConviteModal from "@/components/portal/EnviarConviteModal";
 
 /*
  * Antes esta tela mostrava números e atividades inventados (182 usuários, "Maria Silva
  * confirmou consulta"). Agora mostra só convites e acessos reais da clínica.
- * O botão "Convidar paciente" volta quando o aceite do convite funcionar: hoje as policies
- * de patient_portal_invites/patient_portal_access impedem o paciente de aceitar (ver PENDENCIAS).
+ * O paciente aceita o convite em /portal/auth (funções validar/vincular_convite_portal).
  */
 
 type SituacaoConvite = "pendente" | "aceito" | "expirado";
@@ -31,8 +33,9 @@ const situacaoConvite = (c: { used_at: string | null; expires_at: string }): Sit
 
 const PortalPaciente = () => {
   const { clinicId } = useAuth();
+  const [convidando, setConvidando] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["portal-paciente", clinicId],
     enabled: !!clinicId,
     queryFn: async () => {
@@ -63,7 +66,16 @@ const PortalPaciente = () => {
 
   return (
     <div className="space-y-6">
-      <CabecalhoPagina titulo="Portal do paciente" subtitulo="Convites e acessos dos pacientes ao portal" />
+      <CabecalhoPagina
+        titulo="Portal do paciente"
+        subtitulo="Convites e acessos dos pacientes ao portal"
+        acoes={
+          <Button onClick={() => setConvidando(true)}>
+            <UserPlus className="mr-1.5 h-4 w-4" />
+            Convidar paciente
+          </Button>
+        }
+      />
 
       {isLoading ? (
         <Skeleton className="h-[104px] rounded-lg" />
@@ -115,11 +127,18 @@ const PortalPaciente = () => {
             <EstadoVazio
               icone={Users}
               titulo="Nenhum paciente no portal ainda"
-              descricao="Os convites para o portal serão liberados em breve. Quando um paciente for convidado, ele aparece aqui."
+              descricao="Gere um link de convite: o paciente cria a senha e passa a entrar pelo portal."
+              acao={
+                <Button variant="outline" onClick={() => setConvidando(true)}>
+                  Convidar paciente
+                </Button>
+              }
             />
           )}
         </CardContent>
       </Card>
+
+      <EnviarConviteModal open={convidando} onOpenChange={setConvidando} onConviteGerado={() => refetch()} />
     </div>
   );
 };

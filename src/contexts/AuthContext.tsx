@@ -81,8 +81,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Validate onboarding for non-admins (skip if already on onboarding pages)
       const currentPath = window.location.pathname;
       const isOnOnboarding = currentPath.startsWith("/onboarding");
-      
-      if (!isSuperAdminRole && profileData && !isOnOnboarding) {
+      // Paciente do portal não tem clínica: sem isto, entrar no portal levava ao onboarding de clínica.
+      const isOnPortal = currentPath.startsWith("/portal");
+
+      if (!isSuperAdminRole && profileData && !isOnOnboarding && !isOnPortal) {
         if (!profileData.clinic_id) {
           navigate("/onboarding/welcome");
           return;

@@ -10,6 +10,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, passwordSchema } from "@/lib/password";
+import {
+  mensagemVinculo,
+  temAcessoAtivo,
+  validarConvite,
+  vincularConvite,
+  type ConvitePortal,
+} from "@/lib/portalConvite";
+
+type SituacaoConvite = "sem_token" | "validando" | "valido" | "invalido";
+
+const erroMsg = (e: unknown) => (e instanceof Error ? e.message : "Tente de novo.");
 
 const PortalAuth = () => {
   const [searchParams] = useSearchParams();
@@ -17,9 +28,7 @@ const PortalAuth = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [isResetPassword, setIsResetPassword] = useState(
-    searchParams.get("reset") === "true",
-  );
+  const [isResetPassword, setIsResetPassword] = useState(searchParams.get("reset") === "true");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +36,10 @@ const PortalAuth = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inviteToken] = useState(searchParams.get("token") || "");
+  const [convite, setConvite] = useState<ConvitePortal | null>(null);
+  const [situacaoConvite, setSituacaoConvite] = useState<SituacaoConvite>(inviteToken ? "validando" : "sem_token");
+  const [aba, setAba] = useState(inviteToken ? "signup" : "signin");
+  const [aguardandoConfirmacao, setAguardandoConfirmacao] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("reset") === "true") {
@@ -48,6 +61,20 @@ const PortalAuth = () => {
   }, []);
 
   useEffect(() => {
+    if (!inviteToken) return;
+    validarConvite(inviteToken).then((encontrado) => {
+      if (encontrado) {
+        setConvite(encontrado);
+        setEmail(encontrado.email);
+        setSituacaoConvite("valido");
+      } else {
+        setSituacaoConvite("invalido");
+        setAba("signin");
+      }
+    });
+  }, [inviteToken]);
+
+  useEffect(() => {
     checkExistingSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -63,18 +90,16 @@ const PortalAuth = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      if (!session) return;
 
-      if (session) {
-        const { data: portalAccess } = await supabase
-          .from("patient_portal_access")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .eq("active", true)
-          .maybeSingle();
+      // Voltando do link de confirmação de e-mail (ou já logado ao abrir o convite): aceita o convite.
+      let erroVinculo: string | null = null;
+      if (inviteToken) erroVinculo = await vincularConvite(inviteToken);
 
-        if (portalAccess) {
-          navigate("/portal/dashboard");
-        }
+      if (await temAcessoAtivo(session.user.id)) {
+        navigate("/portal/dashboard");
+      } else if (erroVinculo && erroVinculo !== "convite_invalido") {
+        toast({ title: "Acesso não liberado", description: mensagemVinculo(erroVinculo), variant: "destructive" });
       }
     } catch (error) {
       console.error("Error checking session:", error);
@@ -140,13 +165,7 @@ const PortalAuth = () => {
       data: { session },
     } = await supabase.auth.getSession();
     if (session) {
-      const { data: portalAccess } = await supabase
-        .from("patient_portal_access")
-        .select("id")
-        .eq("user_id", session.user.id)
-        .eq("active", true)
-        .maybeSingle();
-      if (portalAccess) {
+      if (await temAcessoAtivo(session.user.id)) {
         navigate("/portal/dashboard");
         return;
       }
@@ -159,42 +178,31 @@ const PortalAuth = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
       if (data.user) {
-        const { data: portalAccess, error: accessError } = await supabase
-          .from("patient_portal_access")
-          .select("*")
-          .eq("user_id", data.user.id)
-          .eq("active", true)
-          .maybeSingle();
+        // Quem já tinha conta e recebeu um convite aceita ao entrar.
+        const erroVinculo = situacaoConvite === "valido" ? await vincularConvite(inviteToken) : null;
 
-        if (accessError || !portalAccess) {
+        if (!(await temAcessoAtivo(data.user.id))) {
           await supabase.auth.signOut();
           toast({
             title: "Acesso negado",
-            description: "Você não tem permissão para acessar o portal do paciente.",
+            description: erroVinculo
+              ? mensagemVinculo(erroVinculo)
+              : "Esta conta não tem acesso ao portal do paciente. Use o link de convite enviado pela clínica.",
             variant: "destructive",
           });
           return;
         }
 
-        toast({
-          title: "Login realizado",
-          description: "Bem-vindo ao portal do paciente.",
-        });
-
         navigate("/portal/dashboard");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
-        title: "Erro ao fazer login",
-        description: error.message,
+        title: "Erro ao entrar",
+        description: erroMsg(error),
         variant: "destructive",
       });
     } finally {
@@ -204,15 +212,7 @@ const PortalAuth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!inviteToken) {
-      toast({
-        title: "Token inválido",
-        description: "Você precisa de um convite para criar uma conta.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!convite) return;
 
     const validation = passwordSchema.safeParse(password);
     if (!validation.success) {
@@ -227,64 +227,47 @@ const PortalAuth = () => {
     setLoading(true);
 
     try {
-      const { data: invite, error: inviteError } = await supabase
-        .from("patient_portal_invites")
-        .select("*, patients(*)")
-        .eq("token", inviteToken)
-        .is("used_at", null)
-        .gt("expires_at", new Date().toISOString())
-        .single();
-
-      if (inviteError || !invite) {
-        toast({
-          title: "Convite inválido",
-          description: "Este convite expirou ou já foi usado.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: invite.email,
+      const { data, error } = await supabase.auth.signUp({
+        email: convite.email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-          },
-          emailRedirectTo: `${window.location.origin}/portal/dashboard`,
+          data: { full_name: fullName },
+          // Se o projeto exigir confirmação de e-mail, o link volta para cá com o token e o acesso é liberado.
+          emailRedirectTo: `${window.location.origin}/portal/auth?token=${encodeURIComponent(inviteToken)}`,
         },
       });
 
-      if (authError) throw authError;
-
-      if (authData.user) {
-        const { error: accessError } = await supabase
-          .from("patient_portal_access")
-          .insert({
-            patient_id: invite.patient_id,
-            user_id: authData.user.id,
-            active: true,
-          });
-
-        if (accessError) throw accessError;
-
-        await supabase
-          .from("patient_portal_invites")
-          .update({ used_at: new Date().toISOString() })
-          .eq("id", invite.id);
-
-        toast({
-          title: "Conta criada",
-          description: "Sua conta foi criada com sucesso. Faça login para continuar.",
-        });
-
-        setEmail(invite.email);
+      // E-mail já cadastrado: com confirmação ligada o Supabase não devolve erro, só identities vazio.
+      const jaExiste =
+        error?.message?.toLowerCase().includes("already registered") || data?.user?.identities?.length === 0;
+      if (jaExiste) {
+        setAba("signin");
         setPassword("");
+        toast({
+          title: "Este e-mail já tem conta",
+          description: "Entre com sua senha para aceitar o convite.",
+        });
+        return;
       }
-    } catch (error: any) {
+      if (error) throw error;
+
+      if (!data.session) {
+        setAguardandoConfirmacao(true);
+        return;
+      }
+
+      const erroVinculo = await vincularConvite(inviteToken);
+      if (erroVinculo) {
+        await supabase.auth.signOut();
+        toast({ title: "Acesso não liberado", description: mensagemVinculo(erroVinculo), variant: "destructive" });
+        return;
+      }
+
+      navigate("/portal/dashboard");
+    } catch (error) {
       toast({
         title: "Erro ao criar conta",
-        description: error.message,
+        description: erroMsg(error),
         variant: "destructive",
       });
     } finally {
@@ -300,6 +283,12 @@ const PortalAuth = () => {
     );
   }
 
+  const descricao = isResetPassword
+    ? "Defina uma nova senha para continuar"
+    : convite
+      ? `Olá, ${convite.primeiro_nome}. Crie sua senha para acessar o portal${convite.clinica ? ` da ${convite.clinica}` : ""}.`
+      : "Entre com o e-mail e a senha que você criou pelo convite da clínica";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -307,14 +296,8 @@ const PortalAuth = () => {
           <div className="flex justify-center mb-4">
             <Logo className="h-10" />
           </div>
-          <CardTitle className="text-h2">
-            {isResetPassword ? "Redefinir senha" : "Portal do paciente"}
-          </CardTitle>
-          <CardDescription>
-            {isResetPassword
-              ? "Defina uma nova senha para continuar"
-              : "Entre com o e-mail e a senha que você criou pelo convite da clínica"}
-          </CardDescription>
+          <CardTitle className="text-h2">{isResetPassword ? "Redefinir senha" : "Portal do paciente"}</CardTitle>
+          <CardDescription>{descricao}</CardDescription>
         </CardHeader>
         <CardContent>
           {isResetPassword ? (
@@ -353,96 +336,122 @@ const PortalAuth = () => {
                 )}
               </Button>
             </form>
+          ) : aguardandoConfirmacao ? (
+            <div className="space-y-2 py-4 text-center">
+              <p className="text-sm font-medium text-foreground">Confirme seu e-mail</p>
+              <p className="text-sm text-muted-foreground">
+                Enviamos um link para {convite?.email}. Ao abrir o link, seu acesso ao portal é liberado.
+              </p>
+            </div>
           ) : (
-            <Tabs defaultValue={inviteToken ? "signup" : "signin"}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Entrar</TabsTrigger>
-                <TabsTrigger value="signup" disabled={!inviteToken}>
-                  Criar conta
-                </TabsTrigger>
-              </TabsList>
+            <>
+              {situacaoConvite === "invalido" && (
+                <div className="mb-4 rounded-lg border-l-[3px] border-l-sinal-alerta bg-sinal-alerta-tenue px-4 py-3">
+                  <p className="text-sm text-foreground">
+                    Este convite expirou ou já foi usado. Se você já criou sua conta, entre abaixo. Senão, peça um novo
+                    link à clínica.
+                  </p>
+                </div>
+              )}
+              <Tabs value={aba} onValueChange={setAba}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="signin">Entrar</TabsTrigger>
+                  <TabsTrigger value="signup" disabled={situacaoConvite !== "valido"}>
+                    Criar conta
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">E-mail</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="seu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Senha</Label>
-                    <Input
-                      id="signin-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Entrando...
-                      </>
-                    ) : (
-                      "Entrar"
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="signup">
-                {inviteToken ? (
-                  <form onSubmit={handleSignUp} className="space-y-4">
+                <TabsContent value="signin">
+                  <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-name">Nome completo</Label>
+                      <Label htmlFor="signin-email">E-mail</Label>
                       <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder="Seu nome"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        id="signin-email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-password">Senha</Label>
+                      <Label htmlFor="signin-password">Senha</Label>
                       <Input
-                        id="signup-password"
+                        id="signin-password"
                         type="password"
-                        placeholder={PASSWORD_HINT}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        minLength={PASSWORD_MIN_LENGTH}
                       />
-                      <p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p>
                     </div>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Criando conta...
+                          Entrando...
                         </>
                       ) : (
-                        "Criar conta"
+                        "Entrar"
                       )}
                     </Button>
                   </form>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    Você precisa de um convite para criar uma conta.
-                  </p>
-                )}
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+
+                <TabsContent value="signup">
+                  {situacaoConvite === "validando" ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : convite ? (
+                    <form onSubmit={handleSignUp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email">E-mail</Label>
+                        <Input id="signup-email" type="email" value={convite.email} disabled readOnly />
+                        <p className="text-xs text-muted-foreground">É o e-mail do convite. Você entra com ele.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-name">Nome completo</Label>
+                        <Input
+                          id="signup-name"
+                          type="text"
+                          placeholder="Seu nome"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password">Senha</Label>
+                        <Input
+                          id="signup-password"
+                          type="password"
+                          placeholder={PASSWORD_HINT}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          minLength={PASSWORD_MIN_LENGTH}
+                        />
+                        <p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p>
+                      </div>
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Criando conta...
+                          </>
+                        ) : (
+                          "Criar conta"
+                        )}
+                      </Button>
+                    </form>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Você precisa de um convite para criar uma conta.
+                    </p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </>
           )}
         </CardContent>
       </Card>
