@@ -1,201 +1,120 @@
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { endOfDay, format, startOfDay } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Calendar, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, RefreshCw, Calendar, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useCallback } from "react";
-import MobileQuickActions from "@/components/mobile/MobileQuickActions";
-import MobileAgendaList from "@/components/mobile/MobileAgendaList";
-import MobileAlerts from "@/components/mobile/MobileAlerts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
+import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { COLUNAS_CONSULTA_MOBILE, LinhaConsultaMobile, type ConsultaMobile } from "@/components/mobile/LinhaConsultaMobile";
+import { ModuleCards } from "@/components/dashboard/ModuleCards";
 
 interface MobileHomeProps {
-  user?: {
-    full_name?: string;
-    email?: string;
-  } | null;
   clinicId: string;
 }
 
-const MobileHome = ({ user, clinicId }: MobileHomeProps) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
+/**
+ * Home do celular no padrão da referência aprovada: cabeçalho igual ao do desktop ("Hoje" e a data),
+ * faixa de indicadores, agenda do dia em linhas com barra de status e atalhos para os módulos.
+ * Antes: topo em degradê, blocos coloridos, sino sem função, "2 confirmaçãoões" e consultas de
+ * todas as clínicas somadas quando o super admin visualizava uma clínica (faltava o filtro por clínica).
+ */
+const MobileHome = ({ clinicId }: MobileHomeProps) => {
+  const navigate = useNavigate();
+  const hoje = new Date();
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Bom dia";
-    if (hour < 18) return "Boa tarde";
-    return "Boa noite";
-  };
-
-  const firstName = user?.full_name?.split(" ")[0] || "usuário";
-
-  const { data: summaryData, refetch: refetchSummary } = useQuery({
-    queryKey: ["mobile-home-summary", clinicId],
+  const { data: consultas, isLoading } = useQuery({
+    queryKey: ["mobile-agenda-hoje", clinicId],
     queryFn: async () => {
-      const today = new Date();
-      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0).toISOString();
-      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999).toISOString();
-
-      const { data: appointments, error } = await supabase
+      const { data, error } = await supabase
         .from("appointments")
-        .select("id, status, appointment_date")
-        .gte("appointment_date", startOfDay)
-        .lte("appointment_date", endOfDay);
-
+        .select(COLUNAS_CONSULTA_MOBILE)
+        .eq("patients.clinic_id", clinicId)
+        .gte("appointment_date", startOfDay(new Date()).toISOString())
+        .lte("appointment_date", endOfDay(new Date()).toISOString())
+        .order("appointment_date", { ascending: true });
       if (error) throw error;
-
-      const total = appointments?.length || 0;
-      const confirmed = appointments?.filter((a) => a.status === "confirmed").length || 0;
-      const pending = appointments?.filter((a) => a.status === "scheduled").length || 0;
-
-      // Next appointment
-      const now = new Date();
-      const upcoming = appointments
-        ?.filter((a) => new Date(a.appointment_date) > now && a.status !== "cancelled")
-        .sort((a, b) => new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime());
-      
-      const nextTime = upcoming && upcoming.length > 0
-        ? new Date(upcoming[0].appointment_date).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
-        : null;
-
-      return { total, confirmed, pending, nextTime };
+      return (data || []) as unknown as ConsultaMobile[];
     },
   });
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await refetchSummary();
-    setTimeout(() => setIsRefreshing(false), 500);
-  };
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    (e.currentTarget as HTMLElement).dataset.touchStartY = String(e.touches[0].clientY);
-  }, []);
-
-  const handleTouchEnd = useCallback(async (e: React.TouchEvent) => {
-    const touchStartY = Number((e.currentTarget as HTMLElement).dataset.touchStartY || 0);
-    const touchEndY = e.changedTouches[0].clientY;
-    const scrollTop = (e.currentTarget as HTMLElement).scrollTop;
-    if (scrollTop <= 0 && touchEndY - touchStartY > 100) {
-      await handleRefresh();
-    }
-  }, [handleRefresh]);
-
-  const todayFormatted = new Date().toLocaleDateString("pt-BR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
-
-  const summaryCards = [
-    {
-      icon: Calendar,
-      value: summaryData?.total ?? "–",
-      label: "Consultas",
-      colorClass: "text-primary",
-      bgClass: "bg-acao-tenue",
-    },
-    {
-      icon: CheckCircle2,
-      value: summaryData?.confirmed ?? "–",
-      label: "Confirmados",
-      colorClass: "text-sinal-ok",
-      bgClass: "bg-sinal-ok-tenue",
-    },
-    {
-      icon: Clock,
-      value: summaryData?.pending ?? "–",
-      label: "Pendentes",
-      colorClass: "text-sinal-espera",
-      bgClass: "bg-sinal-espera-tenue",
-    },
-  ];
+  const ativas = (consultas || []).filter((c) => c.status !== "cancelled");
+  const confirmadas = ativas.filter((c) => c.status === "confirmed").length;
+  const aConfirmar = ativas.filter((c) => (c.status || "scheduled") === "scheduled").length;
 
   return (
-    <div
-      className="min-h-[100dvh] overflow-y-auto overflow-x-hidden touch-pan-y"
-      style={{ width: '100%', maxWidth: '100%', touchAction: 'pan-y' }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Pull-to-refresh indicator */}
-      {isRefreshing && (
-        <div className="flex justify-center py-2 bg-primary">
-          <RefreshCw className="h-5 w-5 animate-spin text-white" />
-        </div>
+    <div className="space-y-5 pt-4">
+      <CabecalhoPagina
+        titulo="Hoje"
+        subtitulo={<span className="first-letter:uppercase">{format(hoje, "EEEE, d 'de' MMMM", { locale: ptBR })}</span>}
+      />
+
+      {isLoading ? (
+        <Skeleton className="h-[88px] rounded-lg" />
+      ) : (
+        <FaixaIndicadores
+          compacto
+          className="grid-cols-3 divide-x divide-y-0"
+          itens={[
+            { rotulo: "Consultas", valor: ativas.length, onClick: () => navigate("/dashboard/agenda") },
+            { rotulo: "Confirmadas", valor: confirmadas, onClick: () => navigate("/dashboard/agenda") },
+            {
+              rotulo: "Pendentes",
+              valor: aConfirmar,
+              tom: aConfirmar ? "espera" : "padrao",
+              onClick: () => navigate("/dashboard/agenda"),
+            },
+          ]}
+        />
       )}
 
-      {/* Hero Header */}
-      <div className="bg-gradient-to-br from-primary via-acento-600 to-acento-400 text-white">
-        <div className="px-4 pt-12 pb-10">
-          <div className="flex items-center justify-between mb-1">
-            <div>
-              <p className="text-white/60 text-caption capitalize">{todayFormatted}</p>
-              <h1 className="text-title mt-0.5">
-                {getGreeting()}, {firstName}!
-              </h1>
+      <Card>
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-[15px]">Agenda do dia</CardTitle>
+          <Link
+            to="/dashboard/agenda"
+            className="rounded-sm text-[13px] font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Ver agenda
+          </Link>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="space-y-2 px-4 pb-4">
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-12" />
+              ))}
             </div>
-            <div className="flex items-center gap-0.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="text-white hover:bg-white/15 rounded-full h-9 w-9"
-              >
-                <RefreshCw className={`h-4.5 w-4.5 ${isRefreshing ? "animate-spin" : ""}`} />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/15 rounded-full h-9 w-9 relative">
-                <Bell className="h-4.5 w-4.5" />
-                {summaryData && summaryData.pending > 0 && (
-                  <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-sinal-alerta" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Next appointment chip */}
-          {summaryData?.nextTime && (
-            <div className="flex items-center gap-2 mt-3">
-              <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-chip px-3 py-1.5">
-                <Clock className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">Próximo às {summaryData.nextTime}</span>
-              </div>
-            </div>
+          ) : consultas?.length ? (
+            <ul className="divide-y border-t">
+              {consultas.map((c) => (
+                <LinhaConsultaMobile key={c.id} consulta={c} />
+              ))}
+            </ul>
+          ) : (
+            <EstadoVazio
+              icone={Calendar}
+              titulo="Nenhuma consulta hoje"
+              descricao="As consultas do dia aparecem aqui."
+              acao={
+                <Button variant="outline" onClick={() => navigate("/dashboard/agenda?new=true")}>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Agendar consulta
+                </Button>
+              }
+            />
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Content area with overlap */}
-      <div className="w-full bg-background rounded-t-3xl -mt-5 pt-5 relative z-10 pb-[calc(72px+env(safe-area-inset-bottom,0px)+24px)]">
-        
-        {/* Summary Cards Row */}
-        <div className="px-4 mb-5">
-          <div className="grid grid-cols-3 gap-2.5">
-            {summaryCards.map((card, i) => (
-              <div
-                key={i}
-                className={`${card.bgClass} rounded-card p-3 flex flex-col items-center justify-center min-h-[76px] shadow-sm`}
-              >
-                <card.icon className={`h-5 w-5 ${card.colorClass} mb-1`} />
-                <span className={`text-xl font-bold ${card.colorClass}`}>
-                  {card.value}
-                </span>
-                <span className="text-[11px] text-muted-foreground font-medium mt-0.5">
-                  {card.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <MobileQuickActions clinicId={clinicId} />
-
-        {/* Alerts */}
-        <MobileAlerts clinicId={clinicId} pendingCount={summaryData?.pending || 0} />
-
-        {/* Agenda List */}
-        <MobileAgendaList clinicId={clinicId} />
-      </div>
+      <section>
+        <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.04em] text-muted-foreground">Módulos</h2>
+        <ModuleCards limite={6} className="grid-cols-2" />
+      </section>
     </div>
   );
 };

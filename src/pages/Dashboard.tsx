@@ -39,7 +39,7 @@ const Dashboard = () => {
             daysLeft={Math.ceil((new Date(trialEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}
           />
         )}
-        <MobileHome user={profile} clinicId={activeClinicId} />
+        <MobileHome clinicId={activeClinicId} />
       </>
     );
   }

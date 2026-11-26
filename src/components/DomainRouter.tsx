@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { isAppDomain } from "@/config/domains";
 import { lazy, Suspense } from "react";
-import MobileHomeSkeleton from "@/components/mobile/MobileHomeSkeleton";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
 import RequirePermission from "@/components/RequirePermission";

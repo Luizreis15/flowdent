@@ -1,113 +1,100 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, CalendarPlus, UserPlus, DollarSign, ClipboardList } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { useQueryClient } from "@tanstack/react-query";
+import { CalendarPlus, DollarSign, Plus, UserPlus, type LucideIcon } from "lucide-react";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import NovoAgendamentoMobileModal from "@/components/agenda/NovoAgendamentoMobileModal";
-import { useQueryClient } from "@tanstack/react-query";
 
+interface Acao {
+  icone: LucideIcon;
+  rotulo: string;
+  descricao: string;
+  aoEscolher: () => void;
+}
+
+/**
+ * Botão "Novo" da barra inferior: abre a folha de ações rápidas.
+ * Antes flutuava acima da barra com sombra colorida, cada ação tinha uma cor e "Novo orçamento"
+ * só abria a lista de pacientes; agora o botão fica na linha da barra e as ações dizem para onde levam.
+ */
 const CentralFAB = () => {
-  const [open, setOpen] = useState(false);
-  const [agendamentoOpen, setAgendamentoOpen] = useState(false);
+  const [aberto, setAberto] = useState(false);
+  const [agendando, setAgendando] = useState(false);
   const navigate = useNavigate();
   const { clinicId } = useAuth();
   const queryClient = useQueryClient();
 
-  const actions = [
+  const ir = (rota: string) => {
+    setAberto(false);
+    navigate(rota);
+  };
+
+  const acoes: Acao[] = [
     {
-      icon: CalendarPlus,
-      label: "Novo Agendamento",
-      description: "Agendar consulta ou procedimento",
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      onClick: () => {
-        setOpen(false);
-        setTimeout(() => setAgendamentoOpen(true), 200);
+      icone: CalendarPlus,
+      rotulo: "Nova consulta",
+      descricao: "Agendar consulta ou procedimento",
+      aoEscolher: () => {
+        setAberto(false);
+        setTimeout(() => setAgendando(true), 200);
       },
     },
-    {
-      icon: UserPlus,
-      label: "Novo Paciente",
-      description: "Cadastrar um novo paciente",
-      color: "text-sinal-ok",
-      bgColor: "bg-sinal-ok/10",
-      onClick: () => { navigate("/dashboard/prontuario"); setOpen(false); },
-    },
-    {
-      icon: DollarSign,
-      label: "Receber Pagamento",
-      description: "Registrar recebimento",
-      color: "text-green-600",
-      bgColor: "bg-green-600/10",
-      onClick: () => { navigate("/dashboard/financeiro"); setOpen(false); },
-    },
-    {
-      icon: ClipboardList,
-      label: "Novo Orçamento",
-      description: "Criar orçamento para paciente",
-      color: "text-sinal-espera",
-      bgColor: "bg-sinal-espera/10",
-      onClick: () => { navigate("/dashboard/prontuario"); setOpen(false); },
-    },
+    { icone: UserPlus, rotulo: "Novo paciente", descricao: "Abre a lista de pacientes para cadastrar", aoEscolher: () => ir("/dashboard/prontuario") },
+    { icone: DollarSign, rotulo: "Registrar recebimento", descricao: "Abre o financeiro", aoEscolher: () => ir("/dashboard/financeiro") },
   ];
 
   return (
     <>
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={aberto} onOpenChange={setAberto}>
         <SheetTrigger asChild>
           <button
-            className={cn(
-              "relative -top-6 flex items-center justify-center",
-              "h-14 w-14 rounded-full",
-              "bg-primary text-primary-foreground",
-              "shadow-lg shadow-primary/30",
-              "transition-transform duration-200",
-              "active:scale-95",
-              open && "rotate-45"
-            )}
+            type="button"
+            aria-label="Novo"
+            className="flex flex-1 flex-col items-center justify-center gap-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           >
-            <Plus className="h-7 w-7 transition-transform duration-200" />
+            <span className="flex h-8 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Plus className="h-5 w-5" />
+            </span>
+            <span className="text-[11px] font-medium leading-none text-muted-foreground">Novo</span>
           </button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
-          <SheetHeader className="pb-4">
-            <div className="mx-auto w-12 h-1.5 bg-muted rounded-full mb-4" />
-            <SheetTitle className="text-center text-section">Ações Rápidas</SheetTitle>
+        <SheetContent side="bottom" className="rounded-t-lg px-4 pb-[calc(16px+env(safe-area-inset-bottom,0px))]">
+          <SheetHeader className="pb-2 text-left">
+            <SheetTitle className="text-section">Novo</SheetTitle>
+            <SheetDescription className="sr-only">Ações rápidas</SheetDescription>
           </SheetHeader>
-          <div className="space-y-1">
-            {actions.map((action, index) => (
-              <button
-                key={index}
-                className="w-full flex items-center gap-4 h-16 px-4 rounded-btn press-scale hover:bg-muted/50 transition-colors"
-                onClick={action.onClick}
-              >
-                <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", action.bgColor)}>
-                  <action.icon className={cn("h-5 w-5", action.color)} />
-                </div>
-                <div className="text-left min-w-0">
-                  <p className="text-body font-medium text-foreground">{action.label}</p>
-                  <p className="text-caption text-muted-foreground truncate">{action.description}</p>
-                </div>
-              </button>
+          <ul className="divide-y">
+            {acoes.map((a) => (
+              <li key={a.rotulo}>
+                <button
+                  type="button"
+                  onClick={a.aoEscolher}
+                  className="flex w-full items-center gap-3 rounded-md px-1 py-3 text-left transition-colors duration-150 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                    <a.icone className="h-4 w-4 text-muted-foreground" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-foreground">{a.rotulo}</span>
+                    <span className="block truncate text-[13px] text-muted-foreground">{a.descricao}</span>
+                  </span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </SheetContent>
       </Sheet>
 
       {clinicId && (
         <NovoAgendamentoMobileModal
-          open={agendamentoOpen}
-          onOpenChange={setAgendamentoOpen}
+          open={agendando}
+          onOpenChange={setAgendando}
           clinicId={clinicId}
           onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["mobile-agenda"] });
+            for (const chave of ["mobile-agenda", "mobile-agenda-hoje", "dashboard-agenda-table"]) {
+              queryClient.invalidateQueries({ queryKey: [chave] });
+            }
           }}
         />
       )}
