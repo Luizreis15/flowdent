@@ -62,7 +62,7 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 | B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | Concluída (PRs #15–#17) |
 | C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | Concluída (PRs #18–#19) |
 | D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | Concluída (PRs #20–#21) |
-| E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | E1 (casca mobile) em PR; E2 (estados) a fazer |
+| E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | E1 (casca mobile) em produção (PR #23); E2 (estados) a fazer |
 | F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | — |
 | G — Super admin | 21 telas internas | 1–2 | — |
 
