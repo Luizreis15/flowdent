@@ -1,205 +1,109 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  Calendar,
-  FileText,
-  DollarSign,
-  MessageSquare,
-  Users,
-  LayoutDashboard,
-  Settings,
-  FlaskConical,
-  Package,
-  User,
-  Shield,
-  LogOut,
-  ChevronRight,
-  SmilePlus,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LogOut, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-
-// Organized menu categories
-const menuCategories = [
-  {
-    title: "OPERACIONAL",
-    items: [
-      { name: "Painel", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Agenda", href: "/dashboard/agenda", icon: Calendar },
-      { name: "Pacientes", href: "/dashboard/prontuario", icon: FileText },
-    ],
-  },
-  {
-    title: "CONTROLE CLÍNICO",
-    items: [
-      { name: "Ortodontia", href: "/dashboard/ortodontia", icon: SmilePlus },
-      { name: "Próteses", href: "/dashboard/proteses", icon: FlaskConical },
-      { name: "Estoque", href: "/dashboard/estoque", icon: Package },
-    ],
-  },
-  {
-    title: "GESTÃO E RELATÓRIOS",
-    items: [
-      { name: "Financeiro", href: "/dashboard/financeiro", icon: DollarSign },
-      { name: "CRM", href: "/dashboard/crm", icon: MessageSquare },
-    ],
-  },
-  {
-    title: "FERRAMENTAS",
-    items: [
-      { name: "Portal do paciente", href: "/dashboard/portal-paciente", icon: Users },
-    ],
-  },
-  {
-    title: "SISTEMA",
-    items: [
-      { name: "Configurações", href: "/dashboard/configuracoes", icon: Settings },
-      { name: "Perfil", href: "/dashboard/perfil", icon: User },
-    ],
-  },
-];
+import { cn } from "@/lib/utils";
+import { GRUPOS_NAVEGACAO, NAVEGACAO_RODAPE, rotaAtiva, type ItemNavegacao } from "@/lib/navegacao";
 
 interface MobileDrawerMenuProps {
-  user?: {
-    email?: string;
-    full_name?: string;
-  } | null;
+  user?: { email?: string; full_name?: string } | null;
   onClose: () => void;
 }
 
+const iniciais = (nome?: string) =>
+  (nome || "U")
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+/**
+ * Menu "Mais" do celular: a mesma lista e as mesmas permissões da sidebar do desktop
+ * (src/lib/navegacao.ts). Antes tinha a própria cópia, sem "Relatórios" e sem checar permissões.
+ */
 const MobileDrawerMenu = ({ user, onClose }: MobileDrawerMenuProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
-  const { isSuperAdmin } = useAuth();
+  const { pathname } = useLocation();
+  const { isSuperAdmin, canViewModule } = usePermissions();
+  const pode = (item: ItemNavegacao) => !item.permission || canViewModule(item.permission);
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao sair",
-        description: error.message,
-      });
-    } else {
-      toast({
-        title: "Logout realizado",
-        description: "Você saiu da sua conta com sucesso.",
-      });
-      onClose();
-      navigate("/");
-    }
+  const sair = async () => {
+    await supabase.auth.signOut();
+    onClose();
+    navigate("/");
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const linha = (href: string, rotulo: string, Icone?: ItemNavegacao["icon"], recuo = false) => {
+    const ativo = pathname === href || (!recuo && rotaAtiva(pathname, href));
+    return (
+      <Link
+        key={href + rotulo}
+        to={href}
+        onClick={onClose}
+        aria-current={ativo ? "page" : undefined}
+        className={cn(
+          "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          recuo && "ml-[34px] h-9 text-[13px]",
+          ativo
+            ? "bg-card font-medium text-foreground ring-1 ring-sidebar-border [&>svg]:text-primary"
+            : "text-sidebar-foreground/75 hover:bg-bone-200/60 hover:text-sidebar-foreground",
+        )}
+      >
+        {Icone && <Icone className="h-4 w-4 shrink-0" strokeWidth={1.75} />}
+        <span>{rotulo}</span>
+      </Link>
+    );
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header com usuário */}
-      <div className="p-4 bg-primary/5">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12">
-            <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-              {getInitials(user?.full_name)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground truncate">
-              {user?.full_name || "Usuário"}
-            </p>
-            <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
-          </div>
+    <div className="flex h-full flex-col bg-sidebar">
+      <div className="flex items-center gap-3 border-b border-sidebar-border px-4 py-4">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+          {iniciais(user?.full_name)}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-foreground">{user?.full_name || "Usuário"}</p>
+          {user?.email && <p className="truncate text-[13px] text-muted-foreground">{user.email}</p>}
         </div>
       </div>
 
-      <Separator />
-
-      {/* Menu items organized by category */}
       <ScrollArea className="flex-1">
-        <nav className="py-2">
-          {isSuperAdmin && (
-            <div className="px-2 mb-2">
-              <Link
-                to="/super-admin"
-                onClick={onClose}
-                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-              >
-                <Shield className="h-5 w-5" />
-                <span className="font-medium">Super Admin</span>
-                <ChevronRight className="h-4 w-4 ml-auto" />
-              </Link>
-            </div>
-          )}
-
-          {menuCategories.map((category, categoryIndex) => (
-            <div key={category.title} className="mb-2">
-              {/* Category title */}
-              <div className="px-4 py-2">
-                <span className="text-xs font-semibold text-muted-foreground tracking-wider">
-                  {category.title}
-                </span>
+        <nav className="px-3 py-3" aria-label="Módulos">
+          {isSuperAdmin && <div className="mb-1">{linha("/super-admin", "Super Admin", Shield)}</div>}
+          {GRUPOS_NAVEGACAO.map((grupo, i) => {
+            const itens = grupo.items.filter(pode);
+            if (!itens.length) return null;
+            return (
+              <div key={grupo.title} className={cn("space-y-0.5", i > 0 && "pt-4")}>
+                <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-sidebar-foreground/50">
+                  {grupo.title}
+                </p>
+                {itens.map((item) => (
+                  <div key={item.href} className="space-y-0.5">
+                    {linha(item.href, item.name, item.icon)}
+                    {item.subItems?.slice(1).map((sub) => linha(sub.href, sub.name, undefined, true))}
+                  </div>
+                ))}
               </div>
-
-              {/* Category items */}
-              <div className="px-2 space-y-0.5">
-                {category.items.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      onClick={onClose}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
-                        isActive
-                          ? "bg-accent text-primary font-medium"
-                          : "text-foreground hover:bg-accent/50"
-                      )}
-                    >
-                      <item.icon
-                        className={cn(
-                          "h-5 w-5",
-                          isActive ? "text-primary" : "text-muted-foreground"
-                        )}
-                      />
-                      <span className="text-sm">{item.name}</span>
-                      <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Separator between categories */}
-              {categoryIndex < menuCategories.length - 1 && (
-                <Separator className="mt-2" />
-              )}
-            </div>
-          ))}
+            );
+          })}
+          <div className="mt-4 space-y-0.5 border-t border-sidebar-border pt-3">
+            {NAVEGACAO_RODAPE.filter(pode).map((item) => linha(item.href, item.name, item.icon))}
+          </div>
         </nav>
       </ScrollArea>
 
-      <Separator />
-
-      {/* Logout */}
-      <div className="p-2">
+      <div className="border-t border-sidebar-border p-3">
         <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
+          type="button"
+          onClick={sair}
+          className="flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-sm text-sinal-alerta transition-colors duration-150 hover:bg-sinal-alerta-tenue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <LogOut className="h-5 w-5" />
-          <span className="font-medium">Sair</span>
+          <LogOut className="h-4 w-4" strokeWidth={1.75} />
+          Sair
         </button>
       </div>
     </div>

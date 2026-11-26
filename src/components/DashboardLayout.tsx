@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect, type CSSProperties } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, X, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,12 +25,9 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [impersonation, setImpersonation] = useState<ImpersonationState | null>(null);
   
-  const isHomePage = location.pathname === "/dashboard";
-
   useEffect(() => {
     const stored = localStorage.getItem("admin_impersonation");
     if (stored) {
@@ -61,19 +58,20 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
 
   return (
     <div
-      className="min-h-screen bg-background"
+      className="min-h-screen bg-background max-lg:pt-[var(--faixa-h)]"
       style={{ "--faixa-h": impersonation ? "44px" : "0px" } as CSSProperties}
     >
       {/* Impersonation Banner */}
       {impersonation && (
-        <div className="fixed top-0 left-0 right-0 z-[60] flex h-11 print:hidden items-center justify-between border-b border-sinal-espera/20 bg-sinal-espera-tenue px-4 text-sinal-espera">
-          <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              Visualizando como {impersonation.clinicName}
+        <div className="fixed top-0 left-0 right-0 z-[60] flex h-11 print:hidden items-center justify-between gap-2 border-b border-sinal-espera/20 bg-sinal-espera-tenue px-3 text-sinal-espera md:px-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <Eye className="h-4 w-4 shrink-0" />
+            <span className="truncate text-sm font-medium" title={impersonation.clinicName}>
+              <span className="hidden sm:inline">Visualizando como </span>
+              {impersonation.clinicName}
             </span>
           </div>
-          <div className="flex items-center gap-1 md:gap-2">
+          <div className="flex shrink-0 items-center gap-1 md:gap-2">
             <Button
               size="sm"
               variant="outline"
@@ -97,12 +95,10 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
         </div>
       )}
 
-      {/* Mobile Navbar - hidden on home page since MobileHome has its own hero header */}
-      {!isHomePage && (
-        <div className="lg:hidden print:hidden">
-          <Navbar user={user} />
-        </div>
-      )}
+      {/* Barra do topo no celular (em todas as telas, inclusive a home) */}
+      <div className="sticky top-[var(--faixa-h)] z-50 lg:hidden print:hidden">
+        <Navbar user={user} />
+      </div>
 
       {/* Desktop Sidebar (fixed 260px) */}
       <DesktopSidebar />
@@ -112,18 +108,17 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
 
       <div className={cn(
         "flex",
-        impersonation ? "lg:pt-[44px]" : "lg:pt-0",
-        isHomePage ? "pt-0" : (impersonation ? "pt-[104px]" : "pt-16")
+        impersonation ? "lg:pt-[44px]" : "lg:pt-0"
       )}>
         {/* Main content */}
         <main className={cn(
           "flex-1 min-w-0",
           "lg:ml-[260px] lg:mt-16 print:!m-0 print:!p-0",
-          "pb-[calc(72px+env(safe-area-inset-bottom,0px)+8px)] lg:pb-4"
+          "pb-[calc(64px+env(safe-area-inset-bottom,0px)+16px)] lg:pb-4"
         )}>
           <div className={cn(
             "w-full min-w-0 mx-auto min-h-0 overflow-y-auto overflow-x-hidden max-w-[1600px]",
-            isHomePage ? "px-0 lg:p-8" : "px-4 lg:p-8"
+            "px-4 lg:p-8"
           )}>
             {children}
           </div>

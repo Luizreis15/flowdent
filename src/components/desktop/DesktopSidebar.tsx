@@ -2,87 +2,15 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import {
-  Calendar,
-  FileText,
-  DollarSign,
-  MessageSquare,
-  Users,
-  LayoutDashboard,
-  Settings,
-  FlaskConical,
-  Package,
-  User,
-  Shield,
-  SmilePlus,
-  ChevronDown,
-  BarChart3,
-} from "lucide-react";
+import { Shield, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Logo } from "@/components/brand/Logo";
+import { GRUPOS_NAVEGACAO, NAVEGACAO_RODAPE, type ItemNavegacao } from "@/lib/navegacao";
 
-interface NavItem {
-  name: string;
-  href: string;
-  icon: React.ElementType;
-  /** Permission resource required to see this item (checks 'visualizar' action) */
-  permission?: string;
-  subItems?: { name: string; href: string }[];
-}
-
-interface NavGroup {
-  title: string;
-  items: NavItem[];
-}
-
-const navGroups: NavGroup[] = [
-  {
-    title: "OPERACIONAL",
-    items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Agenda", href: "/dashboard/agenda", icon: Calendar, permission: "agenda" },
-      { name: "Pacientes", href: "/dashboard/prontuario", icon: FileText, permission: "prontuario" },
-    ],
-  },
-  {
-    title: "CONTROLE CLÍNICO",
-    items: [
-      { name: "Ortodontia", href: "/dashboard/ortodontia", icon: SmilePlus, permission: "ortodontia" },
-      { name: "Próteses", href: "/dashboard/proteses", icon: FlaskConical, permission: "proteses" },
-      {
-        name: "Estoque",
-        href: "/dashboard/estoque",
-        icon: Package,
-        permission: "estoque",
-        subItems: [
-          { name: "Painel", href: "/dashboard/estoque" },
-          { name: "Produtos", href: "/dashboard/produtos" },
-          { name: "Movimentações", href: "/dashboard/movimentacoes" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "GESTÃO E RELATÓRIOS",
-    items: [
-      { name: "Financeiro", href: "/dashboard/financeiro", icon: DollarSign, permission: "financeiro" },
-      { name: "CRM", href: "/dashboard/crm", icon: MessageSquare, permission: "crm" },
-      { name: "Relatórios", href: "/dashboard/relatorios", icon: BarChart3, permission: "relatorios" },
-    ],
-  },
-  {
-    title: "FERRAMENTAS",
-    items: [
-      { name: "Portal do paciente", href: "/dashboard/portal-paciente", icon: Users, permission: "portal_paciente" },
-    ],
-  },
-];
-
-const bottomNavigation: NavItem[] = [
-  { name: "Configurações", href: "/dashboard/configuracoes", icon: Settings, permission: "configuracoes" },
-  { name: "Meu perfil", href: "/dashboard/perfil", icon: User },
-];
+type NavItem = ItemNavegacao;
+const navGroups = GRUPOS_NAVEGACAO;
+const bottomNavigation = NAVEGACAO_RODAPE;
 
 const DesktopSidebar = () => {
   const location = useLocation();

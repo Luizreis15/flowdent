@@ -61,8 +61,8 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 | **A — Fundação** | Cores escritas à mão → tokens; regra de lint de design; família tipográfica | 1–2 | Itens 1 e 2 em produção (PR #14); fonte aguarda decisão |
 | B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | Concluída (PRs #15–#17) |
 | C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | Concluída (PRs #18–#19) |
-| D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | D1 em produção (PR #20); D2 (Configurações, Perfil, Assinatura, Portal, IA) em PR |
-| E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | — |
+| D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | Concluída (PRs #20–#21) |
+| E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | E1 (casca mobile) em PR; E2 (estados) a fazer |
 | F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | — |
 | G — Super admin | 21 telas internas | 1–2 | — |
 
@@ -112,6 +112,26 @@ Estimativa: 13–16 PRs. A–C levam o app a ~8; E e F fazem a diferença entre 
   Configurações ignorava a impersonação e abria vazia com erro; "Responsável pela clínica" mostrava o ID cru;
   "Economize 10%" no plano anual (o desconto real é de 2 meses, ~17%, agora calculado dos preços);
   duas buscas na aba Usuários.
+
+### Fase E1 — o que entrou
+
+- **Casca do celular no padrão "PROPOSTO"**: barra do topo branca com logotipo e menu da conta; barra inferior com
+  cinco itens na mesma linha (o "+" virou o item "Novo", sem flutuar nem sombra) e item ativo também nas rotas
+  filhas; faixa de impersonação numa linha só (nome da clínica truncado).
+- **Home do celular**: cabeçalho igual ao do desktop ("Hoje" e a data), faixa de indicadores (consultas,
+  confirmadas, pendentes), agenda do dia em linhas com barra de status e selo, atalhos para os módulos.
+  Saíram o topo em degradê, os blocos coloridos e o sino sem função.
+- **Agenda do celular**: cabeçalho comum, abas Dia/Semana/Mês, filtro de profissional, mesmas linhas da home,
+  estados de carregamento, vazio e erro.
+- **Menu "Mais"**: a mesma lista e as mesmas permissões da sidebar (`src/lib/navegacao.ts`); ganhou Relatórios,
+  Produtos e Movimentações. `ModuleCards` (tablet e celular) no padrão neutro, respeitando permissões.
+- Bugs corrigidos: **a agenda do celular gravava status em português** ("confirmado"/"cancelado"); o banco recusa
+  e a tela não avisava, então confirmar e cancelar pelo celular nunca funcionou. **Cancelar era um deslize no
+  cartão, sem confirmação**: agora é uma ação no menu "⋮" com diálogo. Os avisos diziam "o paciente será
+  notificado" (não é). Home e agenda do celular não filtravam por clínica (o super admin via consultas de todas as
+  clínicas). "Perfil" no menu do topo levava a `/dashboard/profile`, rota inexistente. "2 confirmaçãoões".
+  O cartão "Relatórios" levava ao Financeiro.
+- Removidos 9 componentes mobile substituídos ou que não eram usados (cartão de deslizar, FAB, métricas etc.).
 
 ## Decisões pendentes do dono
 
