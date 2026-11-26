@@ -1,4 +1,7 @@
 import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect, useMemo } from "react";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -78,6 +81,7 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
   const canEstorno = can("financeiro", "estorno");
   const [titles, setTitles] = useState<ReceivableTitle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
@@ -97,6 +101,7 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
   const loadTitles = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
       let query = supabase
         .from("receivable_titles")
         .select("*, patient:patients(full_name, phone)")
@@ -115,7 +120,7 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
       setTitles(data || []);
     } catch (error) {
       console.error("Erro ao carregar títulos:", error);
-      toast.error("Erro ao carregar contas a receber");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -220,7 +225,8 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedIds);
-    next.has(id) ? next.delete(id) : next.add(id);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
     setSelectedIds(next);
   };
 
@@ -339,6 +345,7 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
     setRenegoOpen(false);
   };
 
+  const filtrando = statusFilter !== "all" || paymentMethodFilter !== "all" || !!searchTerm;
   return (
     <div className="space-y-4 md:space-y-6">
       <FaixaIndicadores
@@ -434,21 +441,17 @@ export const ReceivablesTab = ({ clinicId }: ReceivablesTabProps) => {
       )}
 
       {/* Table */}
-      <div className="border rounded-lg">
-        {loading ? (
-          <div className="p-12 text-center">
-            <p className="text-muted-foreground">Carregando...</p>
-          </div>
+      <div className="border rounded-lg bg-card">
+        {erroCarregar ? (
+          <EstadoErro titulo="Não foi possível carregar as contas a receber" onTentarDeNovo={loadTitles} />
+        ) : loading ? (
+          <EsqueletoLista linhas={6} colunas={3} className="rounded-none border-0" />
         ) : filteredTitles.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="inline-block p-4 bg-muted rounded-lg mb-4">
-              <DollarSign className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <p className="text-lg font-medium">Nenhum título encontrado</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {statusFilter !== "all" || searchTerm ? "Tente alterar os filtros" : "Aprove orçamentos para gerar títulos"}
-            </p>
-          </div>
+          filtrando ? (
+            <EstadoVazio icone={DollarSign} titulo="Nenhum título encontrado" descricao="Tente alterar a busca ou os filtros." />
+          ) : (
+            <EstadoVazio icone={DollarSign} titulo="Nenhum título a receber" descricao="Os títulos aparecem aqui quando um orçamento é aprovado." />
+          )
         ) : (
           <>
             {/* Mobile cards */}

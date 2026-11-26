@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +35,7 @@ export function OrthoPatientTab({ patientId }: OrthoPatientTabProps) {
   const [detalhesOpen, setDetalhesOpen] = useState(false);
   const [selectedCasoId, setSelectedCasoId] = useState<string | null>(null);
 
-  const { data: casos, refetch } = useQuery({
+  const { data: casos, refetch, isLoading, isError } = useQuery({
     queryKey: ["ortho-cases-patient", patientId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -48,16 +51,26 @@ export function OrthoPatientTab({ patientId }: OrthoPatientTabProps) {
     },
   });
 
+  if (isError) {
+    return (
+      <Card>
+        <EstadoErro titulo="Não foi possível carregar os casos" onTentarDeNovo={() => refetch()} />
+      </Card>
+    );
+  }
+
+  if (isLoading) {
+    return <EsqueletoLista linhas={2} colunas={2} />;
+  }
+
   if (!casos || casos.length === 0) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <SmilePlus className="h-12 w-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-medium text-muted-foreground">Nenhum caso ortodôntico</h3>
-          <p className="text-sm text-muted-foreground/70 mt-1">
-            Este paciente não possui casos ortodônticos registrados.
-          </p>
-        </CardContent>
+        <EstadoVazio
+          icone={SmilePlus}
+          titulo="Nenhum caso ortodôntico"
+          descricao="Os casos deste paciente aparecem aqui. Crie um caso no módulo Ortodontia."
+        />
       </Card>
     );
   }

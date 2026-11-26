@@ -3,56 +3,64 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Users, Kanban, Zap, Settings, Loader2 } from "lucide-react";
+import { MessageSquare, Users, Kanban, Zap, Settings } from "lucide-react";
 import { ConfigurarWhatsAppModal } from "@/components/crm/ConfigurarWhatsAppModal";
 import { CRMContatos } from "@/components/crm/CRMContatos";
 import { CRMChat } from "@/components/crm/CRMChat";
 import { CRMKanban } from "@/components/crm/CRMKanban";
 import { RespostasRapidas } from "@/components/crm/RespostasRapidas";
+import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
 
 export default function CRMAtendimento() {
-  const [clinicId, setClinicId] = useState<string | null>(null);
+  // Clínica ativa (respeita a impersonação); antes vinha do perfil de quem está logado
+  const { clinicId } = useAuth();
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [whatsappConfigured, setWhatsappConfigured] = useState(false);
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("chat");
 
   useEffect(() => {
-    init();
-  }, []);
+    if (clinicId) init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clinicId]);
 
   const init = async () => {
+    if (!clinicId) return;
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("clinic_id")
-        .eq("id", user.user.id)
-        .single();
-
-      if (!profile?.clinic_id) return;
-      setClinicId(profile.clinic_id);
-
-      const { data } = await supabase
+      setLoading(true);
+      setErroCarregar(false);
+      const { data, error } = await supabase
         .from("whatsapp_configs" as any)
         .select("is_active")
-        .eq("clinica_id", profile.clinic_id)
+        .eq("clinica_id", clinicId)
         .maybeSingle();
-
+      if (error) throw error;
       setWhatsappConfigured((data as any)?.is_active || false);
     } catch (error) {
       console.error("Erro ao inicializar CRM:", error);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
   };
 
+  if (erroCarregar) {
+    return (
+      <div className="rounded-lg border bg-card">
+        <EstadoErro titulo="Não foi possível abrir o atendimento" onTentarDeNovo={init} />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-muted-foreground" />
+      <div className="space-y-4" aria-busy="true" aria-label="Carregando">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-full max-w-md" />
+        <Skeleton className="h-[420px] rounded-lg" />
       </div>
     );
   }

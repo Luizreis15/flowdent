@@ -18,6 +18,8 @@ interface Profissional {
 interface ProfissionaisTableProps {
   profissionais: Profissional[];
   loading: boolean;
+  erro?: boolean;
+  onTentarDeNovo?: () => void;
   onEdit: (profissional: Profissional) => void;
   onToggleStatus: (profissional: Profissional) => void;
   onConfigAgenda: (profissional: Profissional) => void;
@@ -33,6 +35,8 @@ const perfilLabels: Record<string, string> = {
 export const ProfissionaisTable = ({
   profissionais,
   loading,
+  erro,
+  onTentarDeNovo,
   onEdit,
   onToggleStatus,
   onConfigAgenda
@@ -95,6 +99,10 @@ export const ProfissionaisTable = ({
       columns={columns}
       data={profissionais}
       isLoading={loading}
+      erro={erro}
+      tituloErro="Não foi possível carregar os profissionais"
+      onTentarDeNovo={onTentarDeNovo}
+      vazio={{ titulo: "Nenhum profissional cadastrado", descricao: "Cadastre os dentistas e profissionais que atendem na clínica." }}
       searchPlaceholder="Buscar profissional..."
       emptyMessage="Nenhum profissional encontrado"
       selectable={false}

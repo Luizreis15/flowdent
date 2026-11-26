@@ -7,12 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Calendar, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Plus, Search, Calendar, TrendingUp, AlertCircle, CheckCircle2, SmilePlus } from "lucide-react";
 import { NovoCasoModal } from "@/components/ortodontia/NovoCasoModal";
 import { DetalhesCasoModal } from "@/components/ortodontia/DetalhesCasoModal";
 import { ReajusteAnualModal } from "@/components/ortodontia/ReajusteAnualModal";
 import { format, differenceInMonths, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 
 const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   planejamento: { label: "Planejamento", variant: "secondary" },
@@ -41,7 +45,7 @@ export default function Ortodontia() {
   const [filtroAgendamento, setFiltroAgendamento] = useState<string>("todos");
   const [reajusteOpen, setReajusteOpen] = useState(false);
 
-  const { data: casos, refetch } = useQuery({
+  const { data: casos, refetch, isLoading, isError } = useQuery({
     queryKey: ["ortho-cases", clinicId],
     enabled: !!clinicId,
     queryFn: async () => {
@@ -160,22 +164,22 @@ export default function Ortodontia() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Ortodontia</h1>
-          <p className="text-muted-foreground text-sm">Acompanhamento de casos ortodônticos</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setReajusteOpen(true)}>
-            <TrendingUp className="w-4 h-4 mr-2" />
-            Reajuste Anual
-          </Button>
-          <Button onClick={() => setNovoCasoOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Caso
-          </Button>
-        </div>
-      </div>
+      <CabecalhoPagina
+        titulo="Ortodontia"
+        subtitulo="Acompanhamento de casos ortodônticos"
+        acoes={
+          <>
+            <Button variant="outline" onClick={() => setReajusteOpen(true)}>
+              <TrendingUp className="mr-1.5 h-4 w-4" />
+              Reajuste anual
+            </Button>
+            <Button onClick={() => setNovoCasoOpen(true)}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Novo caso
+            </Button>
+          </>
+        }
+      />
 
       {/* Filtros */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -227,14 +231,30 @@ export default function Ortodontia() {
       </div>
 
       {/* Lista compacta */}
-      {casosFiltrados.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Calendar className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <h3 className="text-lg font-medium text-muted-foreground">Nenhum caso encontrado</h3>
-            <p className="text-sm text-muted-foreground/70 mt-1">Crie um novo caso ortodôntico para começar.</p>
-          </CardContent>
-        </Card>
+      {isError ? (
+        <div className="rounded-lg border bg-card">
+          <EstadoErro titulo="Não foi possível carregar os casos" onTentarDeNovo={() => refetch()} />
+        </div>
+      ) : isLoading ? (
+        <EsqueletoLista linhas={6} colunas={4} />
+      ) : casosFiltrados.length === 0 ? (
+        <div className="rounded-lg border bg-card">
+          {casos?.length ? (
+            <EstadoVazio icone={Search} titulo="Nenhum caso encontrado" descricao="Tente alterar a busca ou os filtros." />
+          ) : (
+            <EstadoVazio
+              icone={SmilePlus}
+              titulo="Nenhum caso ortodôntico"
+              descricao="Cadastre um caso para acompanhar manutenções, alinhadores e mensalidades."
+              acao={
+                <Button size="sm" onClick={() => setNovoCasoOpen(true)}>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Novo caso
+                </Button>
+              }
+            />
+          )}
+        </div>
       ) : (
         <Card>
           {/* Header da lista */}

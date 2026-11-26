@@ -39,6 +39,7 @@ export const UsuariosTab = ({ clinicaId }: UsuariosTabProps) => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [filteredUsuarios, setFilteredUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -57,6 +58,7 @@ export const UsuariosTab = ({ clinicaId }: UsuariosTabProps) => {
   const loadUsuarios = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("usuarios")
         .select("*")
@@ -79,7 +81,7 @@ export const UsuariosTab = ({ clinicaId }: UsuariosTabProps) => {
       
       setUsuarios(mapped);
     } catch (error: any) {
-      toast.error("Erro ao carregar usuários: " + error.message);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -155,6 +157,8 @@ export const UsuariosTab = ({ clinicaId }: UsuariosTabProps) => {
       </div>
 
       <UsuariosTable
+        erro={erroCarregar}
+        onTentarDeNovo={loadUsuarios}
         usuarios={filteredUsuarios}
         loading={loading}
         onEdit={handleEdit}

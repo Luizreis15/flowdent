@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +32,7 @@ interface Contact {
 export function CRMContatos({ clinicId }: CRMContatosProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [search, setSearch] = useState("");
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -40,6 +45,7 @@ export function CRMContatos({ clinicId }: CRMContatosProps) {
 
   const loadContacts = async () => {
     try {
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("crm_contacts")
         .select("*")
@@ -50,6 +56,7 @@ export function CRMContatos({ clinicId }: CRMContatosProps) {
       setContacts(data || []);
     } catch (error) {
       console.error("Erro ao carregar contatos:", error);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -142,12 +149,16 @@ export function CRMContatos({ clinicId }: CRMContatosProps) {
     c.phone.includes(search)
   );
 
-  if (loading) {
+  if (erroCarregar) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="rounded-lg border bg-card">
+        <EstadoErro titulo="Não foi possível carregar os contatos" onTentarDeNovo={loadContacts} />
       </div>
     );
+  }
+
+  if (loading) {
+    return <EsqueletoLista avatar linhas={8} />;
   }
 
   return (
@@ -201,13 +212,16 @@ export function CRMContatos({ clinicId }: CRMContatosProps) {
               </div>
             </Card>
           ))}
-          {filtered.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              <UserPlus className="w-12 h-12 mx-auto mb-3 opacity-40" />
-              <p>Nenhum contato encontrado</p>
-              <p className="text-sm mt-1">Sincronize pacientes ou adicione contatos manualmente</p>
-            </div>
-          )}
+          {filtered.length === 0 &&
+            (contacts.length ? (
+              <EstadoVazio icone={Search} titulo="Nenhum contato encontrado" descricao="Tente outro nome ou telefone." />
+            ) : (
+              <EstadoVazio
+                icone={UserPlus}
+                titulo="Nenhum contato ainda"
+                descricao="Sincronize os pacientes com telefone ou adicione um contato."
+              />
+            ))}
         </div>
       </ScrollArea>
 

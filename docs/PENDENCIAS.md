@@ -137,6 +137,13 @@ Em ordem de prioridade sugerida:
 16. **Autenticação em duas etapas e sessões ativas**: os cartões "em desenvolvimento" saíram do Perfil.
    Implementar é funcionalidade nova.
 
+17. **Modais ignoram a impersonação do super admin** (achado na E2): cerca de 20 arquivos buscam a clínica em
+   `profiles.clinic_id` de quem está logado, em vez de `useAuth().clinicId` (ex.: `NovaProteseModal`,
+   `NovoProdutoModal`, `EntradaEstoqueModal`, `NovoDocumentoModal`, `ImportPacientesModal`, `PatientDetails`).
+   Para o usuário da clínica não muda nada (é a mesma clínica); para o super admin visualizando uma clínica, as
+   telas ficam vazias e os modais gravariam sem clínica. As telas de lista (Produtos, Estoque, Movimentações,
+   CRM Atendimento) já foram corrigidas na E2. Lista completa: `grep -rn 'select("clinic_id")' src`.
+
 ## P5 — Higiene do repositório
 
 1. **Migrations não recriam o banco do zero** (impede staging/CI): `20251030203313` exige `admin@admin.com`,

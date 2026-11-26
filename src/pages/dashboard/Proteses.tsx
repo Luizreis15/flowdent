@@ -3,7 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Palette, Layers } from "lucide-react";
+import { Plus, Search, Palette, Layers, FlaskConical } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { NovaProteseModal } from "@/components/proteses/NovaProteseModal";
@@ -20,14 +25,17 @@ const COLUNAS = [
 ];
 
 export default function Proteses() {
+  // Antes a lista não filtrava por clínica (o super admin via próteses de todas ao visualizar uma clínica)
+  const { clinicId } = useAuth();
   const [novaProteseOpen, setNovaProteseOpen] = useState(false);
   const [detalhesOpen, setDetalhesOpen] = useState(false);
   const [proteseSelecionada, setProteseSelecionada] = useState<string | null>(null);
   const [busca, setBusca] = useState("");
 
   // Buscar próteses com etapa atual
-  const { data: proteses, refetch } = useQuery({
-    queryKey: ["proteses"],
+  const { data: proteses, refetch, isLoading, isError } = useQuery({
+    queryKey: ["proteses", clinicId],
+    enabled: !!clinicId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("proteses")
@@ -40,6 +48,7 @@ export default function Proteses() {
             id, ordem, nome_etapa, status, cor
           )
         `)
+        .eq("clinica_id", clinicId!)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -49,11 +58,13 @@ export default function Proteses() {
 
   // Buscar total de etapas por prótese
   const { data: etapasCount } = useQuery({
-    queryKey: ["proteses-etapas-count"],
+    queryKey: ["proteses-etapas-count", clinicId],
+    enabled: !!clinicId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("protese_etapas")
-        .select("protese_id");
+        .select("protese_id, proteses!inner(clinica_id)")
+        .eq("proteses.clinica_id", clinicId!);
 
       if (error) throw error;
 
@@ -113,16 +124,16 @@ export default function Proteses() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Controle de Prótese</h1>
-          <p className="text-muted-foreground">Gestão completa do fluxo protético com múltiplas etapas</p>
-        </div>
-        <Button onClick={() => setNovaProteseOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Prótese
-        </Button>
-      </div>
+      <CabecalhoPagina
+        titulo="Próteses"
+        subtitulo="Fluxo protético por etapa, do molde à instalação"
+        acoes={
+          <Button onClick={() => setNovaProteseOpen(true)}>
+            <Plus className="mr-1.5 h-4 w-4" />
+            Nova prótese
+          </Button>
+        }
+      />
 
       {/* Busca */}
       <div className="relative">
@@ -135,7 +146,35 @@ export default function Proteses() {
         />
       </div>
 
-      {/* Kanban */}
+      {isError ? (
+        <div className="rounded-lg border bg-card">
+          <EstadoErro titulo="Não foi possível carregar as próteses" onTentarDeNovo={() => refetch()} />
+        </div>
+      ) : isLoading ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-5" aria-busy="true" aria-label="Carregando">
+          {COLUNAS.map((c) => (
+            <div key={c.id} className="space-y-2 rounded-md border bg-muted/40 p-2">
+              <Skeleton className="h-6 w-2/3" />
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
+            </div>
+          ))}
+        </div>
+      ) : !proteses?.length ? (
+        <div className="rounded-lg border bg-card">
+          <EstadoVazio
+            icone={FlaskConical}
+            titulo="Nenhuma prótese em andamento"
+            descricao="Cadastre uma prótese para acompanhar cada etapa com o laboratório."
+            acao={
+              <Button size="sm" onClick={() => setNovaProteseOpen(true)}>
+                <Plus className="mr-1.5 h-4 w-4" />
+                Nova prótese
+              </Button>
+            }
+          />
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 overflow-x-auto pb-4">
         {COLUNAS.map((coluna) => {
           const protesesColuna = filtrarProteses(coluna.id);
@@ -245,6 +284,7 @@ export default function Proteses() {
           );
         })}
       </div>
+      )}
 
       <NovaProteseModal
         open={novaProteseOpen}

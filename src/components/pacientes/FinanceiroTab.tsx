@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExtratoFinanceiroPaciente } from "./ExtratoFinanceiroPaciente";
 import { Badge } from "@/components/ui/badge";
@@ -107,6 +110,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
   const [pagamentos, setPagamentos] = useState<Pagamento[]>([]);
   const [recibos, setRecibos] = useState<ReceiptDoc[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState("resumo");
   const [selectedTitulo, setSelectedTitulo] = useState<Titulo | null>(null);
   const [paymentDrawerOpen, setPaymentDrawerOpen] = useState(false);
@@ -122,6 +126,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
   const loadData = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
 
       const [titulosRes, pagamentosRes, recibosRes] = await Promise.all([
         supabase
@@ -147,7 +152,7 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
       setRecibos(recibosRes.data || []);
     } catch (error: any) {
       console.error("Erro ao carregar dados financeiros:", error);
-      toast.error("Erro ao carregar dados financeiros");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -200,7 +205,8 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedIds);
-    next.has(id) ? next.delete(id) : next.add(id);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
     setSelectedIds(next);
   };
 
@@ -360,14 +366,16 @@ export const FinanceiroTab = ({ patientId, clinicId }: FinanceiroTabProps) => {
     }
   };
 
-  if (loading) {
+  if (erroCarregar) {
     return (
       <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">Carregando dados financeiros...</p>
-        </CardContent>
+        <EstadoErro titulo="Não foi possível carregar o financeiro do paciente" onTentarDeNovo={loadData} />
       </Card>
     );
+  }
+
+  if (loading) {
+    return <EsqueletoLista linhas={5} colunas={3} />;
   }
 
   return (

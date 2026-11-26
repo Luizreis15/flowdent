@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +40,7 @@ const STAGES = [
 export function CRMKanban({ clinicId }: CRMKanbanProps) {
   const [conversations, setConversations] = useState<KanbanConversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [dragging, setDragging] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,6 +49,7 @@ export function CRMKanban({ clinicId }: CRMKanbanProps) {
 
   const loadConversations = async () => {
     try {
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("crm_conversations")
         .select(`*, contact:crm_contacts(id, name, phone, tags)`)
@@ -54,6 +60,7 @@ export function CRMKanban({ clinicId }: CRMKanbanProps) {
       setConversations((data as any) || []);
     } catch (error) {
       console.error("Erro ao carregar kanban:", error);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -95,10 +102,24 @@ export function CRMKanban({ clinicId }: CRMKanbanProps) {
     setDragging(null);
   };
 
+  if (erroCarregar) {
+    return (
+      <div className="rounded-lg border bg-card">
+        <EstadoErro titulo="Não foi possível carregar o funil" onTentarDeNovo={loadConversations} />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="flex gap-3 overflow-hidden" aria-busy="true" aria-label="Carregando">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="w-72 shrink-0 space-y-2 rounded-lg border bg-muted/40 p-3">
+            <Skeleton className="h-5 w-1/2" />
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
+          </div>
+        ))}
       </div>
     );
   }

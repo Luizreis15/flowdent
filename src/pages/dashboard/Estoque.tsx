@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { EntradaEstoqueModal } from "@/components/estoque/EntradaEstoqueModal";
 import { SaidaEstoqueModal } from "@/components/estoque/SaidaEstoqueModal";
 import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
 import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
 import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+
 import { separarMoeda } from "@/lib/moeda";
 import { classeSeloMovimentacao, quantidadeComSinal, tipoMovimentacao } from "@/lib/movimentacaoEstoque";
 import { cn } from "@/lib/utils";
@@ -23,25 +26,18 @@ export default function Estoque() {
   const [entradaOpen, setEntradaOpen] = useState(false);
   const [saidaOpen, setSaidaOpen] = useState(false);
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const { data } = await supabase.from("profiles").select("clinic_id").eq("id", user.id).single();
-      return data;
-    },
-  });
+  // Clínica ativa (respeita a impersonação do super admin); antes vinha do perfil de quem está logado.
+  const { clinicId } = useAuth();
 
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["stock-dashboard", profile?.clinic_id],
+  const { data: stats, isLoading, isError, refetch } = useQuery({
+    queryKey: ["stock-dashboard", clinicId],
     queryFn: async () => {
-      if (!profile?.clinic_id) return null;
+      if (!clinicId) return null;
 
       const { data: productsData } = await supabase
         .from("products")
         .select("id, estoque_minimo, stocks(quantidade)")
-        .eq("clinica_id", profile.clinic_id)
+        .eq("clinica_id", clinicId)
         .eq("ativo", true);
 
       const belowMinimum = (productsData || []).filter((p) => {
@@ -62,20 +58,20 @@ export default function Estoque() {
       const { data: stocksData } = await supabase
         .from("stocks")
         .select("quantidade, custo_medio, products!inner(clinica_id)")
-        .eq("products.clinica_id", profile.clinic_id);
+        .eq("products.clinica_id", clinicId);
       const totalValue = (stocksData || []).reduce((sum, s) => sum + Number(s.quantidade || 0) * Number(s.custo_medio || 0), 0);
 
       // Contagem real do dia; antes contava só entre as 10 últimas movimentações
       const { count: movesToday } = await supabase
         .from("stock_moves")
         .select("*", { count: "exact", head: true })
-        .eq("clinica_id", profile.clinic_id)
+        .eq("clinica_id", clinicId)
         .gte("created_at", startOfDay(new Date()).toISOString());
 
       const { data: recentMoves } = await supabase
         .from("stock_moves")
         .select("id, tipo, quantidade, created_at, products(nome, unidade)")
-        .eq("clinica_id", profile.clinic_id)
+        .eq("clinica_id", clinicId)
         .order("created_at", { ascending: false })
         .limit(10);
 
@@ -88,7 +84,7 @@ export default function Estoque() {
         recentMoves: recentMoves || [],
       };
     },
-    enabled: !!profile?.clinic_id,
+    enabled: !!clinicId,
   });
 
   const valor = separarMoeda(brl(stats?.totalValue || 0));
@@ -112,7 +108,11 @@ export default function Estoque() {
         }
       />
 
-      {isLoading ? (
+      {isError ? (
+        <div className="rounded-lg border bg-card">
+          <EstadoErro titulo="Não foi possível carregar o estoque" onTentarDeNovo={() => refetch()} />
+        </div>
+      ) : isLoading ? (
         <Skeleton className="h-[104px] rounded-lg" />
       ) : (
         <FaixaIndicadores

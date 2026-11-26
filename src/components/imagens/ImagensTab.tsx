@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -40,6 +44,7 @@ interface ImagensTabProps {
 export default function ImagensTab({ patientId }: ImagensTabProps) {
   const [files, setFiles] = useState<PatientFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
@@ -53,6 +58,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
   const loadFiles = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("patient_files")
         .select("*")
@@ -63,7 +69,7 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
       setFiles(data || []);
     } catch (error) {
       console.error("Erro ao carregar arquivos:", error);
-      toast.error("Erro ao carregar arquivos");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -188,8 +194,24 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
+  if (erroCarregar) {
+    return (
+      <div className="p-6">
+        <div className="rounded-lg border bg-card">
+          <EstadoErro titulo="Não foi possível carregar os arquivos" onTentarDeNovo={loadFiles} />
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
-    return <div className="p-6">Carregando...</div>;
+    return (
+      <div className="grid grid-cols-2 gap-4 p-6 md:grid-cols-4" aria-busy="true" aria-label="Carregando">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="aspect-square rounded-lg" />
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -210,17 +232,19 @@ export default function ImagensTab({ patientId }: ImagensTabProps) {
 
       {/* Lista de Arquivos */}
       {files.length === 0 ? (
-        <Card className="p-12 text-center">
-          <FileImage className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Nenhum arquivo</h3>
-          <p className="text-muted-foreground mb-6">
-            Envie imagens ou PDFs para começar
-          </p>
-          <Button onClick={() => setShowUploadModal(true)}>
-            <Upload className="h-4 w-4 mr-2" />
-            Enviar Primeiro Arquivo
-          </Button>
-        </Card>
+        <div className="rounded-lg border bg-card">
+          <EstadoVazio
+            icone={FileImage}
+            titulo="Nenhum arquivo"
+            descricao="Envie radiografias, fotos ou PDFs do paciente (até 10 MB)."
+            acao={
+              <Button size="sm" onClick={() => setShowUploadModal(true)}>
+                <Upload className="mr-1.5 h-4 w-4" />
+                Enviar arquivo
+              </Button>
+            }
+          />
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {files.map((file) => (

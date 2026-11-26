@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { NovoAgendamentoPacienteModal } from "./NovoAgendamentoPacienteModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +60,7 @@ interface Appointment {
 export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [activeTab, setActiveTab] = useState("todos");
   const [finalizeOpen, setFinalizeOpen] = useState(false);
   const [finalizeTarget, setFinalizeTarget] = useState<Appointment | null>(null);
@@ -86,6 +90,7 @@ export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
   const loadAppointments = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("appointments")
         .select(`
@@ -99,7 +104,7 @@ export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
       setAppointments(data || []);
     } catch (error: any) {
       console.error("Erro ao carregar agendamentos:", error);
-      toast.error("Erro ao carregar agendamentos");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -195,14 +200,16 @@ export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
   };
 
-  if (loading) {
+  if (erroCarregar) {
     return (
       <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">Carregando agendamentos...</p>
-        </CardContent>
+        <EstadoErro titulo="Não foi possível carregar os agendamentos" onTentarDeNovo={loadAppointments} />
       </Card>
     );
+  }
+
+  if (loading) {
+    return <EsqueletoLista linhas={5} colunas={3} />;
   }
 
   return (
@@ -289,15 +296,15 @@ export const AgendamentosTab = ({ patientId }: AgendamentosTabProps) => {
 
             <TabsContent value={activeTab} className="mt-0">
               {filteredAppointments.length === 0 ? (
-                <div className="text-center py-12">
-                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    {activeTab === "todos" 
-                      ? "Nenhum agendamento encontrado"
-                      : `Nenhum agendamento ${activeTab === "proximos" ? "próximo" : activeTab} encontrado`
-                    }
-                  </p>
-                </div>
+                <EstadoVazio
+                  icone={Calendar}
+                  titulo={
+                    activeTab === "todos"
+                      ? "Nenhum agendamento"
+                      : `Nenhum agendamento ${activeTab === "proximos" ? "próximo" : activeTab}`
+                  }
+                  descricao="As consultas deste paciente aparecem aqui."
+                />
               ) : (
                 <div className="overflow-x-auto">
                   <Table>

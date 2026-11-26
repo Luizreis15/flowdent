@@ -62,7 +62,7 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 | B — Uso diário | Financeiro (Receber, Pagar, Calendário, Recorrências, Comissões, Relatórios), Agenda (semana/dia, modais), CRM e Atendimento | 3 | Concluída (PRs #15–#17) |
 | C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | Concluída (PRs #18–#19) |
 | D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | Concluída (PRs #20–#21) |
-| E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | E1 (casca mobile) em produção (PR #23); E2 (estados) a fazer |
+| E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | E1 (casca mobile) em produção (PR #23); E2 (estados) em PR |
 | F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | — |
 | G — Super admin | 21 telas internas | 1–2 | — |
 
@@ -132,6 +132,22 @@ Estimativa: 13–16 PRs. A–C levam o app a ~8; E e F fazem a diferença entre 
   clínicas). "Perfil" no menu do topo levava a `/dashboard/profile`, rota inexistente. "2 confirmaçãoões".
   O cartão "Relatórios" levava ao Financeiro.
 - Removidos 9 componentes mobile substituídos ou que não eram usados (cartão de deslizar, FAB, métricas etc.).
+
+### Fase E2 — o que entrou
+
+- Novos componentes de sistema: `EstadoErro` (mesmo desenho do `EstadoVazio`, com "Tentar de novo") e
+  `EsqueletoLista` (carregamento no desenho da lista pronta). `DataTable` ganhou estado de erro, estado vazio
+  desenhado e "Nenhum resultado para a busca" com "Limpar busca", separado de "não há registros".
+- Carregamento, vazio e erro desenhados em: Pacientes, Agenda (calendário e dia), Financeiro (Receber, Pagar,
+  Recorrências, Comissões), CRM (campanhas, atendimento, conversas, contatos, funil), Ortodontia, Próteses,
+  Estoque, Produtos, Movimentações, Configurações (Profissionais, Usuários) e abas da ficha do paciente
+  (Agendamentos, Financeiro, Imagens, Ortodontia). Antes uma falha ao carregar deixava a lista vazia, como se não
+  houvesse registros, com no máximo um aviso passageiro; no CRM nem isso.
+- Cabeçalho comum em Ortodontia e Próteses; botões em caixa de frase ("Novo caso", "Nova prótese", "Novo paciente").
+- Bugs corrigidos: **Próteses não filtrava por clínica** (o super admin via próteses de todas as clínicas) e a
+  contagem de etapas lia as etapas de todas; Produtos, Estoque, Movimentações e CRM Atendimento ignoravam a
+  impersonação (liam a clínica do perfil); a busca de Pacientes consultava o servidor a cada tecla e quebrava com
+  vírgula ou parênteses no termo.
 
 ## Decisões pendentes do dono
 

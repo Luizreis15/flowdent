@@ -1,4 +1,7 @@
 import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -66,6 +69,7 @@ const PAGE_SIZE = 25;
 export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
   const [titles, setTitles] = useState<PayableTitle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [agingFilter, setAgingFilter] = useState("all");
@@ -86,6 +90,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
   const loadTitles = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
 
       let query = supabase
         .from("payable_titles")
@@ -108,7 +113,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
       setTitles((data || []) as PayableTitle[]);
     } catch (error) {
       console.error("Erro ao carregar títulos:", error);
-      toast.error("Erro ao carregar contas a pagar");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -320,6 +325,7 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
     else exportToPDF(exportData, exportColumns, fileName, "Contas a Pagar");
   };
 
+  const filtrando = statusFilter !== "all" || !!searchTerm;
   return (
     <div className="space-y-4 md:space-y-6">
       <FaixaIndicadores
@@ -407,21 +413,17 @@ export const PayablesTab = ({ clinicId }: PayablesTabProps) => {
       )}
 
       {/* List */}
-      <div className="border rounded-lg overflow-hidden">
-        {loading ? (
-          <div className="p-8 md:p-12 text-center">
-            <p className="text-muted-foreground">Carregando...</p>
-          </div>
+      <div className="border rounded-lg overflow-hidden bg-card">
+        {erroCarregar ? (
+          <EstadoErro titulo="Não foi possível carregar as contas a pagar" onTentarDeNovo={loadTitles} />
+        ) : loading ? (
+          <EsqueletoLista linhas={6} colunas={3} className="rounded-none border-0" />
         ) : filteredTitles.length === 0 ? (
-          <div className="p-8 md:p-12 text-center">
-            <div className="inline-block p-4 bg-muted rounded-lg mb-4">
-              <DollarSign className="h-10 w-10 md:h-12 md:w-12 text-muted-foreground" />
-            </div>
-            <p className="text-base md:text-lg font-medium">Nenhuma despesa encontrada</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {statusFilter !== "all" || searchTerm ? "Tente alterar os filtros" : "Adicione uma nova despesa para começar"}
-            </p>
-          </div>
+          filtrando ? (
+            <EstadoVazio icone={DollarSign} titulo="Nenhuma despesa encontrada" descricao="Tente alterar a busca ou os filtros." />
+          ) : (
+            <EstadoVazio icone={DollarSign} titulo="Nenhuma despesa lançada" descricao="Lance a primeira despesa para acompanhar o que vence." />
+          )
         ) : (
           <>
             {/* Mobile: Cards */}

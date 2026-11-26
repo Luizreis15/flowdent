@@ -1,4 +1,7 @@
 import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -48,6 +51,7 @@ interface RecorrenciasTabProps {
 export const RecorrenciasTab = ({ clinicId }: RecorrenciasTabProps) => {
   const [recurrences, setRecurrences] = useState<Recurrence[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,6 +61,7 @@ export const RecorrenciasTab = ({ clinicId }: RecorrenciasTabProps) => {
   const loadRecurrences = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("financial_recurrences")
         .select(`
@@ -71,7 +76,7 @@ export const RecorrenciasTab = ({ clinicId }: RecorrenciasTabProps) => {
       setRecurrences((data || []) as Recurrence[]);
     } catch (error) {
       console.error("Erro ao carregar recorrências:", error);
-      toast.error("Erro ao carregar recorrências");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -151,21 +156,15 @@ export const RecorrenciasTab = ({ clinicId }: RecorrenciasTabProps) => {
       />
 
       {/* Table */}
-      <div className="border rounded-lg">
-        {loading ? (
-          <div className="p-12 text-center">
-            <p className="text-muted-foreground">Carregando...</p>
-          </div>
+      <div className="border rounded-lg bg-card">
+        {erroCarregar ? (
+          <EstadoErro titulo="Não foi possível carregar as recorrências" onTentarDeNovo={loadRecurrences} />
+        ) : loading ? (
+          <EsqueletoLista linhas={6} colunas={3} className="rounded-none border-0" />
         ) : recurrences.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="inline-block p-4 bg-muted rounded-lg mb-4">
-              <Repeat className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <p className="text-lg font-medium">Nenhuma recorrência</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Crie uma despesa recorrente para vê-la aqui
-            </p>
-          </div>
+          (
+            <EstadoVazio icone={Repeat} titulo="Nenhuma recorrência" descricao="Crie uma despesa recorrente (aluguel, internet) para ela aparecer aqui." />
+          )
         ) : (
           <>
             {/* Mobile Cards */}

@@ -31,6 +31,7 @@ export const ProfissionaisTab = ({ clinicaId }: ProfissionaisTabProps) => {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [filteredProfissionais, setFilteredProfissionais] = useState<Profissional[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProfissional, setEditingProfissional] = useState<Profissional | null>(null);
@@ -48,6 +49,7 @@ export const ProfissionaisTab = ({ clinicaId }: ProfissionaisTabProps) => {
   const loadProfissionais = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("profissionais")
         .select("*")
@@ -57,7 +59,7 @@ export const ProfissionaisTab = ({ clinicaId }: ProfissionaisTabProps) => {
       if (error) throw error;
       setProfissionais(data || []);
     } catch (error: any) {
-      toast.error("Erro ao carregar profissionais: " + error.message);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -148,6 +150,8 @@ export const ProfissionaisTab = ({ clinicaId }: ProfissionaisTabProps) => {
       </div>
 
       <ProfissionaisTable
+        erro={erroCarregar}
+        onTentarDeNovo={loadProfissionais}
         profissionais={filteredProfissionais}
         loading={loading}
         onEdit={handleEdit}
