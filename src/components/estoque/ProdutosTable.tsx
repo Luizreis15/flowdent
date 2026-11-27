@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DataTable, DataTableColumn } from "@/components/desktop/DataTable";
 import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+
 import { cn } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- linhas vêm do select com joins de products */
@@ -27,11 +29,14 @@ interface ProdutosTableProps {
   onNovo?: () => void;
   /** true quando a lista está vazia por causa da busca, não por falta de cadastro */
   buscando?: boolean;
+  /** Falha ao carregar a lista */
+  erro?: boolean;
+  onTentarDeNovo?: () => void;
 }
 
 const brl = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
-export function ProdutosTable({ products, isLoading, onEdit, onNovo, buscando }: ProdutosTableProps) {
+export function ProdutosTable({ products, isLoading, onEdit, onNovo, buscando, erro, onTentarDeNovo }: ProdutosTableProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -133,6 +138,14 @@ export function ProdutosTable({ products, isLoading, onEdit, onNovo, buscando }:
       ),
     },
   ];
+
+  if (erro) {
+    return (
+      <div className="rounded-lg border bg-card">
+        <EstadoErro titulo="Não foi possível carregar os produtos" onTentarDeNovo={onTentarDeNovo} />
+      </div>
+    );
+  }
 
   if (!isLoading && linhas.length === 0) {
     return (

@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +53,7 @@ export function CRMChat({ clinicId }: CRMChatProps) {
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -94,6 +99,7 @@ export function CRMChat({ clinicId }: CRMChatProps) {
 
   const loadConversations = async () => {
     try {
+      setErroCarregar(false);
       const { data, error } = await supabase
         .from("crm_conversations")
         .select(`*, contact:crm_contacts(id, name, phone)`)
@@ -104,6 +110,7 @@ export function CRMChat({ clinicId }: CRMChatProps) {
       setConversations((data as any) || []);
     } catch (error) {
       console.error("Erro ao carregar conversas:", error);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -301,10 +308,25 @@ export function CRMChat({ clinicId }: CRMChatProps) {
     c.phone.includes(contactSearch)
   );
 
+  if (erroCarregar) {
+    return (
+      <div className="rounded-lg border bg-card">
+        <EstadoErro titulo="Não foi possível carregar as conversas" onTentarDeNovo={loadConversations} />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="flex h-[calc(100vh-12rem)] overflow-hidden rounded-lg border bg-card" aria-busy="true" aria-label="Carregando">
+        <div className="w-80 space-y-3 border-r p-3">
+          <Skeleton className="h-8" />
+          <Skeleton className="h-9" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-12" />
+          ))}
+        </div>
+        <div className="flex-1" />
       </div>
     );
   }
@@ -316,7 +338,7 @@ export function CRMChat({ clinicId }: CRMChatProps) {
         <div className="p-3 border-b space-y-2">
           <Button onClick={openNewConversation} className="w-full" size="sm">
             <Plus className="w-4 h-4 mr-2" />
-            Nova Conversa
+            Nova conversa
           </Button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -329,11 +351,12 @@ export function CRMChat({ clinicId }: CRMChatProps) {
           </div>
         </div>
         <ScrollArea className="flex-1">
-          {filteredConvs.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              Nenhuma conversa ainda
-            </div>
-          )}
+          {filteredConvs.length === 0 &&
+            (search.trim() ? (
+              <EstadoVazio titulo="Nenhuma conversa encontrada" descricao="Tente outro nome ou telefone." />
+            ) : (
+              <EstadoVazio titulo="Nenhuma conversa ainda" descricao="Comece uma em Nova conversa." />
+            ))}
           {filteredConvs.map(conv => (
             <div
               key={conv.id}

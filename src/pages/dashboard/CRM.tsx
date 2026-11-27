@@ -11,6 +11,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { NovaCampanhaModal } from "@/components/crm/NovaCampanhaModal";
 import { ConfigurarAutomacoesModal } from "@/components/crm/ConfigurarAutomacoesModal";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
 
 const CRM = () => {
   const navigate = useNavigate();
@@ -21,6 +24,7 @@ const CRM = () => {
   const [automations, setAutomations] = useState<any[]>([]);
   const [metrics, setMetrics] = useState({ totalSent: 0, totalDelivered: 0, totalFailed: 0, activeAutomations: 0 });
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [showNovaCampanha, setShowNovaCampanha] = useState(false);
   const [showAutomacoes, setShowAutomacoes] = useState(false);
   const [sendingCampaignId, setSendingCampaignId] = useState<string | null>(null);
@@ -29,12 +33,16 @@ const CRM = () => {
     if (!clinicId) return;
     try {
       setLoading(true);
+      setErroCarregar(false);
 
       const [campaignsRes, automationsRes, logsRes] = await Promise.all([
         supabase.from("whatsapp_campaigns").select("*").eq("clinic_id", clinicId).order("created_at", { ascending: false }),
         supabase.from("whatsapp_automations").select("*").eq("clinic_id", clinicId),
         supabase.from("whatsapp_message_log").select("status").eq("clinic_id", clinicId),
       ]);
+
+      const falha = campaignsRes.error || automationsRes.error || logsRes.error;
+      if (falha) throw falha;
 
       setCampaigns(campaignsRes.data || []);
       setAutomations(automationsRes.data || []);
@@ -48,6 +56,7 @@ const CRM = () => {
       });
     } catch (err) {
       console.error(err);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -143,23 +152,25 @@ const CRM = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              {erroCarregar ? (
+                <EstadoErro onTentarDeNovo={loadData} />
+              ) : loading ? (
+                <div className="space-y-2" aria-busy="true" aria-label="Carregando">
+                  {[0, 1, 2].map((i) => (
+                    <Skeleton key={i} className="h-14" />
+                  ))}
                 </div>
               ) : campaigns.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p>Nenhuma campanha criada ainda</p>
-                  <Button
-                    variant="outline"
-                    className="mt-3"
-                    onClick={() => setShowNovaCampanha(true)}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Criar primeira campanha
-                  </Button>
-                </div>
+                <EstadoVazio
+                  icone={MessageSquare}
+                  titulo="Nenhuma campanha criada"
+                  descricao="Crie uma campanha para enviar mensagens a um grupo de pacientes."
+                  acao={
+                    <Button variant="outline" size="sm" onClick={() => setShowNovaCampanha(true)}>
+                      Nova campanha
+                    </Button>
+                  }
+                />
               ) : (
                 <div className="space-y-3">
                   {campaigns.map((campaign) => (
@@ -230,23 +241,25 @@ const CRM = () => {
               </Button>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              {erroCarregar ? (
+                <EstadoErro onTentarDeNovo={loadData} />
+              ) : loading ? (
+                <div className="space-y-2" aria-busy="true" aria-label="Carregando">
+                  {[0, 1, 2].map((i) => (
+                    <Skeleton key={i} className="h-14" />
+                  ))}
                 </div>
               ) : automations.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Sparkles className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p>Nenhuma automação configurada</p>
-                  <Button
-                    variant="outline"
-                    className="mt-3"
-                    onClick={() => setShowAutomacoes(true)}
-                  >
-                    <Settings2 className="mr-2 h-4 w-4" />
-                    Configurar automações
-                  </Button>
-                </div>
+                <EstadoVazio
+                  icone={Sparkles}
+                  titulo="Nenhuma automação configurada"
+                  descricao="Configure lembretes e mensagens automáticas."
+                  acao={
+                    <Button variant="outline" size="sm" onClick={() => setShowAutomacoes(true)}>
+                      Configurar automações
+                    </Button>
+                  }
+                />
               ) : (
                 <div className="space-y-3">
                   {automations.map((automation) => (

@@ -9,8 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { CabecalhoPagina } from "@/components/sistema/CabecalhoPagina";
 import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+
 import { TIPO_MOVIMENTACAO, classeSeloMovimentacao, quantidadeComSinal, tipoMovimentacao } from "@/lib/movimentacaoEstoque";
 import { cn } from "@/lib/utils";
 
@@ -18,20 +21,13 @@ export default function Movimentacoes() {
   const [search, setSearch] = useState("");
   const [tipoFilter, setTipoFilter] = useState<string>("todos");
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const { data } = await supabase.from("profiles").select("clinic_id").eq("id", user.id).single();
-      return data;
-    },
-  });
+  // Clínica ativa (respeita a impersonação do super admin); antes vinha do perfil de quem está logado.
+  const { clinicId } = useAuth();
 
-  const { data: moves, isLoading } = useQuery({
-    queryKey: ["stock-moves", profile?.clinic_id, tipoFilter],
+  const { data: moves, isLoading, isError, refetch } = useQuery({
+    queryKey: ["stock-moves", clinicId, tipoFilter],
     queryFn: async () => {
-      if (!profile?.clinic_id) return [];
+      if (!clinicId) return [];
       let query = supabase
         .from("stock_moves")
         .select(`
@@ -41,7 +37,7 @@ export default function Movimentacoes() {
           location_to:stock_locations!stock_moves_location_to_id_fkey(nome),
           batches(codigo, data_validade)
         `)
-        .eq("clinica_id", profile.clinic_id)
+        .eq("clinica_id", clinicId)
         .order("created_at", { ascending: false })
         .limit(100);
       if (tipoFilter !== "todos") {
@@ -59,7 +55,7 @@ export default function Movimentacoes() {
       }
       return (data || []).map((m) => ({ ...m, usuario_nome: m.usuario_id ? nomes.get(m.usuario_id) : undefined }));
     },
-    enabled: !!profile?.clinic_id,
+    enabled: !!clinicId,
   });
 
   const q = search.trim().toLowerCase();
@@ -97,7 +93,9 @@ export default function Movimentacoes() {
       </div>
 
       <Card className="overflow-hidden">
-        {isLoading ? (
+        {isError ? (
+          <EstadoErro titulo="Não foi possível carregar as movimentações" onTentarDeNovo={() => refetch()} />
+        ) : isLoading ? (
           <div className="space-y-2 p-5">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-10" />)}</div>
         ) : filteredMoves.length > 0 ? (
           <Table>

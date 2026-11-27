@@ -10,6 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
@@ -143,6 +146,7 @@ const Agenda = () => {
   const [openPatientCombobox, setOpenPatientCombobox] = useState(false);
   const [buscaPaciente, setBuscaPaciente] = useState("");
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [saving, setSaving] = useState(false);
   const [patients, setPatients] = useState<any[]>([]);
   const [dentists, setDentists] = useState<any[]>([]);
@@ -274,7 +278,8 @@ const Agenda = () => {
     if (!authClinicId) return;
     try {
       setLoading(true);
-      
+      setErroCarregar(false);
+
       // Load patients filtered by clinic
       const { data: patientsData, error: patientsError } = await supabase
         .from("patients")
@@ -366,7 +371,7 @@ const Agenda = () => {
       await loadAppointments();
     } catch (error: any) {
       console.error("Erro ao carregar dados:", error);
-      toast.error("Erro ao carregar dados: " + error.message);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -399,6 +404,7 @@ const Agenda = () => {
       
       if (error) throw error;
       setAppointments(data || []);
+      setErroCarregar(false);
       
       // Calcular estatísticas de faltas por paciente
       const noShowCounts: Record<string, number> = {};
@@ -410,7 +416,7 @@ const Agenda = () => {
       setPatientNoShowStats(noShowCounts);
     } catch (error: any) {
       console.error("Erro ao carregar agendamentos:", error);
-      toast.error("Erro ao carregar agendamentos: " + error.message);
+      setErroCarregar(true);
     }
   };
 
@@ -1584,9 +1590,13 @@ const Agenda = () => {
               <CardDescription>Clique em um dia para ver os horários disponíveis</CardDescription>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  Carregando calendário...
+              {erroCarregar ? (
+                <EstadoErro titulo="Não foi possível carregar a agenda" onTentarDeNovo={loadData} />
+              ) : loading ? (
+                <div className="grid grid-cols-7 gap-2" aria-busy="true" aria-label="Carregando">
+                  {Array.from({ length: 35 }).map((_, i) => (
+                    <Skeleton key={i} className="aspect-square rounded-md" />
+                  ))}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1699,16 +1709,17 @@ const Agenda = () => {
               </CardHeader>
               <CardContent>
                 {selectedDayAppointments.length === 0 ? (
-                  <div className="text-center py-8">
-                    <CalendarIcon className="h-10 w-10 mx-auto mb-3 text-muted-foreground/60" />
-                    <p className="text-muted-foreground mb-4">Nenhum agendamento neste dia</p>
-                    <Button 
-                      onClick={() => setViewMode("day-slots")}
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Agendar Consulta
-                    </Button>
-                  </div>
+                  <EstadoVazio
+                    icone={CalendarIcon}
+                    titulo="Nenhuma consulta neste dia"
+                    descricao="Veja os horários livres para agendar."
+                    acao={
+                      <Button size="sm" onClick={() => setViewMode("day-slots")}>
+                        <Plus className="mr-1.5 h-4 w-4" />
+                        Agendar consulta
+                      </Button>
+                    }
+                  />
                 ) : (
                   <div className="space-y-3 max-h-[600px] overflow-y-auto">
                     {selectedDayAppointments

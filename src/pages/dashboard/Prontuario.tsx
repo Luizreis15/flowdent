@@ -16,7 +16,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button as PaginationButton } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Users } from "lucide-react";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 
 const patientSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
@@ -37,10 +40,16 @@ const patientSchema = z.object({
 
 const PAGE_SIZE = 25;
 
+/** Tira do termo os caracteres que têm significado no filtro .or() do PostgREST (vírgula e parênteses quebravam a busca). */
+const termoSeguro = (texto: string) => texto.replace(/[,()*%\\]/g, " ").trim();
+
 const Prontuario = () => {
   const navigate = useNavigate();
   const { clinicId } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
+  // Busca no servidor só depois de uma pausa na digitação (antes era uma consulta por tecla)
+  const [termoBusca, setTermoBusca] = useState("");
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -70,12 +79,18 @@ const Prontuario = () => {
     if (clinicId) {
       loadPatients();
     }
-  }, [clinicId, page, searchTerm]);
+  }, [clinicId, page, termoBusca]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setTermoBusca(termoSeguro(searchTerm)), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const loadPatients = async () => {
     if (!clinicId) return;
     try {
       setLoading(true);
+      setErroCarregar(false);
       const from = page * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
@@ -85,8 +100,8 @@ const Prontuario = () => {
         .eq("clinic_id", clinicId)
         .order("full_name");
 
-      if (searchTerm) {
-        query = query.or(`full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
+      if (termoBusca) {
+        query = query.or(`full_name.ilike.%${termoBusca}%,phone.ilike.%${termoBusca}%,cpf.ilike.%${termoBusca}%`);
       }
 
       const { data, error, count } = await query.range(from, to);
@@ -97,7 +112,7 @@ const Prontuario = () => {
       setTotalCount(count || 0);
     } catch (error: any) {
       console.error("Erro ao carregar pacientes:", error);
-      toast.error("Erro ao carregar pacientes: " + error.message);
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -197,18 +212,45 @@ const Prontuario = () => {
   };
 
   const renderPatientList = (patientList: any[]) => {
-    if (loading) {
+    if (erroCarregar) {
       return (
-        <div className="text-center py-8 text-muted-foreground">
-          Carregando pacientes...
+        <div className="rounded-lg border bg-card">
+          <EstadoErro titulo="Não foi possível carregar os pacientes" onTentarDeNovo={loadPatients} />
         </div>
       );
     }
-    
+
+    if (loading) {
+      return <EsqueletoLista avatar linhas={8} />;
+    }
+
     if (patientList.length === 0) {
       return (
-        <div className="text-center py-8 text-muted-foreground">
-          {searchTerm ? "Nenhum paciente encontrado" : "Nenhum paciente cadastrado"}
+        <div className="rounded-lg border bg-card">
+          {termoBusca ? (
+            <EstadoVazio
+              icone={Search}
+              titulo="Nenhum paciente encontrado"
+              descricao={`Nada encontrado para "${termoBusca}". Busque por nome, CPF ou telefone.`}
+              acao={
+                <Button variant="outline" size="sm" onClick={() => setSearchTerm("")}>
+                  Limpar busca
+                </Button>
+              }
+            />
+          ) : (
+            <EstadoVazio
+              icone={Users}
+              titulo="Nenhum paciente nesta lista"
+              descricao="Cadastre um paciente ou importe a planilha da clínica."
+              acao={
+                <Button size="sm" onClick={() => setIsSheetOpen(true)}>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Novo paciente
+                </Button>
+              }
+            />
+          )}
         </div>
       );
     }
@@ -270,7 +312,7 @@ const Prontuario = () => {
             <SheetTrigger asChild>
               <Button size="sm">
                 <Plus className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Novo Paciente</span>
+                <span className="hidden sm:inline">Novo paciente</span>
               </Button>
             </SheetTrigger>
             <SheetContent className="sm:max-w-[700px] overflow-y-auto">

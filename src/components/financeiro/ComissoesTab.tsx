@@ -1,4 +1,7 @@
 import { FaixaIndicadores } from "@/components/sistema/FaixaIndicadores";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import { EsqueletoLista } from "@/components/sistema/EsqueletoLista";
 import { separarMoeda } from "@/lib/moeda";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,7 @@ interface ComissoesTabProps {
 
 export const ComissoesTab = ({ clinicId }: ComissoesTabProps) => {
   const [loading, setLoading] = useState(true);
+  const [erroCarregar, setErroCarregar] = useState(false);
   const [provisoes, setProvisoes] = useState<any[]>([]);
   const [profissionais, setProfissionais] = useState<any[]>([]);
   const [filtroMes, setFiltroMes] = useState(new Date().toISOString().slice(0, 7));
@@ -32,6 +36,7 @@ export const ComissoesTab = ({ clinicId }: ComissoesTabProps) => {
   const loadData = async () => {
     try {
       setLoading(true);
+      setErroCarregar(false);
 
       // Carregar profissionais
       const { data: profsData, error: profsError } = await supabase
@@ -66,7 +71,7 @@ export const ComissoesTab = ({ clinicId }: ComissoesTabProps) => {
       setProvisoes(provisoesData || []);
     } catch (error: any) {
       console.error("Erro ao carregar dados:", error);
-      toast.error("Erro ao carregar comissões");
+      setErroCarregar(true);
     } finally {
       setLoading(false);
     }
@@ -168,21 +173,15 @@ export const ComissoesTab = ({ clinicId }: ComissoesTabProps) => {
       />
 
       {/* Tabela de Provisões */}
-      <div className="border rounded-lg">
-        {loading ? (
-          <div className="p-12 text-center">
-            <p className="text-muted-foreground">Carregando...</p>
-          </div>
+      <div className="border rounded-lg bg-card">
+        {erroCarregar ? (
+          <EstadoErro titulo="Não foi possível carregar as comissões" onTentarDeNovo={loadData} />
+        ) : loading ? (
+          <EsqueletoLista linhas={6} colunas={3} className="rounded-none border-0" />
         ) : provisoes.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="inline-block p-4 bg-muted rounded-lg mb-4">
-              <DollarSign className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <p className="text-lg font-medium">Nenhuma provisão encontrada</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Selecione outro período ou profissional
-            </p>
-          </div>
+          (
+            <EstadoVazio icone={DollarSign} titulo="Nenhuma provisão no período" descricao="Selecione outro mês ou profissional." />
+          )
         ) : (
           <Table>
             <TableHeader>

@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { NovoProdutoModal } from "@/components/estoque/NovoProdutoModal";
 import { EditProdutoModal } from "@/components/estoque/EditProdutoModal";
 import { ProdutosTable } from "@/components/estoque/ProdutosTable";
@@ -27,24 +28,17 @@ export default function Produtos() {
     setEditModalOpen(true);
   };
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const { data } = await supabase.from("profiles").select("clinic_id").eq("id", user.id).single();
-      return data;
-    },
-  });
+  // Clínica ativa (respeita a impersonação do super admin); antes vinha do perfil de quem está logado.
+  const { clinicId } = useAuth();
 
-  const { data: products, isLoading } = useQuery({
-    queryKey: ["products", profile?.clinic_id, termo],
+  const { data: products, isLoading, isError, refetch } = useQuery({
+    queryKey: ["products", clinicId, termo],
     queryFn: async () => {
-      if (!profile?.clinic_id) return [];
+      if (!clinicId) return [];
       let query = supabase
         .from("products")
         .select("*, stock_locations(nome), stocks(quantidade, custo_medio)")
-        .eq("clinica_id", profile.clinic_id)
+        .eq("clinica_id", clinicId)
         .order("ativo", { ascending: false })
         .order("nome");
       if (termo) {
@@ -54,7 +48,7 @@ export default function Produtos() {
       if (error) throw error;
       return data;
     },
-    enabled: !!profile?.clinic_id,
+    enabled: !!clinicId,
   });
 
   return (
@@ -92,6 +86,8 @@ export default function Produtos() {
         onEdit={handleEdit}
         onNovo={() => setModalOpen(true)}
         buscando={!!termo}
+        erro={isError}
+        onTentarDeNovo={() => refetch()}
       />
 
       <NovoProdutoModal open={modalOpen} onOpenChange={setModalOpen} />

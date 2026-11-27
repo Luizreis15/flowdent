@@ -16,6 +16,8 @@ interface Usuario {
 interface UsuariosTableProps {
   usuarios: Usuario[];
   loading: boolean;
+  erro?: boolean;
+  onTentarDeNovo?: () => void;
   onEdit: (usuario: Usuario) => void;
   onToggleStatus: (usuario: Usuario) => void;
   onResendInvite: (usuario: Usuario) => void;
@@ -33,7 +35,7 @@ const perfilLabels: Record<string, string> = {
 };
 
 
-export const UsuariosTable = ({ usuarios, loading, onEdit, onToggleStatus, onResendInvite, onManagePermissions }: UsuariosTableProps) => {
+export const UsuariosTable = ({ usuarios, loading, erro, onTentarDeNovo, onEdit, onToggleStatus, onResendInvite, onManagePermissions }: UsuariosTableProps) => {
   const columns: DataTableColumn<Usuario>[] = [
     { key: "nome", label: "Nome", sortable: true, className: "font-medium" },
     { key: "email", label: "E-mail", sortable: true },
@@ -91,6 +93,10 @@ export const UsuariosTable = ({ usuarios, loading, onEdit, onToggleStatus, onRes
       columns={columns}
       data={usuarios}
       isLoading={loading}
+      erro={erro}
+      tituloErro="Não foi possível carregar os usuários"
+      onTentarDeNovo={onTentarDeNovo}
+      vazio={{ titulo: "Nenhum usuário cadastrado", descricao: "Convide a equipe para acessar o sistema." }}
       searchable={false}
       emptyMessage="Nenhum usuário encontrado"
     />

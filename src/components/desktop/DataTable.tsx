@@ -27,6 +27,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EstadoVazio } from "@/components/sistema/EstadoVazio";
+import { EstadoErro } from "@/components/sistema/EstadoErro";
+import type { LucideIcon } from "lucide-react";
 
 export interface DataTableColumn<T> {
   key: string;
@@ -59,8 +62,14 @@ interface DataTableProps<T> {
   pageSizeOptions?: number[];
   /** Default rows per page */
   defaultPageSize?: number;
-  /** Empty state message */
+  /** Empty state message (título do estado vazio quando `vazio` não é passado) */
   emptyMessage?: string;
+  /** Estado vazio desenhado: ícone, título, frase e uma ação (ex.: "Novo produto") */
+  vazio?: { icone?: LucideIcon; titulo: string; descricao?: string; acao?: ReactNode };
+  /** Falha ao carregar: mostra o EstadoErro no lugar das linhas */
+  erro?: boolean;
+  tituloErro?: string;
+  onTentarDeNovo?: () => void;
   /** Extra class on wrapper */
   className?: string;
   /** Toolbar actions (e.g. "Add" button) rendered beside search */
@@ -86,6 +95,10 @@ export function DataTable<T extends Record<string, any>>({
   pageSizeOptions = [10, 25, 50],
   defaultPageSize = 10,
   emptyMessage = "Nenhum registro encontrado",
+  vazio,
+  erro = false,
+  tituloErro,
+  onTentarDeNovo,
   className,
   toolbarActions,
 }: DataTableProps<T>) {
@@ -175,13 +188,19 @@ export function DataTable<T extends Record<string, any>>({
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-10 w-32 ml-auto" />
         </div>
-        <div className="border rounded-lg overflow-hidden">
-          <div className="space-y-0">
-            <Skeleton className="h-11 w-full rounded-none" />
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-none" />
+        <div className="divide-y overflow-hidden rounded-lg border bg-card" aria-busy="true" aria-label="Carregando">
+          <div className="flex gap-6 bg-muted/50 px-4 py-3">
+            {columns.slice(0, 5).map((c) => (
+              <Skeleton key={c.key} className="h-3 w-20" />
             ))}
           </div>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-6 px-4 py-4">
+              {columns.slice(0, 5).map((c, j) => (
+                <Skeleton key={c.key} className="h-3.5" style={{ width: j === 0 ? "28%" : "12%" }} />
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -251,13 +270,30 @@ export function DataTable<T extends Record<string, any>>({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginated.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length + (selectable ? 1 : 0)}
-                    className="h-32 text-center text-muted-foreground"
-                  >
-                    {emptyMessage}
+              {erro || paginated.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={columns.length + (selectable ? 1 : 0)} className="p-0">
+                    {erro ? (
+                      <EstadoErro titulo={tituloErro} onTentarDeNovo={onTentarDeNovo} />
+                    ) : search.trim() && data.length > 0 ? (
+                      <EstadoVazio
+                        icone={Search}
+                        titulo="Nenhum resultado para a busca"
+                        descricao={`Nada encontrado para "${search.trim()}".`}
+                        acao={
+                          <Button variant="outline" size="sm" onClick={() => setSearch("")}>
+                            Limpar busca
+                          </Button>
+                        }
+                      />
+                    ) : (
+                      <EstadoVazio
+                        icone={vazio?.icone}
+                        titulo={vazio?.titulo ?? emptyMessage}
+                        descricao={vazio?.descricao}
+                        acao={vazio?.acao}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               ) : (
