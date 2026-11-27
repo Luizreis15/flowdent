@@ -12,8 +12,6 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie, Legend,
 } from "recharts";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -149,6 +147,8 @@ export const ExtratoFinanceiroPaciente = ({
 
       const clinic = clinicRes.data;
       const patient = patientRes.data;
+      // Carregada só no clique: antes vinha junto com a tela (~400 KB a mais ao abrir).
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
       const pageWidth = doc.internal.pageSize.getWidth();
       const margin = 15;

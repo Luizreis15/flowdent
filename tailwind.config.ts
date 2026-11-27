@@ -157,9 +157,17 @@ export default {
           },
         },
       },
+      // Movimento: uma curva só para o app inteiro (saída rápida, chegada suave) e 150 ms por padrão.
+      transitionTimingFunction: {
+        DEFAULT: "cubic-bezier(0.2, 0, 0, 1)",
+        padrao: "cubic-bezier(0.2, 0, 0, 1)",
+      },
+      transitionDuration: {
+        DEFAULT: "150ms",
+      },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "accordion-down": "accordion-down 0.2s cubic-bezier(0.2, 0, 0, 1)",
+        "accordion-up": "accordion-up 0.2s cubic-bezier(0.2, 0, 0, 1)",
       },
     },
   },

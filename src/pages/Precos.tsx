@@ -156,7 +156,7 @@ export default function Precos() {
             {plans.map((plan) => (
               <Card
                 key={plan.id}
-                className={`relative transition-all hover:shadow-lg ${
+                className={`relative transition-colors hover:border-foreground/30 ${
                   plan.popular ? "border-primary border-2 shadow-xl scale-105 md:scale-110" : ""
                 }`}
               >

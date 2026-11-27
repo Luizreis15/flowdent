@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 
 export interface DocumentoPDFData {
   tipo: "atestado" | "receituario" | "contrato" | "solicitacao_exame";
@@ -565,7 +565,9 @@ function drawFooter(doc: jsPDF, data: DocumentoPDFData) {
 }
 
 export async function generateDocumentoPDF(data: DocumentoPDFData): Promise<void> {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  // Carregada só no clique: antes vinha junto com a tela (~400 KB a mais ao abrir).
+  const { default: JsPDF } = await import("jspdf");
+  const doc = new JsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
   const primaryColor = hexToRgb(data.corPrimaria || "#22577A");
 

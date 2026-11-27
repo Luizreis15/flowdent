@@ -63,7 +63,7 @@ export const QuickActions = () => {
               key={index}
               variant="outline"
               onClick={action.onClick}
-              className="h-auto flex-shrink-0 flex flex-col items-center justify-center p-3 lg:p-2 min-w-[80px] lg:min-w-0 hover:border-primary hover:bg-accent/10 transition-all cursor-pointer"
+              className="h-auto flex-shrink-0 flex flex-col items-center justify-center p-3 lg:p-2 min-w-[80px] lg:min-w-0 hover:border-primary hover:bg-accent/10 transition-colors cursor-pointer"
             >
               <action.icon className={`h-5 w-5 lg:h-4 lg:w-4 mb-1 ${action.color}`} />
               <span className="text-xs font-medium text-center leading-tight whitespace-nowrap">

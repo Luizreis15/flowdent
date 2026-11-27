@@ -186,7 +186,7 @@ export const AgendaCalendar = ({ clinicId }: AgendaCalendarProps) => {
                       <div
                         key={dayIndex}
                         className={cn(
-                          "min-h-[48px] rounded border transition-all",
+                          "min-h-[48px] rounded border transition-colors",
                           apt 
                             ? "border-transparent" 
                             : slotPassed
@@ -199,7 +199,7 @@ export const AgendaCalendar = ({ clinicId }: AgendaCalendarProps) => {
                           <div
                             className={`h-full p-2 rounded ${getStatusColor(
                               apt.status || "scheduled"
-                            )} text-white transition-all cursor-pointer`}
+                            )} text-white transition-colors cursor-pointer`}
                           >
                             <div className="text-sm font-semibold truncate">
                               {apt.patient_id && typeof apt.patient_id === 'object' && 'full_name' in apt.patient_id

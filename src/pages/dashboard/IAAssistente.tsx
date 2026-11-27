@@ -198,7 +198,7 @@ const IAAssistente = () => {
             {automations.map((automation, index) => (
               <div
                 key={index}
-                className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:shadow-md transition-shadow"
+                className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:border-foreground/30 transition-colors"
               >
                 <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 flex-shrink-0">
                   <Sparkles className="h-5 w-5 text-primary" />

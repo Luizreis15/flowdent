@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 import { formatCurrency, formatCNPJ, formatCPF, formatPhone } from "@/lib/utils";
 
 export interface ReciboData {
@@ -98,7 +98,9 @@ function extractCity(address?: string): string {
 }
 
 export async function generateRecibo(data: ReciboData): Promise<void> {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  // Carregada só no clique: antes vinha junto com a tela (~400 KB a mais ao abrir).
+  const { default: JsPDF } = await import("jspdf");
+  const doc = new JsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;

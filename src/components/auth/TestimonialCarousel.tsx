@@ -136,7 +136,7 @@ export default function TestimonialCarousel() {
                 setDirection(index > currentIndex ? 1 : -1);
                 setCurrentIndex(index);
               }}
-              className={`h-2 rounded-full transition-all ${
+              className={`h-2 rounded-full transition-colors ${
                 index === currentIndex
                   ? 'w-8 bg-white'
                   : 'w-2 bg-white/40 hover:bg-white/60'

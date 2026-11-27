@@ -7,7 +7,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, FileSpreadsheet, AlertCircle } from "lucide-react";
-import * as XLSX from "xlsx";
 
 interface ImportProcedimentosModalProps {
   open: boolean;
@@ -47,6 +46,8 @@ export const ImportProcedimentosModal = ({
   };
 
   const parseFile = async (file: File): Promise<any[]> => {
+    // xlsx (~400 KB) carregado só ao ler a planilha
+    const XLSX = await import("xlsx");
     const ext = file.name.split(".").pop()?.toLowerCase();
 
     if (ext === "xlsx" || ext === "xls") {
