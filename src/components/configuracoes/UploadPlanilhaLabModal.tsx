@@ -8,7 +8,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Upload, FileSpreadsheet, Check, AlertTriangle, Info } from "lucide-react";
-import * as XLSX from "xlsx";
 import { formatCurrency } from "@/lib/utils";
 
 interface UploadPlanilhaLabModalProps {
@@ -44,6 +43,8 @@ export function UploadPlanilhaLabModal({
   const [parseError, setParseError] = useState<string | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // xlsx (~400 KB) carregado só ao ler a planilha
+    const XLSX = await import("xlsx");
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 

@@ -71,7 +71,7 @@ const Tipo = () => {
             {options.map((option) => (
               <Card
                 key={option.type}
-                className={`cursor-pointer transition-all hover:shadow-lg ${
+                className={`cursor-pointer transition-colors hover:border-foreground/30 ${
                   selected === option.type
                     ? "border-primary border-2 shadow-lg"
                     : ""

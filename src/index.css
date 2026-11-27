@@ -326,12 +326,12 @@
   .text-label { font-size: 0.75rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 }
 
-/* Pressed state for touch */
+/* Toque: retorno por opacidade, sem escala (movimento da ementa: uma curva, nada de "pular") */
 .press-scale {
-  transition: transform 120ms ease;
+  transition: opacity 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 .press-scale:active {
-  transform: scale(0.97);
+  opacity: 0.8;
 }
 
 /* Card premium */
@@ -357,10 +357,10 @@
   border-radius: calc(var(--radius) - 2px);
   font-size: 0.9375rem;
   font-weight: 600;
-  transition: transform 120ms ease, opacity 150ms ease;
+  transition: opacity 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 .btn-mobile:active {
-  transform: scale(0.97);
+  opacity: 0.8;
 }
 
 /* Chip / pill */
@@ -407,3 +407,14 @@
   }
 }
 
+/* Quem pede menos movimento no sistema: transições e animações praticamente instantâneas */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -11,7 +11,6 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
-import * as XLSX from "xlsx";
 
 interface ImportPacientesModalProps {
   open: boolean;
@@ -146,6 +145,8 @@ export const ImportPacientesModal = ({
   };
 
   const parseFile = async () => {
+    // xlsx (~400 KB) carregado só ao ler a planilha
+    const XLSX = await import("xlsx");
     if (!file) return;
 
     try {

@@ -1730,7 +1730,7 @@ const Agenda = () => {
                           return (
                           <div
                             key={apt.id}
-                            className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow space-y-2 cursor-pointer"
+                            className="p-4 rounded-lg border bg-card hover:border-foreground/30 transition-colors space-y-2 cursor-pointer"
                             onClick={() => handleAppointmentClick(apt)}
                           >
                             <div className="flex items-center justify-between">

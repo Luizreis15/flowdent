@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,17 +14,21 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { NovoOrcamentoModal } from "@/components/orcamentos/NovoOrcamentoModal";
-import { TratamentosTab } from "@/components/tratamentos/TratamentosTab";
-import { OrcamentosTab } from "@/components/orcamentos/OrcamentosTab";
-import AnamnesesTab from "@/components/anamnese/AnamnesesTab";
-import ImagensTab from "@/components/imagens/ImagensTab";
-import { DocumentosTab } from "@/components/documentos/DocumentosTab";
-import { EditPatientModal } from "@/components/pacientes/EditPatientModal";
-import { FinanceiroTab } from "@/components/pacientes/FinanceiroTab";
-import { OdontogramaTab } from "@/components/pacientes/OdontogramaTab";
-import { AgendamentosTab } from "@/components/pacientes/AgendamentosTab";
-import { OrthoPatientTab } from "@/components/ortodontia/OrthoPatientTab";
+import { EsqueletoSecao } from "@/components/sistema/EsqueletoSecao";
+
+// Abas e modais da ficha carregados sob demanda: antes a página baixava todos de uma vez (~340 KB),
+// inclusive os modais de documentos, receituário e contrato que quase nunca abrem.
+const NovoOrcamentoModal = lazy(() => import("@/components/orcamentos/NovoOrcamentoModal").then((m) => ({ default: m.NovoOrcamentoModal })));
+const TratamentosTab = lazy(() => import("@/components/tratamentos/TratamentosTab").then((m) => ({ default: m.TratamentosTab })));
+const OrcamentosTab = lazy(() => import("@/components/orcamentos/OrcamentosTab").then((m) => ({ default: m.OrcamentosTab })));
+const AnamnesesTab = lazy(() => import("@/components/anamnese/AnamnesesTab"));
+const ImagensTab = lazy(() => import("@/components/imagens/ImagensTab"));
+const DocumentosTab = lazy(() => import("@/components/documentos/DocumentosTab").then((m) => ({ default: m.DocumentosTab })));
+const EditPatientModal = lazy(() => import("@/components/pacientes/EditPatientModal").then((m) => ({ default: m.EditPatientModal })));
+const FinanceiroTab = lazy(() => import("@/components/pacientes/FinanceiroTab").then((m) => ({ default: m.FinanceiroTab })));
+const OdontogramaTab = lazy(() => import("@/components/pacientes/OdontogramaTab").then((m) => ({ default: m.OdontogramaTab })));
+const AgendamentosTab = lazy(() => import("@/components/pacientes/AgendamentosTab").then((m) => ({ default: m.AgendamentosTab })));
+const OrthoPatientTab = lazy(() => import("@/components/ortodontia/OrthoPatientTab").then((m) => ({ default: m.OrthoPatientTab })));
 import { cn, formatPhone } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -439,21 +443,21 @@ const PatientDetails = () => {
                 getCivilStatusLabel={getCivilStatusLabel}
                 getEducationLabel={getEducationLabel}
               />
-              <TabsContent value="orcamentos" className="mt-0">
+              <TabsContent value="orcamentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}>
                 {loadingBudgets ? (
-                  <Card><CardContent className="py-12 text-center"><p className="text-muted-foreground">Carregando...</p></CardContent></Card>
+                  <EsqueletoSecao />
                 ) : (
                   <OrcamentosTab budgets={budgets} onRefresh={loadBudgets} onNewBudget={() => setShowNovoOrcamento(true)} />
                 )}
-              </TabsContent>
-              <TabsContent value="tratamentos" className="mt-0"><TratamentosTab patientId={id!} /></TabsContent>
-              <TabsContent value="anamnese" className="mt-0"><AnamnesesTab patientId={id!} /></TabsContent>
-              <TabsContent value="imagens" className="mt-0"><ImagensTab patientId={id!} /></TabsContent>
-              <TabsContent value="documentos" className="mt-0"><DocumentosTab patientId={id!} /></TabsContent>
-              <TabsContent value="financeiro" className="mt-0"><FinanceiroTab patientId={id!} clinicId={clinicaId} /></TabsContent>
-              <TabsContent value="odontograma" className="mt-0"><OdontogramaTab patientId={id!} onAddProcedimento={() => setShowNovoOrcamento(true)} /></TabsContent>
-              <TabsContent value="agendamentos" className="mt-0"><AgendamentosTab patientId={id!} /></TabsContent>
-              <TabsContent value="ortodontia" className="mt-0"><OrthoPatientTab patientId={id!} /></TabsContent>
+              </Suspense></TabsContent>
+              <TabsContent value="tratamentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><TratamentosTab patientId={id!} /></Suspense></TabsContent>
+              <TabsContent value="anamnese" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><AnamnesesTab patientId={id!} /></Suspense></TabsContent>
+              <TabsContent value="imagens" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><ImagensTab patientId={id!} /></Suspense></TabsContent>
+              <TabsContent value="documentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><DocumentosTab patientId={id!} /></Suspense></TabsContent>
+              <TabsContent value="financeiro" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><FinanceiroTab patientId={id!} clinicId={clinicaId} /></Suspense></TabsContent>
+              <TabsContent value="odontograma" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><OdontogramaTab patientId={id!} onAddProcedimento={() => setShowNovoOrcamento(true)} /></Suspense></TabsContent>
+              <TabsContent value="agendamentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><AgendamentosTab patientId={id!} /></Suspense></TabsContent>
+              <TabsContent value="ortodontia" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><OrthoPatientTab patientId={id!} /></Suspense></TabsContent>
             </div>
           </Tabs>
         </>
@@ -488,21 +492,21 @@ const PatientDetails = () => {
                 </TabsList>
 
                 <div className="mt-6">
-                  <TabsContent value="orcamentos" className="mt-0">
+                  <TabsContent value="orcamentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}>
                     {loadingBudgets ? (
-                      <Card><CardContent className="py-12 text-center"><p className="text-muted-foreground">Carregando...</p></CardContent></Card>
+                      <EsqueletoSecao />
                     ) : (
                       <OrcamentosTab budgets={budgets} onRefresh={loadBudgets} onNewBudget={() => setShowNovoOrcamento(true)} />
                     )}
-                  </TabsContent>
-                  <TabsContent value="financeiro" className="mt-0"><FinanceiroTab patientId={id!} clinicId={clinicaId} /></TabsContent>
-                  <TabsContent value="odontograma" className="mt-0"><OdontogramaTab patientId={id!} onAddProcedimento={() => setShowNovoOrcamento(true)} /></TabsContent>
-                  <TabsContent value="tratamentos" className="mt-0"><TratamentosTab patientId={id!} /></TabsContent>
-                  <TabsContent value="ortodontia" className="mt-0"><OrthoPatientTab patientId={id!} /></TabsContent>
-                  <TabsContent value="anamnese" className="mt-0"><AnamnesesTab patientId={id!} /></TabsContent>
-                  <TabsContent value="imagens" className="mt-0"><ImagensTab patientId={id!} /></TabsContent>
-                  <TabsContent value="documentos" className="mt-0"><DocumentosTab patientId={id!} /></TabsContent>
-                  <TabsContent value="agendamentos" className="mt-0"><AgendamentosTab patientId={id!} /></TabsContent>
+                  </Suspense></TabsContent>
+                  <TabsContent value="financeiro" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><FinanceiroTab patientId={id!} clinicId={clinicaId} /></Suspense></TabsContent>
+                  <TabsContent value="odontograma" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><OdontogramaTab patientId={id!} onAddProcedimento={() => setShowNovoOrcamento(true)} /></Suspense></TabsContent>
+                  <TabsContent value="tratamentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><TratamentosTab patientId={id!} /></Suspense></TabsContent>
+                  <TabsContent value="ortodontia" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><OrthoPatientTab patientId={id!} /></Suspense></TabsContent>
+                  <TabsContent value="anamnese" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><AnamnesesTab patientId={id!} /></Suspense></TabsContent>
+                  <TabsContent value="imagens" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><ImagensTab patientId={id!} /></Suspense></TabsContent>
+                  <TabsContent value="documentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><DocumentosTab patientId={id!} /></Suspense></TabsContent>
+                  <TabsContent value="agendamentos" className="mt-0"><Suspense fallback={<EsqueletoSecao />}><AgendamentosTab patientId={id!} /></Suspense></TabsContent>
                 </div>
               </Tabs>
             </div>
@@ -511,11 +515,15 @@ const PatientDetails = () => {
       )}
 
       {/* Modals */}
-      {patient && clinicaId && (
-        <NovoOrcamentoModal open={showNovoOrcamento} onOpenChange={setShowNovoOrcamento} patientId={patient.id} clinicaId={clinicaId} onSuccess={loadBudgets} />
+      {patient && clinicaId && showNovoOrcamento && (
+        <Suspense fallback={null}>
+          <NovoOrcamentoModal open={showNovoOrcamento} onOpenChange={setShowNovoOrcamento} patientId={patient.id} clinicaId={clinicaId} onSuccess={loadBudgets} />
+        </Suspense>
       )}
-      {patient && (
-        <EditPatientModal open={showEditPatient} onOpenChange={setShowEditPatient} patient={patient} onSuccess={loadPatient} />
+      {patient && showEditPatient && (
+        <Suspense fallback={null}>
+          <EditPatientModal open={showEditPatient} onOpenChange={setShowEditPatient} patient={patient} onSuccess={loadPatient} />
+        </Suspense>
       )}
     </div>
   );

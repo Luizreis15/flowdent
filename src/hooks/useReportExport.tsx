@@ -1,7 +1,5 @@
 import { useCallback } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+// jspdf, jspdf-autotable e xlsx são carregados só no clique de exportar (antes vinham com a tela).
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 
@@ -64,8 +62,9 @@ const formatPeriod = (periodo: string) => {
 };
 
 export const useReportExport = () => {
-  const exportToPDF = useCallback((data: ExportData, reportType: "all" | "dre" | "profissionais" | "procedimentos" | "pagamentos" | "inadimplencia") => {
+  const exportToPDF = useCallback(async (data: ExportData, reportType: "all" | "dre" | "profissionais" | "procedimentos" | "pagamentos" | "inadimplencia") => {
     try {
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       let yPos = 20;
@@ -332,8 +331,9 @@ export const useReportExport = () => {
     }
   }, []);
 
-  const exportToExcel = useCallback((data: ExportData, reportType: "all" | "dre" | "profissionais" | "procedimentos" | "pagamentos" | "inadimplencia") => {
+  const exportToExcel = useCallback(async (data: ExportData, reportType: "all" | "dre" | "profissionais" | "procedimentos" | "pagamentos" | "inadimplencia") => {
     try {
+      const XLSX = await import("xlsx");
       const workbook = XLSX.utils.book_new();
 
       // DRE Sheet

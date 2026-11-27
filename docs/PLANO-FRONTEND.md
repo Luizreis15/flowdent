@@ -63,7 +63,7 @@ Cada fase vira PR com preview na Vercel; merge só com aprovação do dono.
 | C — Clínico | Odontograma (ausente/extraído, implante, decíduo, legenda, impressão); Ortodontia, Próteses, Anamnese, Documentos (atestado e recibo impressos) | 2 | Concluída (PRs #18–#19) |
 | D — Gestão | Estoque, Produtos, Movimentações; Relatórios (gráficos); Configurações, Perfil, Assinatura, Portal, IA | 2 | Concluída (PRs #20–#21) |
 | E — Mobile e estados | Casca mobile (`MobileHome`, navbar, barra inferior, faixa de impersonação); estados de carregamento/vazio/erro | 2 | Concluída (PRs #23–#24) |
-| F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | — |
+| F — Acabamento | Acessibilidade, movimento, divisão de JS por rota, modo escuro (se aprovado), captura visual por página no CI | 2–3 | F1 (desempenho e movimento) em produção (PR #25) |
 | G — Super admin | 21 telas internas | 1–2 | — |
 
 Estimativa: 13–16 PRs. A–C levam o app a ~8; E e F fazem a diferença entre 8 e 9.
@@ -148,6 +148,18 @@ Estimativa: 13–16 PRs. A–C levam o app a ~8; E e F fazem a diferença entre 
   contagem de etapas lia as etapas de todas; Produtos, Estoque, Movimentações e CRM Atendimento ignoravam a
   impersonação (liam a clínica do perfil); a busca de Pacientes consultava o servidor a cada tecla e quebrava com
   vírgula ou parênteses no termo.
+
+### Fase F1 — o que entrou
+
+- **Desempenho**: o JS do carregamento inicial caiu de 741 KB (217 KB comprimido) para 158 KB (45 KB), com as
+  bibliotecas em pedaços próprios (`vendor-react`, `-router`, `-supabase`, `-radix`, `-date-fns`, `-dados`,
+  `-graficos`), que ficam em cache entre deploys. `xlsx`, `jspdf` e `jspdf-autotable` (~1,2 MB) passaram a ser
+  carregados só no clique de exportar ou ao ler uma planilha; antes vinham ao abrir Financeiro, Relatórios,
+  Pacientes e Configurações. A ficha do paciente carrega cada aba ao abri-la (antes ~340 KB de uma vez).
+  Acima de 250 KB ficaram só `xlsx` e `jspdf` (sob demanda) e `vendor-graficos` (o `recharts`, 76 KB comprimido).
+- **Movimento**: uma curva para o app inteiro (`cubic-bezier(0.2, 0, 0, 1)`, 150 ms por padrão no Tailwind);
+  `prefers-reduced-motion` desliga transições e animações; toque sem escala (`press-scale` por opacidade); saíram
+  os `transition-all` e `hover:shadow` que restavam no app (landing e super admin ficam para as fases deles).
 
 ## Decisões pendentes do dono
 

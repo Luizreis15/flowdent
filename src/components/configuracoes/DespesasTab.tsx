@@ -417,7 +417,7 @@ export const DespesasTab = ({ clinicaId }: DespesasTabProps) => {
                       key={color}
                       type="button"
                       onClick={() => setCategoryForm({ ...categoryForm, cor: color })}
-                      className={`w-8 h-8 rounded-full transition-all ${
+                      className={`w-8 h-8 rounded-full transition-colors ${
                         categoryForm.cor === color ? "ring-2 ring-offset-2 ring-primary" : ""
                       }`}
                       style={{ backgroundColor: color }}

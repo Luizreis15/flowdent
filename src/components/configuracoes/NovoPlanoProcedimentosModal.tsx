@@ -9,7 +9,6 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Percent, Plus, Upload, FileSpreadsheet } from "lucide-react";
-import * as XLSX from "xlsx";
 
 interface NovoPlanoProcedimentosModalProps {
   open: boolean;
@@ -56,6 +55,8 @@ export const NovoPlanoProcedimentosModal = ({
   };
 
   const parseFile = async (file: File): Promise<any[]> => {
+    // xlsx (~400 KB) carregado só ao ler a planilha
+    const XLSX = await import("xlsx");
     const ext = file.name.split(".").pop()?.toLowerCase();
 
     if (ext === "xlsx" || ext === "xls") {

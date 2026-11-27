@@ -1,7 +1,5 @@
 import { useCallback } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+// jspdf, jspdf-autotable e xlsx são carregados só no clique de exportar (antes vinham com a tela).
 import { toast } from "sonner";
 
 interface ExportColumn {
@@ -34,8 +32,9 @@ export const useRelatorioExport = () => {
     }
   }, []);
 
-  const exportToExcel = useCallback((data: Record<string, any>[], columns: ExportColumn[], fileName: string) => {
+  const exportToExcel = useCallback(async (data: Record<string, any>[], columns: ExportColumn[], fileName: string) => {
     try {
+      const XLSX = await import("xlsx");
       const sheetData = data.map((row) => {
         const obj: Record<string, any> = {};
         columns.forEach((c) => { obj[c.header] = row[c.key]; });
@@ -52,8 +51,9 @@ export const useRelatorioExport = () => {
     }
   }, []);
 
-  const exportToPDF = useCallback((data: Record<string, any>[], columns: ExportColumn[], fileName: string, title: string) => {
+  const exportToPDF = useCallback(async (data: Record<string, any>[], columns: ExportColumn[], fileName: string, title: string) => {
     try {
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
 

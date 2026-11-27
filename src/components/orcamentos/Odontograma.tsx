@@ -35,7 +35,7 @@ const ToothIcon = ({ selected, onClick, status }: { selected: boolean; onClick: 
       type="button"
       onClick={onClick}
       className={cn(
-        "relative w-7 h-9 sm:w-8 sm:h-10 transition-all press-scale flex-shrink-0",
+        "relative w-7 h-9 sm:w-8 sm:h-10 transition-colors press-scale flex-shrink-0",
         selected && "scale-110"
       )}
     >
@@ -44,19 +44,19 @@ const ToothIcon = ({ selected, onClick, status }: { selected: boolean; onClick: 
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className={cn(
-          "w-full h-full transition-all",
+          "w-full h-full transition-colors",
           selected ? "drop-shadow-lg" : "opacity-70 hover:opacity-100"
         )}
       >
         <path
           d="M12 2C8 2 4 4 4 8C4 10 4 14 4 18C4 22 6 30 12 30C18 30 20 22 20 18C20 14 20 10 20 8C20 4 16 2 12 2Z"
-          className={cn("transition-all", getStatusColor())}
+          className={cn("transition-colors", getStatusColor())}
           strokeWidth="2"
         />
         <path
           d="M10 8C10 8 10 12 10 14M14 8C14 8 14 12 14 14"
           className={cn(
-            "transition-all",
+            "transition-colors",
             selected ? "stroke-primary-foreground" : "stroke-muted-foreground"
           )}
           strokeWidth="1.5"

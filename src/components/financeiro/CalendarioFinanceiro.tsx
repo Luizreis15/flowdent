@@ -332,7 +332,7 @@ export const CalendarioFinanceiro = ({ clinicId }: CalendarioFinanceiroProps) =>
                   return (
                     <div
                       key={date.toISOString()}
-                      className={`min-h-[80px] md:min-h-[100px] border rounded-lg p-1 md:p-2 transition-all ${
+                      className={`min-h-[80px] md:min-h-[100px] border rounded-lg p-1 md:p-2 transition-colors ${
                         isToday(date) 
                           ? "bg-primary/10 border-primary ring-2 ring-primary/20" 
                           : hasOverdue 
